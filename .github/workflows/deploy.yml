@@ -8,9 +8,9 @@ on:
   workflow_dispatch:
     inputs:
       app:
-        description: App to deploy
+        description: App to deploy ("all" = site/docs/uptime; container apps deploy only by name)
         type: choice
-        options: [all, site, docs, uptime]
+        options: [all, site, docs, uptime, demo, demo-tasks]
         default: all
 
 jobs:
@@ -33,6 +33,15 @@ jobs:
           app="${{ inputs.app }}"
           for target in site docs uptime; do
             if [ "$app" = "all" ] || [ "$app" = "$target" ]; then
+              pnpm --filter "@fold-run/$target" run deploy
+            fi
+          done
+          # The container apps are deliberately NOT in "all": a deploy rolls
+          # the container, restarting the public demo gateway and clearing
+          # demo-tasks' in-memory job board. Deploy them by name, on purpose.
+          # (wrangler builds their Dockerfiles; ubuntu runners ship Docker.)
+          for target in demo demo-tasks; do
+            if [ "$app" = "$target" ]; then
               pnpm --filter "@fold-run/$target" run deploy
             fi
           done
