@@ -1,0 +1,25 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "fold-uptime",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-07-01",
+  "workers_dev": true,
+  "observability": {
+    "enabled": true
+  },
+  "triggers": {
+    "crons": ["*/5 * * * *"]
+  },
+  "durable_objects": {
+    "bindings": [{ "name": "MONITOR", "class_name": "UptimeMonitorDO" }]
+  },
+  "migrations": [
+    {
+      "tag": "v1",
+      "new_sqlite_classes": ["UptimeMonitorDO"]
+    }
+  ]
+  // Optional alerting: `wrangler secret put ALERT_WEBHOOK` with a Slack/Discord
+  // -compatible webhook URL; transitions (up→down after 2 consecutive
+  // failures, down→up) POST a JSON payload there.
+}

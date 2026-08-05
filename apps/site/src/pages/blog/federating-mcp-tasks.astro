@@ -1,0 +1,345 @@
+---
+// Every number and permalink below resolves to something a hostile reader
+// can click. Publish = site deploy.
+const title = 'Federating MCP tasks: affinity routing over opaque ids';
+const description =
+  'The MCP tasks extension standardized long-running work — and task ids outlive any session. Putting one gateway in front of N task-running servers forces an ownership problem, and the solution generalizes.';
+const SHA = '5173174afc90efb57f1ccae78cf59d6d3ab3a30a';
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title} · fold</title>
+    <meta name="description" content={description} />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <meta property="og:type" content="article" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+  </head>
+  <body>
+    <header class="wrap nav">
+      <a class="brand" href="/">
+        <img src="/favicon.svg" alt="" width="22" height="22" />
+        <span>fold</span>
+      </a>
+      <nav>
+        <a href="/#run">Run it</a>
+        <a href="https://docs.fold.run">Docs</a>
+        <a href="https://github.com/fold-run/fold">GitHub</a>
+      </nav>
+    </header>
+
+    <main class="wrap article">
+      <p class="kicker">2026-08-04 · engineering</p>
+      <h1>{title}</h1>
+
+      <p class="lede">
+        The MCP
+        <a href="https://modelcontextprotocol.io/seps/1686">tasks extension</a>
+        standardized long-running work: a tool call mints a task, and the
+        client polls it with nothing but an opaque id — across requests,
+        sessions, even processes. That's great news for clients — and a real
+        problem for anything <em>in the middle</em>. This post is about what
+        task ids do to a gateway fronting N task-running servers, and the
+        mechanism that solves it. Everything below ships in
+        <a href="https://github.com/fold-run/fold">fold</a>, the open-source
+        enterprise MCP gateway, and every claim links to the code.
+      </p>
+
+      <h2>The problem, concretely</h2>
+      <p>
+        fold presents many MCP servers as one governed virtual server: one
+        endpoint, one merged tool list, namespaced names
+        (<code>gh__create_pr</code>, <code>jobs__start_job</code>).
+      </p>
+      <pre class="term"><code>client ──▶ fold ──▶ github-tools   (platform team)
+                ├──▶ ml-search      (the acquisition)
+                └──▶ jobs           (task-minting batch server)
+
+tools/call jobs__start_job  ──▶ jobs mints "job-42"
+tasks/get  &#123; "job-42" &#125;     ──▶ ...which upstream owns this?</code></pre>
+      <p>
+        A client calls <code>jobs__start_job</code>; the task is born on the
+        jobs server and its id travels back through fold. Every later
+        <code>tasks/get</code>, <code>tasks/cancel</code>,
+        <code>tasks/result</code>, and <code>tasks/update</code> for that id
+        must reach that server — and the request carries nothing but the
+        opaque id. No namespaced tool name, no routing hint, and no session to
+        lean on: clients persist task ids and come back for them tomorrow, on
+        a fresh connection, possibly through a different gateway instance.
+      </p>
+
+      <h2>The answers that don't work</h2>
+      <p>
+        <strong>Rewriting the id</strong> — smuggling the owner into the id
+        the client sees — breaks every client that persists one the moment
+        your encoding changes, and turns an opaque protocol object into a
+        contract you now own forever. fold treats task ids exactly like
+        resource URIs: never rewritten.
+      </p>
+      <p>
+        <strong>Broadcasting every task call to all N upstreams</strong> costs
+        N× amplification on every poll, and it's a correctness bug, not just a
+        cost: <code>tasks/cancel</code> fanned out is a destructive write sent
+        to N−1 servers that never minted the task, and two upstreams can
+        independently mint colliding ids.
+      </p>
+      <p>
+        <strong>Punting to the client</strong> ("remember which server you
+        created it on") recreates the N×M topology sprawl the gateway exists
+        to remove — and it breaks outright when policy deliberately hides
+        topology from the client, which in an enterprise deployment it does.
+      </p>
+
+      <h2>The mechanism: an affinity index with a probe fallback</h2>
+      <p>
+        Ownership is <em>remembered</em> instead of encoded:
+      </p>
+      <ul>
+        <li>
+          <strong>Recorded at mint.</strong> A <code>tools/call</code> result
+          that advertises a task it created pins
+          <code>taskId → upstream</code> as it passes through, so the polls
+          that follow skip discovery entirely.
+        </li>
+        <li>
+          <strong>Probe fallback.</strong> A task fold never saw minted —
+          another gateway instance, an evicted record, an id shared
+          out-of-band — is located by fanning a <em>read-only</em>
+          <code>tasks/get</code> out once: the owner answers, everyone else is
+          a healthy "not mine". Mutating methods are never fanned out; fold
+          locates first, then acts on the owner alone.
+        </li>
+        <li>
+          <strong>Ownership is principal-bound.</strong> The mint records who
+          created the task. Another caller's <code>tasks/get</code> for that
+          id answers exactly like an unknown id — no existence leak, no probe
+          spent on it — and <code>tasks/list</code> merges every upstream but
+          shows each principal only its own tasks.
+        </li>
+        <li>
+          <strong>Honest misses.</strong> An id no upstream recognizes answers
+          <code>-32002</code>, and the owning upstream's own errors pass
+          through verbatim — the gateway stays invisible.
+        </li>
+      </ul>
+      <pre class="term"><code>// gateway/tasks.go — the poll path: affinity, then probe
+if v, ok := g.taskOwner.Load(taskID); ok &#123;
+  // a task minted for a different principal is answered exactly like
+  // an unknown id — the denial must not reveal existence
+  return u.callTask(ctx, method, raw)
+&#125;
+// Probe: read-only tasks/get across upstreams — the owner answers,
+// everyone else is a healthy "no". Never fan out a mutating method.
+owner := g.locateTaskOwner(ctx, rt, taskID)</code></pre>
+      <p class="src">
+        <a href={`https://github.com/fold-run/fold/blob/${SHA}/gateway/tasks.go#L148-L202`}>
+          gateway/tasks.go#L148 — the real thing, including the probe
+        </a>
+      </p>
+      <p>
+        Governance rides along for free: a task-creating call is a tool call,
+        so deny-by-default policy applies at mint, and every poll that follows
+        is an audit record like any other request.
+      </p>
+
+      <h2>What about fan-in?</h2>
+      <p>
+        The extension's companion story is <code>subscriptions/listen</code> —
+        one notification stream south, N streams north, merged. fold doesn't
+        implement it yet, and says so
+        <a href="https://github.com/fold-run/fold#not-implemented">in the README</a>
+        rather than in a footnote: the official Go SDK currently supports the
+        2026-07-28 protocol on its streamable HTTP server only in stateless
+        mode, and fold's session-keyed bridging (sampling, elicitation,
+        per-client streams) requires stateful sessions.
+      </p>
+      <p>
+        What ships today is the fan-in the protocol already exercises:
+        list-changed and resource-updated notifications from every upstream
+        fan out to the clients that care, proxied results are origin-tagged
+        (<code>_meta["run.fold/upstream"]</code>), and a
+        <a href={`https://github.com/fold-run/fold/blob/${SHA}/gateway/listen_test.go`}>
+          drift canary in the test suite</a>
+        fails the moment the SDK lifts the restriction — the gap closes when
+        it can, and CI notices before we do.
+      </p>
+
+      <h2>The transferable lesson</h2>
+      <p>
+        None of this is MCP-specific. Federating any protocol whose resources
+        outlive their transport reduces to the same shape: <strong>an
+        ownership index for stateful resources, recorded at mint, with a
+        read-only probe path for the records you'll inevitably miss.</strong>
+        Fronting N job APIs with one endpoint, aggregating webhooks, sharding
+        a queue behind a facade — same checklist:
+      </p>
+      <ul>
+        <li>Namespace what you own at the boundary; never rewrite identifiers clients persist.</li>
+        <li>Record ownership at mint time; keep a probe path for the records you'll inevitably miss.</li>
+        <li>Probe with reads, act with writes — never fan out a mutating method.</li>
+        <li>Bind ownership to the caller, and make a denial indistinguishable from a miss.</li>
+        <li>Fail closed on index misses, and audit them.</li>
+      </ul>
+
+      <h2>Try it</h2>
+      <p>
+        <code>go run github.com/fold-run/fold/cmd/fold@latest</code> — or
+        <code>docker run ghcr.io/fold-run/fold</code> — puts the gateway in
+        front of your servers in a minute
+        (<a href="https://docs.fold.run/run-it-locally/">walkthrough</a>).
+        The integration suite runs the whole story against real MCP servers
+        from the official Go SDK —
+        <a href={`https://github.com/fold-run/fold/blob/${SHA}/gateway/tasks_test.go`}>gateway/tasks_test.go</a>
+        is the receipts. <a href="https://docs.fold.run">docs.fold.run</a> ·
+        <a href="https://github.com/fold-run/fold">github.com/fold-run/fold</a>
+        (Apache-2.0). The conformance results are
+        <a href="https://docs.fold.run/conformance/">in CI, on every merge</a> —
+        check them.
+      </p>
+    </main>
+
+    <footer class="wrap foot">
+      <span>© fold.run · Apache-2.0</span>
+      <nav>
+        <a href="https://docs.fold.run">docs.fold.run</a>
+        <a href="https://github.com/fold-run/fold">github.com/fold-run/fold</a>
+      </nav>
+    </footer>
+  </body>
+</html>
+
+<style>
+  :root {
+    --bg: #0c0d12;
+    --panel: #12141c;
+    --line: #23263a;
+    --text: #e8e9f2;
+    --muted: #9a9db5;
+    --accent: #5560ff;
+    --accent-soft: #c4c8ff;
+    color-scheme: dark;
+  }
+  * {
+    box-sizing: border-box;
+    margin: 0;
+  }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font:
+      16px/1.65 ui-sans-serif,
+      system-ui,
+      sans-serif;
+  }
+  .wrap {
+    max-width: 44rem;
+    margin-inline: auto;
+    padding-inline: 1.25rem;
+  }
+  a {
+    color: var(--accent-soft);
+    text-decoration: none;
+  }
+  a:hover {
+    text-decoration: underline;
+  }
+  .nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-block: 1.1rem;
+    border-bottom: 1px solid var(--line);
+    max-width: 62rem;
+  }
+  .brand {
+    display: flex;
+    gap: 0.55rem;
+    align-items: center;
+    font-weight: 700;
+    font-size: 1.15rem;
+    color: var(--text);
+  }
+  .nav nav {
+    display: flex;
+    gap: 1.4rem;
+    font-size: 0.95rem;
+  }
+  .article {
+    padding-block: 3rem 4rem;
+  }
+  .kicker {
+    color: var(--muted);
+    font-family: ui-monospace, monospace;
+    font-size: 0.85rem;
+    margin-bottom: 0.9rem;
+  }
+  h1 {
+    font-size: clamp(1.7rem, 4.5vw, 2.3rem);
+    line-height: 1.15;
+    letter-spacing: -0.015em;
+    margin-bottom: 1.2rem;
+  }
+  h2 {
+    font-size: 1.35rem;
+    letter-spacing: -0.01em;
+    margin: 2.4rem 0 0.8rem;
+  }
+  p,
+  ul {
+    margin-bottom: 1rem;
+  }
+  .lede {
+    color: var(--muted);
+    font-size: 1.08rem;
+  }
+  ul {
+    padding-left: 1.2rem;
+  }
+  li {
+    margin-bottom: 0.5rem;
+  }
+  code {
+    font-family: ui-monospace, monospace;
+    font-size: 0.92em;
+    color: var(--accent-soft);
+  }
+  .term {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 0.7rem;
+    padding: 1rem 1.2rem;
+    overflow-x: auto;
+    font:
+      0.84rem/1.55 ui-monospace,
+      monospace;
+    color: var(--accent-soft);
+    margin: 1.2rem 0;
+  }
+  .term code {
+    font-size: 1em;
+  }
+  .src {
+    font-size: 0.85rem;
+    color: var(--muted);
+    margin-top: -0.6rem;
+  }
+  .foot {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+    padding-block: 1.6rem;
+    border-top: 1px solid var(--line);
+    color: var(--muted);
+    font-size: 0.9rem;
+    max-width: 62rem;
+  }
+  .foot nav {
+    display: flex;
+    gap: 1.2rem;
+  }
+</style>

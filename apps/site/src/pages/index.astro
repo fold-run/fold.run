@@ -1,0 +1,406 @@
+---
+const useCases = [
+  {
+    title: 'Unify a federation',
+    body: 'Acquisitions, child orgs, and teams each ship their own MCP servers — any language, any SDK. fold presents them as one virtual server with namespaced tools. No team rewrites anything.',
+  },
+  {
+    title: 'Draw the security boundary',
+    body: 'One choke point for authentication, deny-by-default tool allowlists, per-principal visibility, and an audit event for every request — including the denials.',
+  },
+  {
+    title: 'Discover upstreams automatically',
+    body: 'A team ships an MCP server, the registry lists it, and it appears behind the gateway — no config change. On Kubernetes, label a Service fold.run/upstream: "true" and fold-discovery does the rest.',
+  },
+  {
+    title: 'Run tasks across the federation',
+    body: 'Long-running work flows through fold: task polls and updates route to the server that owns the task — remembered at mint, or found by probe — and tasks/list merges every org, scoped per principal.',
+  },
+  {
+    title: 'Broker credentials',
+    body: 'Clients hold one token with fold as audience; fold exchanges it per upstream (RFC 8693) or injects service credentials. API keys never reach agents.',
+  },
+  {
+    title: 'Protect fragile services',
+    body: 'Response caching, global and per-upstream rate limits, and circuit breakers stand between agent traffic storms and your internal systems.',
+  },
+  {
+    title: 'Govern vendor MCP servers',
+    body: 'Put third-party and SaaS MCP endpoints behind your own auth, policy, and audit — instead of scattering per-user API keys across every client.',
+  },
+  {
+    title: 'Expose tools outward, carefully',
+    body: 'Offer partners a curated, policy-scoped subset of internal tools on one hardened endpoint — a single static binary, self-hosted in your VPC.',
+  },
+  {
+    title: 'Conformant, provably',
+    body: 'The official MCP conformance suite runs through fold on every merge — 40/40 checks, including sampling, elicitation, and subscriptions bridged through the gateway.',
+  },
+];
+
+const configSnippet = `<span class="c"># every team's servers, one governed endpoint</span>
+{
+  "upstreams": [
+    { "id": "github-tools", "url": "…", "namespace": "gh" },
+    { "id": "ml-search",    "url": "…", "namespace": "search",
+      "rateLimit": { "requestsPerMinute": 600 },
+      "circuitBreaker": { "failureThreshold": 5 } }
+  ],
+  "auth":   { "mode": "required", "…": "…" },
+  "policy": { "defaultDecision": "deny", "…": "…" }
+}`;
+
+const proof = [
+  ['40/40', 'official MCP conformance checks, run through the gateway on every merge'],
+  ['~0.2 ms', 'typical added p50 latency; CI gates every merge at < 5 ms'],
+  ['1 binary', 'static Go binary or ~22 MB distroless container, no local state'],
+  ['Apache-2.0', 'open source, on GitHub'],
+];
+
+const quickSnippet = `<span class="c"># one upstream, one governed endpoint — 60 seconds</span>
+$ go run github.com/fold-run/fold/cmd/fold@latest --config fold.config.json
+<span class="c"># or the container:</span>
+$ docker run -p 8080:8080 -e FOLD_CONFIG="$(cat fold.config.json)" ghcr.io/fold-run/fold
+<span class="c"># MCP endpoint: http://localhost:8080/mcp · health: /healthz · metrics: /metrics</span>`;
+
+const runOptions = [
+  {
+    ns: 'binary',
+    body: 'A single static Go binary — go install, or grab a prebuilt archive from GitHub releases. Linux and macOS, amd64 and arm64.',
+  },
+  {
+    ns: 'container',
+    body: 'ghcr.io/fold-run/fold — multi-arch and distroless, ~22 MB. Config injected as a file or straight through FOLD_CONFIG.',
+  },
+  {
+    ns: 'kubernetes',
+    body: 'A Helm chart with probes, HPA, and ServiceMonitor — plus fold-discovery, so labeled Services join the federation on their own.',
+  },
+];
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>fold — the enterprise MCP gateway</title>
+    <meta
+      name="description"
+      content="One governed endpoint between every MCP client and every MCP server. Federation, auth, policy, caching, and audit — built on the official MCP Go SDK."
+    />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="fold — the enterprise MCP gateway" />
+    <meta
+      property="og:description"
+      content="One governed endpoint between every MCP client and every MCP server. fold is the one. fold.run is the execution."
+    />
+  </head>
+  <body>
+    <header class="wrap nav">
+      <a class="brand" href="/">
+        <img src="/favicon.svg" alt="" width="22" height="22" />
+        <span>fold</span>
+      </a>
+      <nav>
+        <a href="#run">Run it</a>
+        <a href="https://docs.fold.run">Docs</a>
+        <a href="https://docs.fold.run/use-cases/">Use cases</a>
+        <a href="https://github.com/fold-run/fold">GitHub</a>
+      </nav>
+    </header>
+
+    <main>
+      <section class="wrap hero">
+        <p class="kicker">fold is the one. fold.run is the execution.</p>
+        <h1>The enterprise<br />MCP gateway.</h1>
+        <p class="lede">
+          One governed endpoint between every MCP client and every MCP server.
+          Federation, auth, policy, caching, and audit — built on the official
+          MCP Go SDK on both sides of the proxy.
+        </p>
+        <div class="actions">
+          <a class="btn primary" href="https://docs.fold.run/getting-started/">Get started</a>
+          <a class="btn" href="#run">Run it in 60 seconds</a>
+          <a class="btn" href="https://github.com/fold-run/fold">View source</a>
+        </div>
+        <pre class="term"><code set:html={configSnippet} /></pre>
+      </section>
+
+      <section class="wrap proof">
+        {proof.map(([n, label]) => (
+          <div class="stat">
+            <strong>{n}</strong>
+            <span>{label}</span>
+          </div>
+        ))}
+      </section>
+
+      <section class="wrap" id="run">
+        <h2>Run it in 60 seconds.</h2>
+        <p class="section-lede">
+          fold is a single static binary with no local state. One config file
+          in front of your first server, governance when you're ready.
+        </p>
+        <pre class="term"><code set:html={quickSnippet} /></pre>
+        <div class="grid demo-grid">
+          {runOptions.map((u) => (
+            <article class="card">
+              <h3><code>{u.ns}</code></h3>
+              <p>{u.body}</p>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section class="wrap">
+        <h2>One gateway. A family of problems.</h2>
+        <p class="section-lede">
+          Most deployments start with one of these and grow into the others —
+          they all ride the same config file.
+        </p>
+        <div class="grid">
+          {useCases.map((u) => (
+            <article class="card">
+              <h3>{u.title}</h3>
+              <p>{u.body}</p>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section class="wrap closing">
+        <h2>Start where it hurts.</h2>
+        <p class="section-lede">
+          A single passthrough upstream in front of your most-used server is
+          one config file away. Governance grows from there.
+        </p>
+        <div class="actions center">
+          <a class="btn primary" href="https://docs.fold.run/getting-started/">Read the docs</a>
+        </div>
+      </section>
+    </main>
+
+    <footer class="wrap foot">
+      <span>© fold.run · Apache-2.0</span>
+      <nav>
+        <a href="https://docs.fold.run">docs.fold.run</a>
+        <a href="https://github.com/fold-run/fold">github.com/fold-run/fold</a>
+        <a href="https://docs.fold.run/conformance/">Conformance</a>
+        <a href="/blog/federating-mcp-tasks/">Blog</a>
+      </nav>
+    </footer>
+  </body>
+</html>
+
+<style>
+  :root {
+    --bg: #0c0d12;
+    --panel: #12141c;
+    --line: #23263a;
+    --text: #e8e9f2;
+    --muted: #9a9db5;
+    --accent: #5560ff;
+    --accent-soft: #c4c8ff;
+    color-scheme: dark;
+  }
+  * {
+    box-sizing: border-box;
+    margin: 0;
+  }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font:
+      16px/1.6 ui-sans-serif,
+      system-ui,
+      sans-serif;
+  }
+  .wrap {
+    max-width: 62rem;
+    margin-inline: auto;
+    padding-inline: 1.25rem;
+  }
+  a {
+    color: var(--accent-soft);
+    text-decoration: none;
+  }
+  a:hover {
+    text-decoration: underline;
+  }
+
+  .nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-block: 1.1rem;
+    border-bottom: 1px solid var(--line);
+  }
+  .brand {
+    display: flex;
+    gap: 0.55rem;
+    align-items: center;
+    font-weight: 700;
+    font-size: 1.15rem;
+    color: var(--text);
+  }
+  .nav nav {
+    display: flex;
+    gap: 1.4rem;
+    font-size: 0.95rem;
+  }
+
+  .hero {
+    padding-block: 5rem 3.5rem;
+  }
+  .kicker {
+    color: var(--accent-soft);
+    font-family: ui-monospace, monospace;
+    font-size: 0.85rem;
+    letter-spacing: 0.04em;
+    margin-bottom: 1rem;
+  }
+  h1 {
+    font-size: clamp(2.4rem, 6vw, 3.8rem);
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+  }
+  .lede {
+    color: var(--muted);
+    max-width: 40rem;
+    margin-top: 1.2rem;
+    font-size: 1.1rem;
+  }
+  .actions {
+    display: flex;
+    gap: 0.8rem;
+    margin-top: 1.8rem;
+    flex-wrap: wrap;
+  }
+  .actions.center {
+    justify-content: center;
+  }
+  .btn {
+    display: inline-block;
+    padding: 0.6rem 1.15rem;
+    border: 1px solid var(--line);
+    border-radius: 0.55rem;
+    color: var(--text);
+    font-weight: 600;
+  }
+  .btn.primary {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+  }
+  .btn:hover {
+    text-decoration: none;
+    border-color: var(--accent);
+  }
+
+  .term {
+    margin-top: 2.6rem;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 0.7rem;
+    padding: 1.1rem 1.3rem;
+    overflow-x: auto;
+    font:
+      0.85rem/1.55 ui-monospace,
+      monospace;
+    color: var(--accent-soft);
+  }
+  .term .c {
+    color: var(--muted);
+  }
+
+  .proof {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+    gap: 1px;
+    background: var(--line);
+    border-block: 1px solid var(--line);
+    padding: 0;
+    max-width: 100%;
+  }
+  .stat {
+    background: var(--bg);
+    padding: 1.4rem 1.25rem;
+  }
+  .stat strong {
+    display: block;
+    font-size: 1.5rem;
+    color: var(--accent-soft);
+  }
+  .stat span {
+    color: var(--muted);
+    font-size: 0.88rem;
+  }
+
+  section.wrap {
+    padding-block: 3.5rem;
+  }
+  h2 {
+    font-size: 1.8rem;
+    letter-spacing: -0.01em;
+  }
+  .section-lede {
+    color: var(--muted);
+    margin-top: 0.5rem;
+    max-width: 38rem;
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(17rem, 1fr));
+    gap: 1rem;
+    margin-top: 2rem;
+  }
+  .card {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 0.7rem;
+    padding: 1.2rem 1.3rem;
+  }
+  .card h3 {
+    font-size: 1.02rem;
+    margin-bottom: 0.45rem;
+  }
+  .card p {
+    color: var(--muted);
+    font-size: 0.92rem;
+  }
+  .card h3 code {
+    font-family: ui-monospace, monospace;
+    color: var(--accent-soft);
+  }
+  .demo-grid {
+    grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+  }
+
+  .closing {
+    text-align: center;
+    border-top: 1px solid var(--line);
+  }
+  .closing .section-lede {
+    margin-inline: auto;
+  }
+  .closing .actions {
+    margin-top: 1.4rem;
+  }
+
+  .foot {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+    padding-block: 1.6rem;
+    border-top: 1px solid var(--line);
+    color: var(--muted);
+    font-size: 0.9rem;
+  }
+  .foot nav {
+    display: flex;
+    gap: 1.2rem;
+  }
+</style>

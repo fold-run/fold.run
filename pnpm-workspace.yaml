@@ -1,0 +1,14 @@
+packages:
+  - apps/*
+
+onlyBuiltDependencies:
+  - esbuild
+  - sharp
+  - workerd
+
+# Shared tooling versions (https://pnpm.io/catalogs).
+catalog:
+  typescript: ^7.0.2
+  '@biomejs/biome': ^2.5.6
+  wrangler: ^4.118.0
+  '@cloudflare/workers-types': ^5.20260801.1

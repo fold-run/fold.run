@@ -1,0 +1,17 @@
+/**
+ * fold.run — the marketing/landing site at the apex domain.
+ * Static-only build served via Workers Static Assets.
+ */
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "fold-site",
+  "compatibility_date": "2026-07-01",
+  "observability": { "enabled": true },
+  "assets": { "directory": "./dist", "not_found_handling": "single-page-application" },
+  // Custom domains: wrangler owns the DNS records + TLS for both hostnames
+  // (the stale apex A records were removed to make room).
+  "routes": [
+    { "pattern": "fold.run", "custom_domain": true },
+    { "pattern": "www.fold.run", "custom_domain": true }
+  ]
+}

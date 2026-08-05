@@ -1,0 +1,101 @@
+---
+title: Getting started
+description: Run fold in front of your first MCP servers in five minutes.
+---
+
+{/* Source: fold README § Quick start — curate, don't fork; keep in sync with github.com/fold-run/fold */}
+
+import { Steps, Tabs, TabItem } from '@astrojs/starlight/components';
+
+fold sits between MCP clients and any number of upstream MCP servers. This
+walkthrough federates two servers behind one endpoint.
+
+<Steps>
+
+1. **Get the binary**
+
+   fold is a single Go binary — no runtime to install. Any of the run
+   options in step 3 will fetch or build it for you; there's nothing to
+   set up first.
+
+2. **Describe your upstreams**
+
+   ```json
+   // fold.config.json
+   {
+     "upstreams": [
+       {
+         "id": "github-tools",
+         "url": "https://mcp.platform.acme.com/mcp",
+         "namespace": "gh",
+         "owner": { "org": "acme-platform", "team": "devex" }
+       },
+       {
+         "id": "ml-search",
+         "url": "https://mcp.ml.acquired-co.com/mcp",
+         "namespace": "search",
+         "owner": { "org": "acquired-co", "team": "ml" }
+       }
+     ]
+   }
+   ```
+
+   A single upstream without a `namespace` runs in passthrough mode (no
+   name rewriting). Multiple upstreams require namespaces; tools and
+   prompts surface as `{namespace}__{name}`. `fold --validate` checks a
+   config file, and `fold --schema` prints the JSON Schema for editor
+   completion and CI linting.
+
+3. **Run it**
+
+   <Tabs>
+     <TabItem label="Go">
+       ```bash
+       go run github.com/fold-run/fold/cmd/fold@latest --config fold.config.json --port 8080
+       # MCP endpoint: http://localhost:8080/mcp
+       # Binds 127.0.0.1 by default; pass --host 0.0.0.0 to expose beyond loopback.
+       ```
+
+       Or install it once: `go install github.com/fold-run/fold/cmd/fold@latest`.
+     </TabItem>
+     <TabItem label="Docker">
+       ```bash
+       docker run --rm -p 8080:8080 \
+         -e FOLD_CONFIG="$(cat fold.config.json)" \
+         ghcr.io/fold-run/fold:latest
+       ```
+
+       `FOLD_CONFIG` accepts either a file path or the JSON document itself
+       (convenient for container env injection) — mount `fold.config.json`
+       into the container and point `FOLD_CONFIG` at the mounted path
+       instead if you'd rather not inline it.
+     </TabItem>
+     <TabItem label="Release binary">
+       Prebuilt binaries for linux/darwin (amd64/arm64) are on the
+       [releases page](https://github.com/fold-run/fold/releases).
+
+       ```bash
+       tar -xzf fold_darwin_arm64.tar.gz
+       ./fold --config fold.config.json --port 8080
+       ```
+     </TabItem>
+   </Tabs>
+
+4. **Point a client at it**
+
+   Any MCP client connects to `/mcp` and sees one virtual server named
+   `fold` with every team's tools:
+
+   ```
+   gh__create_pr        (acme-platform / devex)
+   gh__get_issue
+   search__query        (acquired-co / ml)
+   ```
+
+5. **Turn on governance**
+
+   Add [`auth`, `policy`, and `audit` blocks](/configuration/) when you're
+   ready to require tokens, scope tools per team, and stream audit events —
+   then walk the [production checklist](/deployment/#production-checklist).
+
+</Steps>

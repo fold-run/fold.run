@@ -1,0 +1,4 @@
+
+> @fold-run/uptime@0.0.1 typecheck /Users/blake/Projects/fold/apps/uptime
+> tsc --noEmit
+

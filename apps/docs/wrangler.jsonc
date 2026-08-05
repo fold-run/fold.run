@@ -1,0 +1,16 @@
+/**
+ * fold docs — public documentation site at docs.fold.run.
+ *
+ * Static-only build: Starlight emits HTML+CSS+JS to `dist/`, served via
+ * Workers Static Assets. No worker entrypoint, no bindings — assets-only.
+ * `custom_domain: true` provisions DNS + TLS on deploy (zone must exist in
+ * the account and the API token must be scoped to it).
+ */
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "fold-docs",
+  "compatibility_date": "2026-07-01",
+  "observability": { "enabled": true },
+  "assets": { "directory": "./dist", "not_found_handling": "404-page" },
+  "routes": [{ "pattern": "docs.fold.run", "custom_domain": true }]
+}

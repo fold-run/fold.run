@@ -1,0 +1,38 @@
+# Manual deploys only — `pnpm --filter @fold-run/<app> deploy` from a laptop is
+# the primary path; this workflow is the same thing from the Actions tab.
+# Requires repo secrets CLOUDFLARE_API_TOKEN (zone-scoped for fold.run) and
+# CLOUDFLARE_ACCOUNT_ID.
+name: Deploy
+
+on:
+  workflow_dispatch:
+    inputs:
+      app:
+        description: App to deploy
+        type: choice
+        options: [all, site, docs, uptime]
+        default: all
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Deploy
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          set -euo pipefail
+          app="${{ inputs.app }}"
+          for target in site docs uptime; do
+            if [ "$app" = "all" ] || [ "$app" = "$target" ]; then
+              pnpm --filter "@fold-run/$target" deploy
+            fi
+          done

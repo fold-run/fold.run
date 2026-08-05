@@ -1,0 +1,20 @@
+{
+  "name": "fold-run-web",
+  "private": true,
+  "packageManager": "pnpm@10.33.2",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "build": "pnpm -r build",
+    "typecheck": "pnpm -r typecheck",
+    "lint": "biome check .",
+    "fmt": "biome check --write .",
+    "deploy": "pnpm -r deploy"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "catalog:",
+    "typescript": "catalog:"
+  },
+  "license": "Apache-2.0"
+}
