@@ -14,6 +14,7 @@ Day-2 reference: the endpoints a running gateway serves, every metric and audit 
 | `POST/GET /mcp` | always | The MCP endpoint (path configurable via `server.mcpPath`). |
 | `GET /healthz` | always | Pings every upstream concurrently (5 s internal budget); `503` when none is reachable. Detailed fields (URLs, owners, labels, error text) appear only when auth is disabled, so an unauthenticated caller on a public deployment cannot enumerate the federation. Multi-endpoint upstreams include a per-replica `endpoints` array with the balancer's rotation state. |
 | `GET /metrics` | always | Prometheus exposition (below). |
+| `GET /console/` | `server.console.enabled` | The read-only [console](/console/): dashboard assets, plus `GET /console/api/state`, which authenticates like `/mcp`. |
 | `GET /.well-known/oauth-protected-resource` | `auth.mode: required` | RFC 9728 resource metadata; announces the EMA extension when configured. |
 | `GET /.well-known/jwks.json` | EMA configured | fold's minting key. |
 | `POST /oauth/token` | EMA configured | The ID-JAG exchange endpoint — unauthenticated by design (the assertion is the credential) and rate limited (`auth.ema.tokenRateLimitPerMinute`). |

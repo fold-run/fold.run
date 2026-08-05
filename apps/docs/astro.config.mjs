@@ -50,6 +50,7 @@ export default defineConfig({
           items: [
             { label: 'Deployment', slug: 'deployment' },
             { label: 'Operations', slug: 'operations' },
+            { label: 'The console', slug: 'console' },
             { label: 'Discovery & Kubernetes', slug: 'discovery' },
             { label: 'Embedding in Go', slug: 'embedding' },
           ],
