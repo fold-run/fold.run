@@ -1,0 +1,32 @@
+/**
+ * fold-demo-tasks — the jobs__* upstream behind demo.fold.run.
+ *
+ * A singleton Cloudflare Container runs the Go MCP task server built from
+ * ./main.go (see Dockerfile). Same worker name as the retired TS version,
+ * so the workers.dev URL the demo gateway dials is unchanged.
+ */
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "fold-demo-tasks",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-07-01",
+  "observability": { "enabled": true },
+  "workers_dev": true,
+  "containers": [
+    {
+      "class_name": "TasksBoard",
+      "image": "./Dockerfile",
+      "instance_type": "lite",
+      "max_instances": 1
+    }
+  ],
+  "durable_objects": {
+    "bindings": [{ "name": "TASKS_BOARD", "class_name": "TasksBoard" }]
+  },
+  "migrations": [
+    {
+      "tag": "v1",
+      "new_sqlite_classes": ["TasksBoard"]
+    }
+  ]
+}

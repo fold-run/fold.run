@@ -46,6 +46,22 @@ importers:
         specifier: 'catalog:'
         version: 4.118.0(@cloudflare/workers-types@5.20260804.1)
 
+  apps/demo-tasks:
+    dependencies:
+      '@cloudflare/containers':
+        specifier: ^0.3.7
+        version: 0.3.7
+    devDependencies:
+      '@cloudflare/workers-types':
+        specifier: 'catalog:'
+        version: 5.20260804.1
+      typescript:
+        specifier: 'catalog:'
+        version: 7.0.2
+      wrangler:
+        specifier: 'catalog:'
+        version: 4.118.0(@cloudflare/workers-types@5.20260804.1)
+
   apps/docs:
     dependencies:
       '@astrojs/starlight':

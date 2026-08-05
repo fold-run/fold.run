@@ -1,0 +1,21 @@
+{
+  "name": "@fold-run/demo-tasks",
+  "version": "0.0.1",
+  "private": true,
+  "description": "The jobs__* upstream behind demo.fold.run: a Go MCP task server (official SDK) in a Cloudflare Container.",
+  "type": "module",
+  "scripts": {
+    "build": "go vet ./... && tsc --noEmit",
+    "typecheck": "tsc --noEmit",
+    "deploy": "wrangler deploy"
+  },
+  "dependencies": {
+    "@cloudflare/containers": "^0.3.7"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "catalog:",
+    "typescript": "catalog:",
+    "wrangler": "catalog:"
+  },
+  "license": "Apache-2.0"
+}

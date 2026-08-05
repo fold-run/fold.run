@@ -11,7 +11,7 @@ description: Walk through demo.fold.run — three public MCP servers behind one 
 |---|---|---|
 | `cfdocs__*` | Cloudflare's MCP docs server | A real third-party upstream |
 | `git__*` | GitMCP | A public 2025-era server on the session handshake — behind the gateway, just another namespace |
-| `jobs__*` | fold-demo-tasks | A task-minting server; where the [federated-tasks story](https://fold.run/blog/federating-mcp-tasks/) runs live |
+| `jobs__*` | fold-demo-tasks | A task-minting server (Go, on the official SDK); where the [federated-tasks story](https://fold.run/blog/federating-mcp-tasks/) runs live |
 
 Every example below is plain `curl`. Responses arrive as a one-event SSE body — read the `data:` line.
 
@@ -51,28 +51,34 @@ curl -s -X POST $DEMO -H "mcp-session-id: $SID" \
   -d '{"jsonrpc":"2.0","id":3,"method":"tools/call","params":{"name":"jobs__start_job","arguments":{"label":"my job","seconds":15}}}'
 ```
 
-The response is task-shaped and origin-tagged:
+The minted task rides the result's `_meta`, origin-tagged by the gateway:
 
 ```json
-{ "result": { "resultType": "task", "_meta": { "run.fold/upstream": "demo-tasks" }, "content": [] } }
+{ "result": {
+    "_meta": {
+      "task": { "taskId": "demo-job-2", "status": "working", "label": "my job", "remainingMs": 14999, "createdAt": "…" },
+      "pollIntervalMs": 1000,
+      "run.fold/upstream": "demo-tasks"
+    },
+    "content": [{ "type": "text", "text": "started demo-job-2 (\"my job\", 15s) — poll it with tasks/get" }] } }
 ```
 
-A task now exists on the jobs server, minted through the gateway — a tool call like any other, so deny-by-default policy would have applied at mint and the call is in the audit trail.
+Because the mint is visible in `_meta`, fold pinned `taskId → upstream` affinity as the response passed through — and a tool call is a tool call, so deny-by-default policy would have applied at mint and the call is in the audit trail.
 
-## 3. Find it and poll it — fold routes to the owner
+## 3. Poll it — fold routes to the owner
 
 ```bash
 curl -s -X POST $DEMO -H "mcp-session-id: $SID" \
   -H 'content-type: application/json' -H 'accept: application/json, text/event-stream' \
-  -d '{"jsonrpc":"2.0","id":4,"method":"tasks/list"}'
+  -d '{"jsonrpc":"2.0","id":4,"method":"tasks/get","params":{"taskId":"demo-job-2"}}'
 ```
 
-`tasks/list` fans out to every upstream and merges the result in task-id order — your job is in there as `demo-job-N`. Now poll it with nothing but that opaque id:
+`tasks/list` shows the merged view across the whole federation — your job in task-id order, with `_meta["run.fold/partialFailure"]` naming the two upstreams that don't speak tasks at all:
 
 ```bash
 curl -s -X POST $DEMO -H "mcp-session-id: $SID" \
   -H 'content-type: application/json' -H 'accept: application/json, text/event-stream' \
-  -d '{"jsonrpc":"2.0","id":5,"method":"tasks/get","params":{"taskId":"demo-job-N"}}'
+  -d '{"jsonrpc":"2.0","id":5,"method":"tasks/list"}'
 ```
 
 No tool name, no routing hint — fold resolves the owner from its affinity index, or by a read-only probe across upstreams for a task it never saw minted (try it: task ids survive sessions, so `tasks/get` from a brand-new session still finds the owner). Mutating methods are never fanned out; `tasks/cancel` and `tasks/result` locate first, then act on the owner alone. The mechanism is the subject of [the launch post](https://fold.run/blog/federating-mcp-tasks/).
@@ -100,7 +106,7 @@ The demo is assembled from one config — the same shape as any fold deployment 
   "upstreams": [
     { "id": "cf-docs",    "url": "https://docs.mcp.cloudflare.com/mcp", "namespace": "cfdocs" },
     { "id": "gitmcp",     "url": "https://gitmcp.io/docs",              "namespace": "git" },
-    { "id": "demo-tasks", "url": "https://…workers.dev/mcp",            "namespace": "jobs", "protocol": "2026-07-28" }
+    { "id": "demo-tasks", "url": "https://…workers.dev/mcp",            "namespace": "jobs" }
   ],
   "server": {
     "rateLimit": { "requestsPerMinute": 300 },
