@@ -67,7 +67,13 @@ export default {
   async fetch(request: Request, env: Env): Promise<Response> {
     const url = new URL(request.url);
     const stub = env.MONITOR.get(env.MONITOR.idFromName('monitor'));
-    if (url.pathname === '/status') return await stub.fetch('https://monitor.internal/status');
+    if (url.pathname === '/status') {
+      const res = await stub.fetch('https://monitor.internal/status');
+      // Public data, read cross-origin by the fold.run/status page.
+      const headers = new Headers(res.headers);
+      headers.set('access-control-allow-origin', '*');
+      return new Response(res.body, { status: res.status, headers });
+    }
     if (url.pathname === '/run' && request.method === 'POST') {
       return await stub.fetch('https://monitor.internal/run', { method: 'POST' });
     }
