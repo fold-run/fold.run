@@ -1,0 +1,189 @@
+---
+// The blog index. Add new posts to this list, newest first — each entry's
+// href must match a sibling .astro page in this directory.
+const posts = [
+  {
+    href: '/blog/federating-mcp-tasks/',
+    date: '2026-08-04',
+    title: 'Federating MCP tasks: affinity routing over opaque ids',
+    description:
+      'The MCP tasks extension standardized long-running work — and task ids outlive any session. Putting one gateway in front of N task-running servers forces an ownership problem, and the solution generalizes.',
+  },
+];
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Blog · fold</title>
+    <meta
+      name="description"
+      content="Engineering notes from fold, the enterprise MCP gateway — federation, governance, and what a stateless protocol does to the thing in the middle."
+    />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Blog · fold" />
+    <meta
+      property="og:description"
+      content="Engineering notes from fold, the enterprise MCP gateway."
+    />
+  </head>
+  <body>
+    <header class="wrap nav">
+      <a class="brand" href="/">
+        <img src="/favicon.svg" alt="" width="22" height="22" />
+        <span>fold</span>
+      </a>
+      <nav>
+        <a href="/#run">Run it</a>
+        <a href="https://docs.fold.run">Docs</a>
+        <a href="https://github.com/fold-run/fold">GitHub</a>
+      </nav>
+    </header>
+
+    <main class="wrap article">
+      <h1>Blog</h1>
+      <p class="lede">
+        Engineering notes from fold — federation, governance, and what a
+        stateless protocol does to the thing in the middle.
+      </p>
+
+      <ul class="posts">
+        {posts.map((p) => (
+          <li>
+            <p class="kicker">{p.date} · engineering</p>
+            <h2><a href={p.href}>{p.title}</a></h2>
+            <p class="desc">{p.description}</p>
+          </li>
+        ))}
+      </ul>
+    </main>
+
+    <footer class="wrap foot">
+      <span>© fold.run · Apache-2.0</span>
+      <nav>
+        <a href="https://docs.fold.run">docs.fold.run</a>
+        <a href="https://github.com/fold-run/fold">github.com/fold-run/fold</a>
+      </nav>
+    </footer>
+  </body>
+</html>
+
+<style>
+  :root {
+    --bg: #0c0d12;
+    --panel: #12141c;
+    --line: #23263a;
+    --text: #e8e9f2;
+    --muted: #9a9db5;
+    --accent: #5560ff;
+    --accent-soft: #c4c8ff;
+    color-scheme: dark;
+  }
+  * {
+    box-sizing: border-box;
+    margin: 0;
+  }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font:
+      16px/1.65 ui-sans-serif,
+      system-ui,
+      sans-serif;
+  }
+  .wrap {
+    max-width: 44rem;
+    margin-inline: auto;
+    padding-inline: 1.25rem;
+  }
+  a {
+    color: var(--accent-soft);
+    text-decoration: none;
+  }
+  a:hover {
+    text-decoration: underline;
+  }
+  .nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-block: 1.1rem;
+    border-bottom: 1px solid var(--line);
+    max-width: 62rem;
+  }
+  .brand {
+    display: flex;
+    gap: 0.55rem;
+    align-items: center;
+    font-weight: 700;
+    font-size: 1.15rem;
+    color: var(--text);
+  }
+  .nav nav {
+    display: flex;
+    gap: 1.4rem;
+    font-size: 0.95rem;
+  }
+  .article {
+    padding-block: 3rem 4rem;
+  }
+  h1 {
+    font-size: clamp(1.7rem, 4.5vw, 2.3rem);
+    line-height: 1.15;
+    letter-spacing: -0.015em;
+    margin-bottom: 1.2rem;
+  }
+  .lede {
+    color: var(--muted);
+    font-size: 1.08rem;
+    margin-bottom: 2.4rem;
+  }
+  .posts {
+    list-style: none;
+    padding: 0;
+  }
+  .posts li {
+    border-top: 1px solid var(--line);
+    padding-block: 1.6rem;
+  }
+  .kicker {
+    color: var(--muted);
+    font-family: ui-monospace, monospace;
+    font-size: 0.85rem;
+    margin-bottom: 0.5rem;
+  }
+  .posts h2 {
+    font-size: 1.25rem;
+    letter-spacing: -0.01em;
+    margin-bottom: 0.5rem;
+  }
+  .posts h2 a {
+    color: var(--text);
+  }
+  .posts h2 a:hover {
+    color: var(--accent-soft);
+    text-decoration: none;
+  }
+  .desc {
+    color: var(--muted);
+    font-size: 0.95rem;
+  }
+  .foot {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+    padding-block: 1.6rem;
+    border-top: 1px solid var(--line);
+    color: var(--muted);
+    font-size: 0.9rem;
+    max-width: 62rem;
+  }
+  .foot nav {
+    display: flex;
+    gap: 1.2rem;
+  }
+</style>
