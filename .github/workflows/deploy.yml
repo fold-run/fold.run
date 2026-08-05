@@ -33,6 +33,6 @@ jobs:
           app="${{ inputs.app }}"
           for target in site docs uptime; do
             if [ "$app" = "all" ] || [ "$app" = "$target" ]; then
-              pnpm --filter "@fold-run/$target" deploy
+              pnpm --filter "@fold-run/$target" run deploy
             fi
           done

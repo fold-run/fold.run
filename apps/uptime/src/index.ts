@@ -109,6 +109,17 @@ export class UptimeMonitorDO implements DurableObject {
   }
 
   async #runChecks(): Promise<void> {
+    // Prune state for targets that no longer exist (e.g. removed from TARGETS
+    // in a deploy) — the DO outlives the target list that wrote it.
+    const known = new Set(TARGETS.map((t) => t.id));
+    for (const id of [...this.#targets.keys()]) {
+      if (!known.has(id)) {
+        this.#targets.delete(id);
+        await this.#state.storage.delete(`target:${id}`);
+        await this.#state.storage.delete(`history:${id}`);
+      }
+    }
+
     const results = await Promise.all(TARGETS.map(async (t) => ({ t, r: await checkTarget(t) })));
     for (const { t, r } of results) {
       const prev: TargetState = this.#targets.get(t.id) ?? {

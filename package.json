@@ -10,7 +10,7 @@
     "typecheck": "pnpm -r typecheck",
     "lint": "biome check .",
     "fmt": "biome check --write .",
-    "deploy": "pnpm -r deploy"
+    "deploy": "pnpm -r run deploy"
   },
   "devDependencies": {
     "@biomejs/biome": "catalog:",

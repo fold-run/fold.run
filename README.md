@@ -27,9 +27,10 @@ Each app deploys independently with wrangler (Cloudflare Workers static assets, 
 already attached to the workers `fold-site`, `fold-docs`, `fold-uptime`):
 
 ```bash
-pnpm --filter @fold-run/site deploy
-pnpm --filter @fold-run/docs deploy
-pnpm --filter @fold-run/uptime deploy
+# note the `run` — pnpm's built-in `deploy` command shadows the script name
+pnpm --filter @fold-run/site run deploy
+pnpm --filter @fold-run/docs run deploy
+pnpm --filter @fold-run/uptime run deploy
 ```
 
 ## License
