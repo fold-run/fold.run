@@ -14,7 +14,7 @@ const FOLD_CONFIG = {
   upstreams: [
     { id: 'cf-docs', url: 'https://docs.mcp.cloudflare.com/mcp', namespace: 'cfdocs' },
     { id: 'gitmcp', url: 'https://gitmcp.io/docs', namespace: 'git' },
-    { id: 'demo-tasks', url: 'https://fold-demo-tasks.bauman.workers.dev/mcp', namespace: 'jobs' },
+    { id: 'demo-tasks', url: 'https://tasks.fold.run/mcp', namespace: 'jobs' },
   ],
   server: {
     allowedHosts: ['demo.fold.run', 'fold-demo.bauman.workers.dev'],

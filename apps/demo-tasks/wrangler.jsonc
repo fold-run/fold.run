@@ -28,5 +28,6 @@
       "tag": "v1",
       "new_sqlite_classes": ["TasksBoard"]
     }
-  ]
+  ],
+  "routes": [{ "pattern": "tasks.fold.run", "custom_domain": true }]
 }

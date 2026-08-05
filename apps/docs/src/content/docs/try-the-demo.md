@@ -106,7 +106,7 @@ The demo is assembled from one config — the same shape as any fold deployment 
   "upstreams": [
     { "id": "cf-docs",    "url": "https://docs.mcp.cloudflare.com/mcp", "namespace": "cfdocs" },
     { "id": "gitmcp",     "url": "https://gitmcp.io/docs",              "namespace": "git" },
-    { "id": "demo-tasks", "url": "https://…workers.dev/mcp",            "namespace": "jobs" }
+    { "id": "demo-tasks", "url": "https://tasks.fold.run/mcp",          "namespace": "jobs" }
   ],
   "server": {
     "rateLimit": { "requestsPerMinute": 300 },
