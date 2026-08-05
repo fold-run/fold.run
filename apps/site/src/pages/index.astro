@@ -57,6 +57,28 @@ const proof = [
   ['Apache-2.0', 'open source, on GitHub'],
 ];
 
+const demoSnippet = `<span class="c"># three public MCP servers, one governed endpoint — no signup, no key</span>
+https://demo.fold.run/mcp
+tools/list           → cfdocs__* · git__* · jobs__*
+jobs__start_job      → mints a task on the jobs server
+tasks/get            → routed to the owner — carrying nothing but the id
+/console             → the federation, live (read-only)`;
+
+const demoUpstreams = [
+  {
+    ns: 'cfdocs',
+    body: "Cloudflare's public docs MCP server — a real third-party upstream, governed and namespaced like any internal one.",
+  },
+  {
+    ns: 'git',
+    body: 'GitMCP — a public 2025-era server on the session handshake. Behind the gateway it is just another namespace.',
+  },
+  {
+    ns: 'jobs',
+    body: 'A task-minting demo server. Start a job, then poll it with nothing but the task id — fold routes every poll to the owner.',
+  },
+];
+
 const quickSnippet = `<span class="c"># one upstream, one governed endpoint — 60 seconds</span>
 $ go run github.com/fold-run/fold/cmd/fold@latest --config fold.config.json
 <span class="c"># or the container:</span>
@@ -104,6 +126,7 @@ const runOptions = [
         <span>fold</span>
       </a>
       <nav>
+        <a href="#demo">Live demo</a>
         <a href="#run">Run it</a>
         <a href="https://docs.fold.run">Docs</a>
         <a href="https://docs.fold.run/use-cases/">Use cases</a>
@@ -122,7 +145,7 @@ const runOptions = [
         </p>
         <div class="actions">
           <a class="btn primary" href="https://docs.fold.run/getting-started/">Get started</a>
-          <a class="btn" href="#run">Run it in 60 seconds</a>
+          <a class="btn" href="#demo">Try the live demo</a>
           <a class="btn" href="https://github.com/fold-run/fold">View source</a>
         </div>
         <pre class="term"><code set:html={configSnippet} /></pre>
@@ -135,6 +158,25 @@ const runOptions = [
             <span>{label}</span>
           </div>
         ))}
+      </section>
+
+      <section class="wrap" id="demo">
+        <h2>See it live.</h2>
+        <p class="section-lede">
+          demo.fold.run federates three public MCP servers behind one
+          endpoint — the unmodified release binary, governed by its own
+          config. Point any MCP client at it. Rate-limited, unauthenticated,
+          no warranty; live status on <a href="/status/">/status</a>.
+        </p>
+        <pre class="term"><code set:html={demoSnippet} /></pre>
+        <div class="grid demo-grid">
+          {demoUpstreams.map((u) => (
+            <article class="card">
+              <h3><code>{u.ns}__*</code></h3>
+              <p>{u.body}</p>
+            </article>
+          ))}
+        </div>
       </section>
 
       <section class="wrap" id="run">
