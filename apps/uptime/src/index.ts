@@ -22,9 +22,11 @@ interface Target {
 const TARGETS: Target[] = [
   { id: 'site', kind: 'http', url: 'https://fold.run' },
   { id: 'docs', kind: 'http', url: 'https://docs.fold.run' },
-  // A real JSON-RPC round trip (initialize), not just a 200 — we monitor
-  // the protocol, not the port.
+  // Real JSON-RPC round trips (initialize), not just a 200 — we monitor
+  // the protocol, not the port. Checking the tasks upstream directly also
+  // separates "gateway down" from "upstream down" when demo alerts fire.
   { id: 'demo', kind: 'mcp-init', url: 'https://demo.fold.run/mcp' },
+  { id: 'demo-tasks', kind: 'mcp-init', url: 'https://tasks.fold.run/mcp' },
 ];
 
 const FAILURES_BEFORE_DOWN = 2;
