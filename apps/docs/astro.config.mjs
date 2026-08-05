@@ -61,6 +61,7 @@ export default defineConfig({
             { label: 'Architecture', slug: 'architecture' },
             { label: 'Security model', slug: 'security' },
             { label: 'Conformance', slug: 'conformance' },
+            { label: 'Benchmarks', slug: 'benchmarks' },
             { label: 'Defaults', slug: 'defaults' },
           ],
         },
