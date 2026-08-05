@@ -1,0 +1,22 @@
+{
+  "name": "@fold-run/demo",
+  "version": "0.0.1",
+  "private": true,
+  "description": "demo.fold.run — the public fold gateway: the real Go binary in a Cloudflare Container, federating three public MCP servers.",
+  "type": "module",
+  "scripts": {
+    "build": "tsc --noEmit",
+    "typecheck": "tsc --noEmit",
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy"
+  },
+  "dependencies": {
+    "@cloudflare/containers": "^0.3.7"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "catalog:",
+    "typescript": "catalog:",
+    "wrangler": "catalog:"
+  },
+  "license": "Apache-2.0"
+}

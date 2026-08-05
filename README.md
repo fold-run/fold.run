@@ -6,7 +6,8 @@ Web properties for [fold](https://github.com/fold-run/fold), the enterprise MCP 
 | --- | --- | --- |
 | [`apps/site`](apps/site) | [fold.run](https://fold.run) | Astro, Cloudflare Workers static assets |
 | [`apps/docs`](apps/docs) | [docs.fold.run](https://docs.fold.run) | Astro + Starlight (serves `/llms.txt`) |
-| [`apps/uptime`](apps/uptime) | cron Worker | HTTP uptime checks + webhook alerts |
+| [`apps/uptime`](apps/uptime) | cron Worker | HTTP + MCP-ping uptime checks, webhook alerts |
+| [`apps/demo`](apps/demo) | [demo.fold.run](https://demo.fold.run/mcp) | The real fold binary in a Cloudflare Container, federating three public MCP servers |
 
 The gateway itself lives in [fold-run/fold](https://github.com/fold-run/fold); that repo's README is the
 source of truth for features and configuration — docs pages here curate it, they don't fork it.

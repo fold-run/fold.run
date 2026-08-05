@@ -1,7 +1,8 @@
 /**
  * fold-uptime — cron monitor for the public fold.run properties.
  *
- * Every 5 minutes: HTTP checks on the site and docs. State lives in one
+ * Every 5 minutes: HTTP checks on the site and docs, plus an MCP initialize
+ * round trip against the demo gateway. State lives in one
  * Durable Object; /status serves the latest snapshot; an optional
  * ALERT_WEBHOOK secret receives a POST on every state transition (down
  * after 2 consecutive failures, and recovery).
@@ -14,15 +15,16 @@ export interface Env {
 
 interface Target {
   id: string;
-  kind: 'http';
+  kind: 'http' | 'mcp-init';
   url: string;
 }
 
-// TODO: restore an MCP-level ping (JSON-RPC round trip) when a public
-// gateway endpoint exists again.
 const TARGETS: Target[] = [
   { id: 'site', kind: 'http', url: 'https://fold.run' },
   { id: 'docs', kind: 'http', url: 'https://docs.fold.run' },
+  // A real JSON-RPC round trip (initialize), not just a 200 — we monitor
+  // the protocol, not the port.
+  { id: 'demo', kind: 'mcp-init', url: 'https://demo.fold.run/mcp' },
 ];
 
 const FAILURES_BEFORE_DOWN = 2;
@@ -45,9 +47,35 @@ async function checkTarget(
 ): Promise<{ ok: boolean; latencyMs: number; error?: string }> {
   const started = Date.now();
   try {
-    const res = await fetch(target.url, { signal: AbortSignal.timeout(CHECK_TIMEOUT_MS) });
+    const res =
+      target.kind === 'mcp-init'
+        ? await fetch(target.url, {
+            method: 'POST',
+            headers: {
+              'content-type': 'application/json',
+              accept: 'application/json, text/event-stream',
+            },
+            body: JSON.stringify({
+              jsonrpc: '2.0',
+              id: 1,
+              method: 'initialize',
+              params: {
+                protocolVersion: '2026-07-28',
+                capabilities: {},
+                clientInfo: { name: 'fold-uptime', version: '1' },
+              },
+            }),
+            signal: AbortSignal.timeout(CHECK_TIMEOUT_MS),
+          })
+        : await fetch(target.url, { signal: AbortSignal.timeout(CHECK_TIMEOUT_MS) });
     const latencyMs = Date.now() - started;
     if (!res.ok) return { ok: false, latencyMs, error: `HTTP ${res.status}` };
+    if (target.kind === 'mcp-init') {
+      const body = await res.text();
+      if (!body.includes('"serverInfo"')) {
+        return { ok: false, latencyMs, error: 'no initialize result in response' };
+      }
+    }
     return { ok: true, latencyMs };
   } catch (error) {
     return {

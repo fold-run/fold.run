@@ -1,0 +1,35 @@
+/**
+ * demo.fold.run — the public fold playground.
+ *
+ * A singleton Cloudflare Container runs the real fold binary
+ * (ghcr.io/fold-run/fold, pinned in the Dockerfile); the Worker routes every
+ * request to that one instance so fold's session-keyed client side works.
+ * Config is embedded in src/index.ts (FOLD_CONFIG env). Rate-limited,
+ * unauthenticated, no warranty — governance is fold's own (300 req/min).
+ */
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "fold-demo",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-07-01",
+  "observability": { "enabled": true },
+  "workers_dev": true,
+  "containers": [
+    {
+      "class_name": "FoldDemo",
+      "image": "./Dockerfile",
+      "instance_type": "basic",
+      "max_instances": 1
+    }
+  ],
+  "durable_objects": {
+    "bindings": [{ "name": "FOLD_DEMO", "class_name": "FoldDemo" }]
+  },
+  "migrations": [
+    {
+      "tag": "v1",
+      "new_sqlite_classes": ["FoldDemo"]
+    }
+  ],
+  "routes": [{ "pattern": "demo.fold.run", "custom_domain": true }]
+}

@@ -10,7 +10,8 @@ pnpm workspace (`apps/*`), Node >= 22, all apps deploy to Cloudflare Workers:
 
 - `apps/site` — marketing site at fold.run. Plain Astro, static-only build served via Workers Static Assets (worker `fold-site`).
 - `apps/docs` — docs.fold.run. Astro + Starlight, with `starlight-llms-txt` emitting `/llms.txt` + `/llms-full.txt`. Static-only, no worker entrypoint (worker `fold-docs`). Content is markdown/MDX in `apps/docs/src/content/docs/`; the sidebar is defined in `apps/docs/astro.config.mjs` — new pages must be added there.
-- `apps/uptime` — cron Worker (`fold-uptime`, every 5 min) in a single file, `apps/uptime/src/index.ts`. HTTP checks on site and docs; state in one Durable Object (`UptimeMonitorDO`, SQLite-backed); `/status` serves a JSON snapshot; optional `ALERT_WEBHOOK` secret gets a POST on up↔down transitions (down = 2 consecutive failures). Targets are the hardcoded `TARGETS` list; the DO prunes state for targets removed from that list.
+- `apps/uptime` — cron Worker (`fold-uptime`, every 5 min) in a single file, `apps/uptime/src/index.ts`. HTTP checks on site and docs plus an MCP initialize round trip against the demo; state in one Durable Object (`UptimeMonitorDO`, SQLite-backed); `/status` serves a JSON snapshot (CORS-open, rendered by the site's `/status` page); optional `ALERT_WEBHOOK` secret gets a POST on up↔down transitions (down = 2 consecutive failures). Targets are the hardcoded `TARGETS` list; the DO prunes state for targets removed from that list.
+- `apps/demo` — demo.fold.run: the unmodified fold Go binary (image pinned in `apps/demo/Dockerfile`) in a **Cloudflare Container** behind worker `fold-demo`. A single named instance preserves fold's session-keyed clients; the federation config is inline in `apps/demo/src/index.ts` (`FOLD_CONFIG` env). Deploying needs local Docker running.
 
 ## Commands
 
