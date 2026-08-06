@@ -185,41 +185,20 @@ const jsonld = {
   }
   .targets {
     list-style: none;
-    padding: 0 0 0 28px;
-    margin: 0;
+    padding: 0;
     display: grid;
-    gap: var(--spacing-md);
-    position: relative;
-  }
-  .targets:not(:empty)::before {
-    /* the shared route: every monitored property hangs off one fold-line */
-    content: '';
-    position: absolute;
-    left: 0;
-    top: 12px;
-    bottom: 12px;
-    border-left: 1px solid var(--color-trace);
+    gap: 1px;
+    background: var(--color-trace);
+    border: 1px solid var(--color-trace);
   }
   .target {
-    background: var(--color-rack);
-    border: 1px solid var(--color-trace);
-    border-radius: var(--radius-lg);
-    padding: var(--spacing-md) var(--spacing-lg);
+    background: var(--color-bg);
     display: flex;
+    justify-content: space-between;
     align-items: center;
     gap: var(--spacing-md);
+    padding: var(--spacing-md) var(--spacing-lg);
     flex-wrap: wrap;
-    position: relative;
-  }
-  .target::before {
-    /* fold-line connector notch from the rail into the row */
-    content: '';
-    position: absolute;
-    left: -28px;
-    top: 50%;
-    width: 26px;
-    height: 0;
-    border-top: 1px solid var(--color-trace);
   }
   .target .name {
     font-family: var(--mono-font-family);
@@ -270,17 +249,23 @@ const jsonld = {
   /* ===== responsive (page-specific) ===== */
   @media (max-width: 640px) {
     .targets {
-      padding-left: 0;
-    }
+    list-style: none;
+    padding: 0;
+    display: grid;
+    gap: 1px;
+    background: var(--color-trace);
+    border: 1px solid var(--color-trace);
+  }
     .targets::before,
-    .target::before {
-      display: none;
-    }
-    .target {
-      flex-direction: column;
-      align-items: flex-start;
-      gap: var(--spacing-sm);
-    }
+      .target {
+    background: var(--color-bg);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--spacing-md);
+    padding: var(--spacing-md) var(--spacing-lg);
+    flex-wrap: wrap;
+  }
     .target .name {
       margin-right: 0;
     }

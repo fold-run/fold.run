@@ -221,17 +221,66 @@ const { title, description, canonical, jsonld, current, template } = Astro.props
         border-top: 1px solid var(--color-trace);
       }
 
-      /* buttons */
+      /* buttons: sharp, label left, arrow right */
       .btn {
         display: inline-flex;
         align-items: center;
-        gap: 8px;
+        justify-content: space-between;
+        gap: 40px;
+        min-width: 220px;
+        min-height: 48px;
         font: 600 var(--body) / 1 var(--body-font-family);
-        border-radius: var(--radius);
-        padding: 12px 20px;
+        border-radius: 0;
+        padding: 0 16px;
         transition:
           background-color 0.18s cubic-bezier(0.25, 1, 0.5, 1),
           border-color 0.18s cubic-bezier(0.25, 1, 0.5, 1);
+      }
+      .btn::after {
+        content: '\2192';
+        font-weight: 400;
+      }
+      .arrow-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-weight: 600;
+      }
+      .arrow-link::after {
+        content: '\2192';
+        color: var(--color-accent);
+      }
+      /* flush tile grids: hairline gutters */
+      .tile-grid {
+        display: grid;
+        gap: 1px;
+        background: var(--color-trace);
+        border: 1px solid var(--color-trace);
+      }
+      .tile-grid > * {
+        background: var(--color-bg);
+        border: 0;
+        border-radius: 0;
+        padding: var(--spacing-lg);
+        margin: 0;
+      }
+      a.tile {
+        position: relative;
+        display: block;
+        color: var(--color-fg);
+        min-height: 160px;
+      }
+      a.tile:hover {
+        background: var(--color-rack);
+        text-decoration: none;
+      }
+      a.tile::after {
+        content: '\2192';
+        position: absolute;
+        right: var(--spacing-lg);
+        bottom: var(--spacing-md);
+        color: var(--color-accent);
+        font-size: 1.25rem;
       }
       .btn-primary {
         background: var(--color-accent);
@@ -303,7 +352,10 @@ const { title, description, canonical, jsonld, current, template } = Astro.props
         color: var(--color-fg);
       }
       header.site .btn {
-        padding: 9px 16px;
+        min-width: auto;
+        min-height: 36px;
+        gap: 12px;
+        padding: 0 14px;
         font-size: var(--body-sm);
       }
 
@@ -312,12 +364,14 @@ const { title, description, canonical, jsonld, current, template } = Astro.props
         border-top: 1px solid var(--color-trace);
         padding-block: var(--spacing-xl);
       }
-      .foot-grid {
+      footer.site .wrap.foot-grid {
         display: grid;
-        grid-template-columns: 2fr 1fr 1fr 1fr;
+        grid-template-columns: minmax(240px, 1.4fr) repeat(3, auto);
+        justify-content: space-between;
         align-items: start;
-        gap: var(--spacing-xl);
-        padding-bottom: var(--spacing-lg);
+        column-gap: var(--spacing-xl);
+        row-gap: var(--spacing-lg);
+        padding-bottom: var(--spacing-xl);
       }
       .foot-brand .brandmark-sm {
         display: inline-flex;
@@ -332,8 +386,9 @@ const { title, description, canonical, jsonld, current, template } = Astro.props
         margin-top: var(--spacing-sm);
       }
       @media (max-width: 768px) {
-        .foot-grid {
+        footer.site .wrap.foot-grid {
           grid-template-columns: 1fr 1fr;
+          justify-content: stretch;
           gap: var(--spacing-lg);
         }
         .foot-brand {
@@ -503,8 +558,8 @@ const { title, description, canonical, jsonld, current, template } = Astro.props
     <footer class="site" data-section="footer" data-intent="navigate" data-layout="contained" data-canon>
       <div class="wrap foot-grid">
         <div class="foot-brand">
-          <span class="brandmark-sm" aria-hidden="true">
-            <svg width="24" height="24" viewBox="0 0 28 28">
+          <span class="brandmark-sm">
+            <svg width="24" height="24" viewBox="0 0 28 28" aria-hidden="true">
               <rect x="1.5" y="1.5" width="25" height="25" rx="2" fill="#12141c" stroke="#23263a" stroke-width="1.5"
               ></rect>
               <path d="M 3 25 L 25 3" stroke="#23263a" stroke-width="1.5" stroke-dasharray="3.5 3.5" fill="none"
