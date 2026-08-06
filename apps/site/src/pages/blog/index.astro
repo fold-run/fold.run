@@ -102,15 +102,15 @@ const jsonld = {
   .posts {
     list-style: none;
     display: grid;
-    gap: 1px;
-    background: var(--color-trace);
-    border: 1px solid var(--color-trace);
+    gap: var(--spacing-md);
     padding: 0;
     display: grid;
     gap: var(--spacing-xl);
   }
   .post-row {
-    background: var(--color-bg);
+    background: var(--color-rack);
+    border: 1px solid var(--color-trace);
+    border-radius: var(--radius);
     padding: var(--spacing-lg);
   }
   .post-meta {
@@ -141,11 +141,12 @@ const jsonld = {
 
   /* ===== closing: compact Route drench (subordinated to the index h1) ===== */
   .closing :focus-visible {
-    outline-color: var(--color-bg);
+    outline-color: var(--color-accent);
   }
   .closing {
-    background: var(--color-accent);
-    border-top: none;
+    background: #0d0e12;
+    border-top: 1px solid var(--color-trace);
+    
     padding-block: 48px;
   }
   .closing .wrap {
@@ -154,20 +155,19 @@ const jsonld = {
     justify-items: start;
   }
   .closing h2 {
-    color: var(--color-bg);
+    color: var(--color-fg);
     font-size: clamp(1.5rem, 2.4vw, 1.9rem);
   }
   .closing p {
-    color: var(--color-bg);
-    opacity: 0.92;
-    max-width: 56ch;
+    color: var(--color-static);
+        max-width: 56ch;
   }
   .closing .btn-primary {
-    background: var(--color-bg);
-    color: var(--color-carrier);
+    background: var(--color-accent);
+    color: #0c0d0d;
   }
   .closing .btn-primary:hover {
-    background: #1c1f2b;
+    background: #00cc88;
   }
 
   /* ===== responsive (page-specific) ===== */

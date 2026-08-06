@@ -31,11 +31,16 @@ const jsonld = {
   <main id="main">
     <section
       class="hero"
+      data-glow="true"
       data-section="hero"
       data-intent="value proposition + show the topology"
       data-layout="split-media"
       data-media="image"
     >
+      <div class="hero-field" aria-hidden="true">
+        <span class="glow glow-a"></span>
+        <span class="glow glow-b"></span>
+      </div>
       <div class="wrap">
         <div>
           <p class="kicker">
@@ -92,10 +97,10 @@ const jsonld = {
                 width="68"
                 height="64"
                 rx="2"
-                fill="#12141c"
-                stroke="#d9a441"
+                fill="#131415"
+                stroke="#00E599"
                 stroke-width="1.5"></rect>
-              <path d="M 314 186 V 176 A 2 2 0 0 0 306 168 H 296 Z" fill="#d9a441"></path>
+              <path d="M 314 186 V 176 A 2 2 0 0 0 306 168 H 296 Z" fill="#00E599"></path>
               <text class="fold-node-label" x="280" y="204" text-anchor="middle" font-weight="700"
                 >fold</text
               >
@@ -327,12 +332,12 @@ const jsonld = {
             <svg width="40" height="40" viewBox="0 0 40 40" aria-hidden="true">
               <path
                 d="M 4 8 C 16 8, 16 20, 24 20 M 4 20 H 24 M 4 32 C 16 32, 16 20, 24 20"
-                stroke="#666d9e"
+                stroke="#71717A"
                 stroke-width="1.5"
                 stroke-dasharray="4 3"
                 fill="none"></path>
-              <path d="M 24 20 H 36" stroke="#d9a441" stroke-width="2" fill="none"></path>
-              <path d="M 32 16 L 37 20 L 32 24 Z" fill="#d9a441"></path>
+              <path d="M 24 20 H 36" stroke="#00E599" stroke-width="2" fill="none"></path>
+              <path d="M 32 16 L 37 20 L 32 24 Z" fill="#00E599"></path>
             </svg>
             <h3>Federate</h3>
           </div>
@@ -368,11 +373,11 @@ const jsonld = {
           <div class="cluster-rail">
             <!-- glyph: route through a notched gate -->
             <svg width="40" height="40" viewBox="0 0 40 40" aria-hidden="true">
-              <path d="M 4 20 H 16" stroke="#666d9e" stroke-width="1.5" stroke-dasharray="4 3" fill="none"
+              <path d="M 4 20 H 16" stroke="#71717A" stroke-width="1.5" stroke-dasharray="4 3" fill="none"
               ></path>
               <path d="M 18 10 v 20 M 23 12 v 16" stroke="#c4c8ff" stroke-width="1.5"></path>
-              <path d="M 25 20 H 36" stroke="#d9a441" stroke-width="2" fill="none"></path>
-              <path d="M 32 16 L 37 20 L 32 24 Z" fill="#d9a441"></path>
+              <path d="M 25 20 H 36" stroke="#00E599" stroke-width="2" fill="none"></path>
+              <path d="M 32 16 L 37 20 L 32 24 Z" fill="#00E599"></path>
             </svg>
             <h3>Govern</h3>
           </div>
@@ -405,10 +410,10 @@ const jsonld = {
           <div class="cluster-rail">
             <!-- glyph: route with gauge ticks -->
             <svg width="40" height="40" viewBox="0 0 40 40" aria-hidden="true">
-              <path d="M 4 20 H 36" stroke="#d9a441" stroke-width="2" fill="none"></path>
-              <path d="M 12 14 v 5 M 20 12 v 7 M 28 14 v 5" stroke="#666d9e" stroke-width="1.5"
+              <path d="M 4 20 H 36" stroke="#00E599" stroke-width="2" fill="none"></path>
+              <path d="M 12 14 v 5 M 20 12 v 7 M 28 14 v 5" stroke="#71717A" stroke-width="1.5"
               ></path>
-              <path d="M 12 26 v -3 M 20 28 v -5 M 28 26 v -3" stroke="#666d9e" stroke-width="1.5"
+              <path d="M 12 26 v -3 M 20 28 v -5 M 28 26 v -3" stroke="#71717A" stroke-width="1.5"
               ></path>
             </svg>
             <h3>Operate</h3>
@@ -489,11 +494,88 @@ const jsonld = {
       }, 1800);
     });
   }
+
+  {
+    const hero = document.querySelector('[data-glow]');
+    const fine = matchMedia('(pointer: fine)');
+    const calm = matchMedia('(prefers-reduced-motion: reduce)');
+    if (hero && fine.matches && !calm.matches) {
+      let raf = 0;
+      hero.addEventListener('pointermove', (e) => {
+        if (raf) return;
+        raf = requestAnimationFrame(() => {
+          const r = hero.getBoundingClientRect();
+          hero.style.setProperty('--mx', String((e.clientX - r.left) / r.width - 0.5));
+          hero.style.setProperty('--my', String((e.clientY - r.top) / r.height - 0.5));
+          raf = 0;
+        });
+      });
+      hero.addEventListener('pointerleave', () => {
+        hero.style.setProperty('--mx', '0');
+        hero.style.setProperty('--my', '0');
+      });
+    }
+  }
 </script>
 
 <style is:global>
   /* ===== hero ===== */
+  .hero {
+    position: relative;
+    overflow: hidden;
+  }
+  .hero-field {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    transform: translate3d(calc(var(--mx, 0) * 28px), calc(var(--my, 0) * 20px), 0);
+    transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .glow {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(90px);
+  }
+  .glow-a {
+    width: 560px;
+    height: 420px;
+    right: -6%;
+    top: 4%;
+    background: radial-gradient(closest-side, rgba(0, 229, 153, 0.2), transparent 70%);
+  }
+  .glow-b {
+    width: 420px;
+    height: 360px;
+    left: 30%;
+    bottom: -22%;
+    background: radial-gradient(closest-side, rgba(37, 157, 244, 0.1), transparent 70%);
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .glow-a {
+      animation: drift-a 14s ease-in-out infinite alternate;
+    }
+    .glow-b {
+      animation: drift-b 18s ease-in-out infinite alternate;
+    }
+    @keyframes drift-a {
+      to {
+        transform: translate3d(-40px, 26px, 0);
+      }
+    }
+    @keyframes drift-b {
+      to {
+        transform: translate3d(48px, -20px, 0);
+      }
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .hero-field {
+      transition: none;
+      transform: none;
+    }
+  }
   .hero .wrap {
+    position: relative;
     display: grid;
     grid-template-columns: 7fr 5fr;
     gap: var(--spacing-xl);
@@ -595,9 +677,7 @@ const jsonld = {
   .proof .wrap {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
-    gap: 1px;
-    background: var(--color-trace);
-    border: 1px solid var(--color-trace);
+    gap: var(--spacing-md);
     padding: 0;
     max-width: calc(var(--max-width) - 2.5rem);
   }
@@ -605,6 +685,9 @@ const jsonld = {
     padding-block: 40px;
   }
   .stat {
+    background: var(--color-rack);
+    border: 1px solid var(--color-trace);
+    border-radius: var(--radius);
     position: relative;
     display: block;
     background: var(--color-bg);
@@ -651,11 +734,12 @@ const jsonld = {
   .termini {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-    gap: 1px;
-    background: var(--color-trace);
-    border: 1px solid var(--color-trace);
+    gap: var(--spacing-md);
   }
   .terminus {
+    background: var(--color-rack);
+    border: 1px solid var(--color-trace);
+    border-radius: var(--radius);
     background: var(--color-rack);
     border: 1px solid var(--color-trace);
     border-radius: var(--radius-lg);
@@ -751,12 +835,12 @@ const jsonld = {
     margin-top: var(--spacing-xl);
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-    gap: 1px;
-    background: var(--color-trace);
-    border: 1px solid var(--color-trace);
+    gap: var(--spacing-md);
   }
   .path {
-    background: var(--color-bg);
+    background: var(--color-rack);
+    border: 1px solid var(--color-trace);
+    border-radius: var(--radius);
     padding: var(--spacing-lg);
   }
   .path h3 {
@@ -785,14 +869,15 @@ const jsonld = {
   .cluster {
     display: grid;
     grid-template-columns: 220px 1fr 1fr 1fr;
-    gap: 1px;
-    background: var(--color-trace);
-    border: 1px solid var(--color-trace);
+    gap: var(--spacing-md);
   }
   .cluster + .cluster {
-    margin-top: -1px;
+    margin-top: var(--spacing-md);
   }
   .cluster-rail {
+    background: var(--color-rack);
+    border: 1px solid var(--color-trace);
+    border-radius: var(--radius);
     background: var(--color-rack);
     padding: var(--spacing-lg);
   }
@@ -807,7 +892,9 @@ const jsonld = {
     display: contents;
   }
   .problem {
-    background: var(--color-bg);
+    background: var(--color-rack);
+    border: 1px solid var(--color-trace);
+    border-radius: var(--radius);
     padding: var(--spacing-lg);
   }
   .problem h4 {
@@ -821,11 +908,12 @@ const jsonld = {
 
   /* ===== closing: the Route drench ===== */
   .closing :focus-visible {
-    outline-color: var(--color-bg);
+    outline-color: var(--color-accent);
   }
   .closing {
-    background: var(--color-accent);
-    border-top: none;
+    background: #0d0e12;
+    border-top: 1px solid var(--color-trace);
+    
     padding-block: 80px;
   }
   .closing .wrap {
@@ -834,20 +922,19 @@ const jsonld = {
     justify-items: start;
   }
   .closing h2 {
-    color: var(--color-bg);
+    color: var(--color-fg);
     font-size: clamp(2rem, 4vw, 3rem);
   }
   .closing p {
-    color: var(--color-bg);
-    opacity: 0.92;
-    max-width: 56ch;
+    color: var(--color-static);
+        max-width: 56ch;
   }
   .closing .btn-primary {
-    background: var(--color-bg);
-    color: var(--color-carrier);
+    background: var(--color-accent);
+    color: #0c0d0d;
   }
   .closing .btn-primary:hover {
-    background: #1c1f2b;
+    background: #00cc88;
   }
 
   /* ===== responsive (page-specific) ===== */
