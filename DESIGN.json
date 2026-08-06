@@ -1,13 +1,13 @@
 {
   "_provenance": {
-    "writtenBy": "stardust:direct/add-variant",
-    "writtenAt": "2026-08-06T15:50:01.505Z",
-    "stardustVersion": "0.2.0"
+    "writtenBy": "impeccable",
+    "writtenAt": "2026-08-06T23:59:00Z",
+    "note": "final identity \u2014 clean rewrite; prior variants in git history"
   },
   "schemaVersion": 2,
   "extensions": {
     "colorMeta": {
-      "format": "hex (brand-faithful retention; see divergence.brand_faithful_inversions)",
+      "format": "hex",
       "roles": [
         {
           "name": "Backplane",
@@ -17,353 +17,112 @@
         {
           "name": "Rack",
           "hex": "#131415",
-          "use": "panels, cards, code surfaces"
+          "use": "cards, panels, code surfaces"
         },
         {
           "name": "Trace",
           "hex": "#242628",
-          "use": "hairlines, borders, fold-line diagram strokes"
+          "use": "hairlines, borders, diagram strokes"
         },
         {
           "name": "Signal",
           "hex": "#FAFAFA",
-          "use": "primary text on dark"
+          "use": "primary text"
         },
         {
           "name": "Static",
           "hex": "#94979E",
-          "use": "muted text; lifted from captured #9a9db5 for AA headroom"
+          "use": "muted text"
         },
         {
-          "name": "Paper",
-          "hex": "#ffffff",
-          "use": "docs light-theme ground only"
+          "name": "Carrier",
+          "hex": "#C9CBCF",
+          "use": "links, badges, kicker meta"
         },
         {
-          "name": "Up",
+          "name": "Live",
           "hex": "#00E599",
-          "use": "RESERVED: live status ok"
+          "use": "primary actions (ink text), active routes, status-up, arrows, focus"
+        },
+        {
+          "name": "Live Deep",
+          "hex": "#00cc88",
+          "use": "hover depth"
+        },
+        {
+          "name": "Pulse",
+          "hex": "#34D59A",
+          "use": "soft accent in graphics only"
+        },
+        {
+          "name": "Live Ink",
+          "hex": "#1d7f5c",
+          "use": "docs light-theme text accent (4.95:1 on Paper)"
         },
         {
           "name": "Down",
           "hex": "#ff4c79",
-          "use": "RESERVED: live status down"
-        },
-        {
-          "name": "Brass",
-          "hex": "#d9a441",
-          "use": "primary actions (ink text), active diagram paths, focus rings"
-        },
-        {
-          "name": "Brass Deep",
-          "hex": "#a87c1f",
-          "use": "hover/active depth"
-        },
-        {
-          "name": "Brass Soft",
-          "hex": "#ecd9a8",
-          "use": "links, badges, kickers"
+          "use": "RESERVED: status failures"
         }
       ]
     },
     "typographyMeta": {
+      "families": "IBM Plex Sans + Geist Mono (OFL, self-hosted)",
       "scale": {
         "kind": "modular",
-        "ratio": 1.25,
-        "name": "major-third"
+        "ratio": 1.25
       },
-      "families": "IBM Plex Sans + Geist Mono (both OFL, self-hosted) \u2014 user reference re-direct 2026-08-06",
-      "earnedMonoRule": "mono blocks must contain runnable or live content"
-    },
-    "shadows": {
-      "dark": "none (background-step + Trace hairlines)",
-      "docsLight": "Starlight minimal only"
+      "earnedMonoRule": "mono content must be runnable or live"
     },
     "motion": {
-      "budget": "sparse; one orchestrated reveal max per page; diagram path-draw allowed",
+      "heroGlow": "pointer-tracked aurora field; rAF-throttled CSS vars; idle drift; pointer:fine gated; static under prefers-reduced-motion",
       "easing": "ease-out-quart",
-      "reducedMotion": "every animation ships a prefers-reduced-motion fallback"
+      "reducedMotion": "every animation ships a fallback"
     },
     "breakpoints": {
-      "strategy": "fluid-first (clamp + auto-fit grids)",
+      "strategy": "fluid-first",
       "checkAt": [390, 768, 1024, 1440]
-    },
-    "componentStyle": {
-      "buttons": {
-        "primary": {
-          "background": "#d9a441",
-          "color": "#0c0d0d",
-          "borderRadius": "2px",
-          "padding": "12px 20px",
-          "fontWeight": 700,
-          "hover": "background #a87c1f"
-        },
-        "secondary": {
-          "background": "transparent",
-          "border": "1px solid #242628",
-          "color": "#C9CBCF",
-          "borderRadius": "2px",
-          "hover": "border-color #C9CBCF"
-        }
-      },
-      "dualCTAPattern": "primary-then-secondary-outline (upgraded from captured primary-then-plain-link)",
-      "cards": {
-        "background": "#131415",
-        "border": "1px solid #242628",
-        "borderRadius": "2px",
-        "padding": "20px 24px",
-        "shadow": null
-      },
-      "inputs": {
-        "background": "#131415",
-        "border": "1px solid #242628",
-        "borderRadius": "2px",
-        "focusRing": "0 0 0 2px #00E599"
-      }
     },
     "systemComponentRoles": {
       "header": {
-        "purpose": "single site chrome across both origins",
-        "positionClass": "top; sticky on docs, static on marketing",
-        "constraint": "wordmark + 5 links + one Get started primary; identical link set everywhere"
+        "constraint": "mark + Docs-first nav + pill CTA; identical on both origins"
       },
       "footer": {
-        "purpose": "single footer across both origins",
-        "positionClass": "bottom",
-        "constraint": "wordmark, license line, full link set (docs/GitHub/Conformance/Blog/Status) on every page"
+        "constraint": "brand column + Product/Deploy/Project + legal strip; every page"
       },
       "code-panel": {
-        "purpose": "signature operational surface",
-        "positionClass": "in-flow",
-        "constraint": "earned-mono rule; copy affordance; context tag"
+        "constraint": "earned-mono; context tag; copy affordance"
       },
       "topology-diagram": {
-        "purpose": "signature brand imagery; fold-line vocabulary",
-        "positionClass": "hero band / architecture sections",
-        "constraint": "authored SVG only; aria-label describes topology; active path in Route"
-      },
-      "status-readout": {
-        "purpose": "live proof surface",
-        "positionClass": "status page + compact status chip in footer",
-        "constraint": "Up/Down colors reserved here; timestamps carry timezone"
+        "constraint": "authored SVG, fold-line vocabulary, aria-label; active path in Live"
       },
       "proof-band": {
-        "purpose": "stats with receipts",
-        "positionClass": "below hero",
-        "constraint": "every number links to its source or carries its caveat inline"
+        "constraint": "every number links to its receipt or carries its caveat inline"
+      },
+      "status-readout": {
+        "constraint": "Live/Down semantics; live hydration; timezone on timestamps"
       }
+    },
+    "identityAssets": {
+      "mark": "square tile + Live folded corner + Live-Deep crease (favicon.svg, apple-touch-icon.png, inline chrome SVGs, og.png)",
+      "ogImage": "https://fold.run/og.png (1200x630)"
     },
     "voice": {
-      "examples": {
-        "do": [
-          "The enterprise MCP gateway.",
-          "See it live.",
-          "Start where it hurts.",
-          "Run it in 60 seconds.",
-          "One governed endpoint between every MCP client and every MCP server."
-        ],
-        "dont": [
-          "Supercharge your MCP infrastructure!",
-          "Enterprise-grade, world-class gateway solutions",
-          "Blazingly fast. Infinitely scalable. Beautifully simple.",
-          "Welcome to the future of AI tool federation"
-        ]
-      },
       "rules": [
-        "Banned marketing adjectives (toolkit 7.1): artisanal/crafted/premium/curated/seamless family",
-        "No exclamation points (toolkit 7.2; captured corpus has zero)",
-        "New-authored copy prefers periods and colons over em-dashes (impeccable house rule); captured body copy is preserved as content",
-        "Expand 'MCP' once per page on first use (Model Context Protocol) \u2014 Jordan fix",
+        "Banned marketing adjectives; no exclamation points",
+        "New copy prefers periods and colons over em-dashes; captured copy preserved",
+        "Expand MCP once per page on first use",
         "Every stat carries caveat or receipt-link inline"
-      ]
-    },
-    "iaPriorities": [
-      {
-        "signal": "proof-affordance",
-        "evidence": "pages/home.json: hero links to live demo; stat band carries conformance 40/40 + latency; /status is open JSON; user constraint 'preserve proof-forward architecture'",
-        "preserveAs": "first-viewport prominence for the live-demo path and proof band on home; status/conformance reachable from every footer",
-        "scope": "site-wide"
-      }
-    ],
-    "divergence": {
-      "toolkit_version": "v1.0 (stardust v2)",
-      "mode": "A (brand-faithful) + B (anchor references) + C (ground override)",
-      "seed": {
-        "input": "fold|2026-08-06",
-        "md5": "88898549f3a79ba1a1d21c13233d962d",
-        "decade": "2025-now",
-        "craft": "Tailor's pattern paper",
-        "register": "Travel agency brochure (route-map structural metaphor only; vocabulary cosplay banned)",
-        "ground_family": "dark",
-        "picked_by": "mixed",
-        "overrides": [
-          {
-            "dimension": "decade",
-            "picked_by": "anchor-reference: konghq.com + infisical.com (current-era dev-infra)",
-            "would_be": "1990s"
-          },
-          {
-            "dimension": "ground_family",
-            "picked_by": "brand-faithful (Mode C)",
-            "reason": "brand-faithful",
-            "would_be": "stark-white"
-          }
-        ]
-      },
-      "font_deck": {
-        "name": "custom: archivo + martian-mono",
-        "picked_by": "user-refinement 2026-08-06",
-        "note": "Mode A type pin overridden by brand owner; selection ran the brand.md procedure (brand words: machined/exact/load-bearing); neither face on the reflex-reject list; Martian Mono is bauhaus-functional-deck-adjacent"
-      },
-      "palette_source": {
-        "source": "inherited from stardust/current/_brand-extraction.json",
-        "picked_by": "user-constraint",
-        "note": "role-renamed brand-native per toolkit \u00a74; Static lifted for AA; Route Deep promoted from captured docs accent to unified tonal ramp"
-      },
-      "anti_toolbox_count": 4,
-      "anti_toolbox_hits": [
-        {
-          "move": "Monospace used for body microcopy / metadata as a load-bearing device",
-          "justification": "fold is a wire-protocol gateway; every mono block is a real runnable command, live status value, or captured config from the product itself. Critique: 'monospace is earned, not costume'. The earned-mono rule makes the justification enforceable."
-        },
-        {
-          "move": "Stat-callout bar",
-          "justification": "the captured home trust bar is made of live receipts (conformance 40/40 links to the harness, Apache-2.0 is the license, latency links to benchmarks). Improvements #4 requires the latency caveat inline \u2014 the bar survives because its numbers are provable, which would not transfer to an arbitrary brand."
-        },
-        {
-          "move": "Dark mode editorial palette family (ink ground + soft text + one saturated accent)",
-          "justification": "inherited, not chosen: color-scheme:dark and this exact palette are the captured brand surface. Dark is literal for a terminal-native gateway, and Mode A pins it."
-        },
-        {
-          "move": "Sticky top navigation",
-          "justification": "docs.fold.run (Starlight) already ships a sticky header; the unified chrome inherits the docs convention rather than introducing stickiness. Marketing pages remain static-header."
-        }
-      ],
-      "off_toolbox_moves": [
-        {
-          "move": "Fold-line diagram vocabulary (tailor's pattern paper: dashed fold/cut lines, notch marks, grain arrows) as the site's entire imagery system",
-          "why_off_toolbox": "brand-literal: the product is named fold, and the diagrams show where N routes fold into one governed endpoint. Could not transfer unchanged to any other brand."
-        },
-        {
-          "move": "Route-map pipeline structure (request journey client \u2192 authn \u2192 policy \u2192 cache \u2192 upstream as an annotated route)",
-          "why_off_toolbox": "the register metaphor maps to the product's literal architecture \u2014 routing is what a gateway does; the blog's affinity-routing post already speaks this language."
-        },
-        {
-          "move": "Live status semantics as reserved first-class palette roles (Up/Down)",
-          "why_off_toolbox": "derived from the brand's own /status surface; reserving them enforces that proof colors never become decoration."
-        }
-      ],
-      "audit_adjustments": [],
-      "references_used": [
-        {
-          "source": "konghq.com",
-          "trend": "committed brand color across marketing\u2192docs continuum; enterprise trust signals below developer proof",
-          "tag": "off-toolbox (calibration, not lift)"
-        },
-        {
-          "source": "infisical.com",
-          "trend": "terminal/code surfaces as first-class design elements on a dark ground",
-          "tag": "in-toolbox (matches captured brand; inherited, not introduced)"
-        }
-      ],
-      "brand_faithful_inversions": [
-        "Color tokens retained in hex format (matches captured brand surface and DESIGN.md Stitch frontmatter convention). OKLCH applies to new authoring; this is inheritance.",
-        "Saturated #00E599 retained as the primary brand color (existing canonical accent of fold.run). The agent-default reflex toward tinted-neutral primaries is inverted per brand-faithful direction.",
-        "#ffffff (Paper) retained as the docs light-theme ground (existing Starlight decision; unified layer restyles hues/type, not the light ground). The 'no pure white' rule is inverted per brand-faithful direction.",
-        "Up #00E599 / Down #ff4c79 retained as reserved colors for live status semantics only (existing /status decision). The agent-default reflex to spread accents across the system is inverted; see divergence-toolkit \u00a7 color reservation.",
-        "SUPERSEDED 2026-08-06: type inheritance (system stacks) replaced by user re-direct \u2014 Archivo + Martian Mono. The kicker keeps its mono treatment (now Martian Mono) as the single named kicker."
-      ],
-      "variant": {
-        "id": "C",
-        "role": "user reference re-direct",
-        "note": "green/ink palette, IBM Plex Sans + Geist Mono, pill CTAs, rounded card surfaces, pointer-tracked hero glow field. Colors and character derived from a user-provided reference by observation; implemented natively (no third-party code or licensed assets copied). IBM Plex is on the reflex-reject list but is the explicit user requirement here."
-      }
-    },
-    "metadata": {
-      "siteName": "fold",
-      "defaultOgImage": "to-be-authored: 1200\u00d7630 fold wordmark card (improvements #1)",
-      "themeColor": {
-        "dark": "#0c0d0d",
-        "light": "#ffffff"
-      },
-      "locale": "en"
-    },
-    "canon": {
-      "author": "home (approved 2026-08-06)",
-      "extractedAt": "2026-08-06T16:24:36.993Z",
-      "files": [
-        {
-          "path": "stardust/canon/header.html",
-          "sha": "7f7591f"
-        },
-        {
-          "path": "stardust/canon/footer.html",
-          "sha": "da2d5ee"
-        },
-        {
-          "path": "stardust/canon/skip-link.html",
-          "sha": "4648c22"
-        },
-        {
-          "path": "stardust/canon/canon.css",
-          "sha": "b5ba78d"
-        },
-        {
-          "path": "stardust/canon/modules/cta-band.html",
-          "sha": "3cf67e3"
-        },
-        {
-          "path": "stardust/canon/modules/proof-band.html",
-          "sha": "57c441b"
-        }
-      ],
-      "pinned": {
-        "sectionPadding.desktop": "64px",
-        "sectionPadding.tablet": "48px",
-        "sectionPadding.mobile": "32px",
-        "densityTier": "balanced",
-        "typeScale": 1.25,
-        "lineHeights.display": 1.02,
-        "lineHeights.body": 1.6,
-        "radius": "0-2px machined",
-        "fonts": "Archivo + Martian Mono (self-hosted at migrate)"
-      },
-      "compositionalMoves": [
-        "Dashed strokes are reserved for fold-line semantics (routes, rails, connectors); decorative separators are solid Trace.",
-        "One Route-filled primary per viewport; header CTA is secondary-outline.",
-        "Proof band sits tight (40px) between hero and first content band; closing drench breathes (80px on landing, 48px on interior templates with h2 subordinated to the page h1).",
-        "Interior pages hang list content off a vertical fold-line rail with a terminus notch.",
-        "Every stat links to its receipt or carries its caveat inline."
       ]
     }
   },
   "narrative": {
-    "northStar": "Same proof-forward machined system, warmed: brass instruments on ink, one type skeleton for prose and wire.",
-    "overview": "Brand-faithful amplification of the existing terminal-native dark system: same palette (renamed to brand-native roles), same system type (committed to an 800-weight display and a major-third scale), unified across both origins, with the fold-line drawing vocabulary as the new ownable signature.",
-    "keyCharacteristics": [
-      "proof surfaces as visual centerpieces",
-      "fold-line diagrams (dashed routes, notch marks, grain arrows)",
-      "one indigo (Route) on two grounds (Backplane / Paper)",
-      "earned monospace, flat elevation, hairline construction"
-    ],
+    "northStar": "The gateway that proves itself: one governed endpoint, one live-green thread of proof through near-black instrument panels.",
     "rules": [
-      "Every number has a receipt or a caveat",
-      "One CTA verb per destination; Get started is the canonical docs verb",
-      "Diagrams are authored SVG in the fold-line vocabulary; no stock anything",
-      "Docs and marketing consume the same tokens; divergence is a bug"
-    ],
-    "dos": [
-      "Route-drenched CTA band as the single color moment per page",
-      "topology diagram in the hero band",
-      "grouped problem clusters (Federate / Govern / Operate)"
-    ],
-    "donts": [
-      "gradients",
-      "glassmorphism",
-      "mono marketing prose",
-      "fabricated stats",
-      "per-origin theming",
-      "new hues"
+      "Live is reserved for action and proof",
+      "One chrome across both origins",
+      "Diagrams are authored, never stock",
+      "Divergence between origins is a bug"
     ]
   }
 }
