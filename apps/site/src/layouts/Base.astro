@@ -1,0 +1,462 @@
+---
+// Shared chrome for fold.run: head metadata, design tokens, base styles, and
+// the canon header/footer from the stardust redesign (stardust/canon/*).
+// Page-specific section styles live in each page, not here.
+interface Props {
+  title: string;
+  description: string;
+  canonical: string;
+  jsonld?: Record<string, unknown>;
+  /** Highlights the matching nav/footer link with aria-current="page". */
+  current?: 'blog' | 'status';
+  /** Value for <body data-template> (landing | listing | article | unique). */
+  template?: string;
+}
+
+const { title, description, canonical, jsonld, current, template } = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="theme-color" content="#0c0d12" />
+    <meta name="description" content={description} />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="canonical" href={canonical} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content="https://fold.run/og.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta name="twitter:card" content="summary_large_image" />
+    {jsonld && <script type="application/ld+json" is:inline set:html={JSON.stringify(jsonld)} />}
+    <style is:global>
+      /* self-hosted · Switzer (ITF free license) + JetBrains Mono (OFL) */
+      @font-face {
+        font-family: 'Switzer';
+        font-style: normal;
+        font-weight: 400;
+        font-display: swap;
+        src: url(/fonts/Switzer-400.woff2) format('woff2');
+      }
+      @font-face {
+        font-family: 'Switzer';
+        font-style: normal;
+        font-weight: 600;
+        font-display: swap;
+        src: url(/fonts/Switzer-600.woff2) format('woff2');
+      }
+      @font-face {
+        font-family: 'Switzer';
+        font-style: normal;
+        font-weight: 700;
+        font-display: swap;
+        src: url(/fonts/Switzer-700.woff2) format('woff2');
+      }
+      @font-face {
+        font-family: 'Switzer';
+        font-style: normal;
+        font-weight: 800;
+        font-display: swap;
+        src: url(/fonts/Switzer-800.woff2) format('woff2');
+      }
+      @font-face {
+        font-family: 'JetBrains Mono';
+        font-style: normal;
+        font-weight: 400;
+        font-display: swap;
+        src: url(/fonts/JetBrainsMono-400-latin-ext.woff2) format('woff2');
+        unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304,
+          U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0,
+          U+2113, U+2C60-2C7F, U+A720-A7FF;
+      }
+      @font-face {
+        font-family: 'JetBrains Mono';
+        font-style: normal;
+        font-weight: 400;
+        font-display: swap;
+        src: url(/fonts/JetBrainsMono-400-latin.woff2) format('woff2');
+        unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC,
+          U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215,
+          U+FEFF, U+FFFD;
+      }
+      @font-face {
+        font-family: 'JetBrains Mono';
+        font-style: normal;
+        font-weight: 700;
+        font-display: swap;
+        src: url(/fonts/JetBrainsMono-700-latin-ext.woff2) format('woff2');
+        unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304,
+          U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0,
+          U+2113, U+2C60-2C7F, U+A720-A7FF;
+      }
+      @font-face {
+        font-family: 'JetBrains Mono';
+        font-style: normal;
+        font-weight: 700;
+        font-display: swap;
+        src: url(/fonts/JetBrainsMono-700-latin.woff2) format('woff2');
+        unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC,
+          U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215,
+          U+FEFF, U+FFFD;
+      }
+
+      /* ===== stardust :root token contract (token-contract.md) ===== */
+      :root {
+        --heading-font-family: 'Switzer', ui-sans-serif, system-ui, sans-serif;
+        --body-font-family: 'Switzer', ui-sans-serif, system-ui, sans-serif;
+        --mono-font-family: 'JetBrains Mono', ui-monospace, monospace;
+
+        --heading-xxl: clamp(2.6rem, 6.5vw, 4.5rem); /* display, weight 800 */
+        --heading-xl: clamp(1.7rem, 3vw, 2.4rem);
+        --heading-lg: 1.25rem;
+        --heading-md: 1.0625rem;
+        --body: 1rem;
+        --body-sm: 0.875rem;
+
+        --line-height-heading: 1.08;
+        --line-height-body: 1.6;
+
+        /* colors — brand-native roles per DESIGN.md */
+        --color-bg: #0c0d12; /* Backplane */
+        --color-fg: #e8e9f2; /* Signal */
+        --color-accent: #d9a441; /* Brass */
+
+        --color-rack: #12141c; /* Rack — panels */
+        --color-trace: #23263a; /* Trace — hairlines (decorative borders) */
+        --color-fold-line: #666d9e; /* Trace-bright — meaningful fold-line graphics */
+        --color-static: #a6aac2; /* Static — muted text (AA-lifted) */
+        --color-carrier: #ecd9a8; /* Brass Soft — links, badges */
+        --color-route-deep: #a87c1f; /* Brass Deep — hover depth, drench ground */
+
+        --spacing-xs: 4px;
+        --spacing-sm: 8px;
+        --spacing-md: 16px;
+        --spacing-lg: 24px;
+        --spacing-xl: 48px;
+        --spacing-2xl: 64px;
+
+        --section-padding: 64px; /* balanced tier; 48 tablet / 32 mobile below */
+        --max-width: 68rem;
+        --radius: 2px; /* machined (user re-direct) */
+        --radius-sm: 0px;
+        --radius-lg: 2px;
+      }
+
+      /* ===== base ===== */
+      * {
+        box-sizing: border-box;
+        margin: 0;
+      }
+      html {
+        color-scheme: dark;
+      }
+      body {
+        background: var(--color-bg);
+        color: var(--color-fg);
+        font: 400 var(--body) / var(--line-height-body) var(--body-font-family);
+        letter-spacing: 0.01em; /* light-on-dark compensation */
+      }
+      a {
+        color: var(--color-carrier);
+        text-decoration: none;
+      }
+      a:hover {
+        text-decoration: underline;
+        text-underline-offset: 3px;
+      }
+      main p a,
+      main .lede a,
+      .intro a {
+        text-decoration: underline;
+        text-underline-offset: 3px;
+      }
+      :focus-visible {
+        outline: 2px solid var(--color-accent);
+        outline-offset: 2px;
+        border-radius: 2px;
+      }
+      .wrap {
+        max-width: var(--max-width);
+        margin-inline: auto;
+        padding-inline: 1.25rem;
+      }
+      h1,
+      h2,
+      h3 {
+        font-family: var(--heading-font-family);
+        text-wrap: balance;
+      }
+      h2 {
+        font-size: var(--heading-xl);
+        font-weight: 700;
+        line-height: 1.12;
+        letter-spacing: -0.015em;
+      }
+      h3 {
+        font-size: var(--heading-lg);
+        font-weight: 700;
+        line-height: 1.3;
+      }
+      p {
+        max-width: 70ch;
+      }
+      .muted {
+        color: var(--color-static);
+      }
+      .mono {
+        font-family: var(--mono-font-family);
+        font-size: var(--body-sm);
+        letter-spacing: 0;
+      }
+      section {
+        padding-block: var(--section-padding);
+      }
+      section + section {
+        border-top: 1px solid var(--color-trace);
+      }
+
+      /* buttons */
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font: 600 var(--body) / 1 var(--body-font-family);
+        border-radius: var(--radius);
+        padding: 12px 20px;
+        transition:
+          background-color 0.18s cubic-bezier(0.25, 1, 0.5, 1),
+          border-color 0.18s cubic-bezier(0.25, 1, 0.5, 1);
+      }
+      .btn-primary {
+        background: var(--color-accent);
+        color: var(--color-bg);
+      }
+      .btn-primary:hover {
+        background: var(--color-route-deep);
+        text-decoration: none;
+      }
+      .btn-secondary {
+        border: 1px solid var(--color-trace);
+        color: var(--color-carrier);
+        padding: 11px 19px;
+      }
+      .btn-secondary:hover {
+        border-color: var(--color-carrier);
+        text-decoration: none;
+      }
+
+      /* skip link */
+      .skip-link {
+        position: absolute;
+        left: -9999px;
+        top: 0;
+        background: var(--color-accent);
+        color: #fff;
+        padding: 10px 16px;
+        border-radius: 0 0 var(--radius) 0;
+        z-index: 10;
+      }
+      .skip-link:focus {
+        left: 0;
+      }
+
+      /* ===== header ===== */
+      header.site {
+        border-bottom: 1px solid var(--color-trace);
+        padding-block: 1rem;
+      }
+      header.site .wrap {
+        display: flex;
+        align-items: center;
+        gap: var(--spacing-lg);
+        flex-wrap: wrap;
+      }
+      .brandmark {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        color: var(--color-fg);
+        font-weight: 700;
+        font-size: 1.2rem;
+      }
+      .brandmark:hover {
+        text-decoration: none;
+      }
+      header.site nav {
+        display: flex;
+        align-items: center;
+        gap: var(--spacing-sm);
+        margin-left: auto;
+        flex-wrap: wrap;
+        font-size: 0.95rem;
+      }
+      header.site nav a:not(.btn) {
+        padding: 12px 8px;
+      }
+      header.site nav a[aria-current='page'] {
+        color: var(--color-fg);
+      }
+      header.site .btn {
+        padding: 9px 16px;
+        font-size: var(--body-sm);
+      }
+
+      /* ===== footer ===== */
+      footer.site {
+        border-top: 1px solid var(--color-trace);
+        padding-block: var(--spacing-xl);
+      }
+      footer.site .wrap {
+        display: flex;
+        gap: var(--spacing-lg);
+        align-items: center;
+        flex-wrap: wrap;
+      }
+      footer.site .legal {
+        color: var(--color-static);
+        font-size: var(--body-sm);
+        margin-right: auto;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+      }
+      footer.site nav {
+        display: flex;
+        gap: var(--spacing-sm);
+        flex-wrap: wrap;
+        font-size: var(--body-sm);
+      }
+      footer.site nav a {
+        padding: 12px 8px;
+      }
+
+      /* ===== code panels (signature chrome, shared across pages) ===== */
+      .code-panel {
+        background: var(--color-rack);
+        border: 1px solid var(--color-trace);
+        border-radius: var(--radius-lg);
+        position: relative;
+        margin-top: var(--spacing-sm);
+      }
+      .code-panel .tag {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+        justify-content: flex-end;
+        padding: 10px 12px 0;
+      }
+      .code-panel .tag span {
+        font-family: var(--mono-font-family);
+        font-size: 0.75rem;
+        color: var(--color-carrier);
+        border: 1px solid var(--color-trace);
+        border-radius: var(--radius-sm);
+        padding: 2px 8px;
+      }
+      .code-panel button {
+        font: 600 0.75rem/1 var(--mono-font-family);
+        letter-spacing: 0.02em;
+        color: var(--color-carrier);
+        background: transparent;
+        border: 1px solid var(--color-trace);
+        border-radius: var(--radius-sm);
+        padding: 3px 10px;
+        cursor: pointer;
+        position: relative;
+      }
+      .code-panel button::before {
+        content: '';
+        position: absolute;
+        inset: -12px;
+      }
+      .code-panel button:hover {
+        border-color: var(--color-carrier);
+      }
+      .code-panel pre {
+        overflow-x: auto;
+        padding: var(--spacing-sm) var(--spacing-lg) var(--spacing-md);
+        font: 400 0.78rem/1.6 var(--mono-font-family);
+        color: var(--color-fg);
+      }
+      .code-panel code .c {
+        color: var(--color-static); /* comments */
+      }
+      .code-panel code .k {
+        color: var(--color-carrier); /* keys / prompts */
+      }
+
+      /* ===== shared responsive ===== */
+      @media (max-width: 768px) {
+        :root {
+          --section-padding: 48px;
+        }
+      }
+      @media (max-width: 640px) {
+        :root {
+          --section-padding: 32px;
+        }
+        header.site nav {
+          gap: var(--spacing-md);
+        }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .btn {
+          transition: none;
+        }
+      }
+    </style>
+  </head>
+  <body data-template={template}>
+    <a class="skip-link" href="#main">Skip to content</a>
+
+    <header class="site" data-section="header" data-intent="navigate" data-layout="contained" data-canon>
+      <div class="wrap">
+        <a class="brandmark" href="/" aria-label="fold home">
+          <!-- authored fold wordmark: fold-line letterform mark -->
+          <svg width="28" height="28" viewBox="0 0 28 28" role="img" aria-hidden="true">
+            <rect x="1.5" y="1.5" width="25" height="25" rx="2" fill="#12141c" stroke="#23263a" stroke-width="1.5"></rect>
+            <path d="M 3 25 L 25 3" stroke="#23263a" stroke-width="1.5" stroke-dasharray="3.5 3.5" fill="none"></path>
+            <path d="M 26.5 12 V 7.5 A 2 2 0 0 0 20.5 1.5 H 16 Z" fill="#d9a441"></path>
+          </svg>
+          fold
+        </a>
+        <nav aria-label="Site">
+          <a href="/#demo">Live demo</a>
+          <a href="https://docs.fold.run/use-cases/">Use cases</a>
+          <a href="/blog/" aria-current={current === 'blog' ? 'page' : undefined}>Blog</a>
+          <a href="/status/" aria-current={current === 'status' ? 'page' : undefined}>Status</a>
+          <a href="https://github.com/fold-run/fold">GitHub</a>
+          <a class="btn btn-secondary" href="https://docs.fold.run/getting-started/">Get started</a>
+        </nav>
+      </div>
+    </header>
+
+    <slot />
+
+    <footer class="site" data-section="footer" data-intent="navigate" data-layout="contained" data-canon>
+      <div class="wrap">
+        <span class="legal">
+          <svg width="20" height="20" viewBox="0 0 28 28" role="img" aria-hidden="true">
+            <rect x="1.5" y="1.5" width="25" height="25" rx="2" fill="#12141c" stroke="#23263a" stroke-width="1.5"></rect>
+            <path d="M 3 25 L 25 3" stroke="#23263a" stroke-width="1.5" stroke-dasharray="3.5 3.5" fill="none"></path>
+            <path d="M 26.5 12 V 7.5 A 2 2 0 0 0 20.5 1.5 H 16 Z" fill="#d9a441"></path>
+          </svg>
+          © fold.run · Apache-2.0
+        </span>
+        <nav aria-label="Footer">
+          <a href="https://docs.fold.run/">docs.fold.run</a>
+          <a href="https://github.com/fold-run/fold">github.com/fold-run/fold</a>
+          <a href="https://docs.fold.run/conformance/">Conformance</a>
+          <a href="/blog/">Blog</a>
+          <a href="/status/" aria-current={current === 'status' ? 'page' : undefined}>Status</a>
+        </nav>
+      </div>
+    </footer>
+  </body>
+</html>

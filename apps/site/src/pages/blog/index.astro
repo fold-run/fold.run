@@ -1,189 +1,224 @@
 ---
-// The blog index. Add new posts to this list, newest first — each entry's
+// The blog index — stardust redesign (stardust/migrated/blog/index.html).
+// Add new posts as .post-row items in the list below, newest first — each
 // href must match a sibling .astro page in this directory.
-const posts = [
-  {
-    href: '/blog/federating-mcp-tasks/',
-    date: '2026-08-04',
-    title: 'Federating MCP tasks: affinity routing over opaque ids',
-    description:
-      'The MCP tasks extension standardized long-running work — and task ids outlive any session. Putting one gateway in front of N task-running servers forces an ownership problem, and the solution generalizes.',
-  },
-];
+import Base from '../../layouts/Base.astro';
+
+const description =
+  'Engineering notes from fold, the enterprise MCP gateway — federation, governance, and what a stateless protocol does to the thing in the middle.';
+
+const jsonld = {
+  '@context': 'https://schema.org',
+  '@type': 'Blog',
+  name: 'Blog · fold',
+  url: 'https://fold.run/blog/',
+};
 ---
 
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Blog · fold</title>
-    <meta
-      name="description"
-      content="Engineering notes from fold, the enterprise MCP gateway — federation, governance, and what a stateless protocol does to the thing in the middle."
-    />
-    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-    <meta property="og:type" content="website" />
-    <meta property="og:title" content="Blog · fold" />
-    <meta
-      property="og:description"
-      content="Engineering notes from fold, the enterprise MCP gateway."
-    />
-  </head>
-  <body>
-    <header class="wrap nav">
-      <a class="brand" href="/">
-        <img src="/favicon.svg" alt="" width="22" height="22" />
-        <span>fold</span>
-      </a>
-      <nav>
-        <a href="/#run">Run it</a>
-        <a href="https://docs.fold.run">Docs</a>
-        <a href="https://github.com/fold-run/fold">GitHub</a>
-      </nav>
-    </header>
+<Base
+  title="Blog · fold"
+  description={description}
+  canonical="https://fold.run/blog/"
+  jsonld={jsonld}
+  current="blog"
+  template="listing"
+>
+  <main id="main">
+    <section class="index-hero" data-section="index-hero" data-intent="orient" data-layout="contained">
+      <div class="wrap">
+        <h1>Blog</h1>
+        <p class="lede">
+          Engineering notes from fold — federation, governance, and what a stateless protocol does
+          to the thing in the middle.
+        </p>
+      </div>
+    </section>
 
-    <main class="wrap article">
-      <h1>Blog</h1>
-      <p class="lede">
-        Engineering notes from fold — federation, governance, and what a
-        stateless protocol does to the thing in the middle.
-      </p>
-
-      <ul class="posts">
-        {posts.map((p) => (
-          <li>
-            <p class="kicker">{p.date} · engineering</p>
-            <h2><a href={p.href}>{p.title}</a></h2>
-            <p class="desc">{p.description}</p>
+    <section
+      class="post-list"
+      data-section="post-list"
+      data-intent="discovery"
+      data-layout="stack"
+      data-items="1"
+      data-fragment="post-row"
+      data-fragment-role="source"
+    >
+      <div class="wrap">
+        <ul class="posts">
+          <li class="post-row">
+            <p class="post-meta">2026-08-04 · engineering</p>
+            <h2>
+              <a href="/blog/federating-mcp-tasks/"
+                >Federating MCP tasks: affinity routing over opaque ids</a
+              >
+            </h2>
+            <p class="teaser">
+              The MCP tasks extension standardized long-running work — and task ids outlive any
+              session. Putting one gateway in front of N task-running servers forces an ownership
+              problem, and the solution generalizes.
+            </p>
           </li>
-        ))}
-      </ul>
-    </main>
+        </ul>
+      </div>
+    </section>
 
-    <footer class="wrap foot">
-      <span>© fold.run · Apache-2.0</span>
-      <nav>
-        <a href="https://docs.fold.run">docs.fold.run</a>
-        <a href="https://github.com/fold-run/fold">github.com/fold-run/fold</a>
-      </nav>
-    </footer>
-  </body>
-</html>
+    <section
+      class="closing"
+      data-section="closing"
+      data-intent="drive action"
+      data-layout="full-bleed"
+      data-module="cta-band"
+    >
+      <div class="wrap">
+        <h2>Start where it hurts.</h2>
+        <p>
+          A single passthrough upstream in front of your most-used server is one config file away.
+          Governance grows from there.
+        </p>
+        <a class="btn btn-primary" href="https://docs.fold.run/getting-started/">Get started</a>
+      </div>
+    </section>
+  </main>
+</Base>
 
-<style>
-  :root {
-    --bg: #0c0d12;
-    --panel: #12141c;
-    --line: #23263a;
-    --text: #e8e9f2;
-    --muted: #9a9db5;
-    --accent: #5560ff;
-    --accent-soft: #c4c8ff;
-    color-scheme: dark;
+<style is:global>
+  /* ===== index hero ===== */
+  .index-hero h1 {
+    font-size: var(--heading-xl);
+    font-weight: 800;
+    line-height: 1.08;
+    letter-spacing: -0.02em;
+    margin-bottom: var(--spacing-md);
   }
-  * {
-    box-sizing: border-box;
-    margin: 0;
+  .index-hero .lede {
+    color: var(--color-static);
+    font-size: 1.0625rem;
   }
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font:
-      16px/1.65 ui-sans-serif,
-      system-ui,
-      sans-serif;
-  }
-  .wrap {
-    max-width: 44rem;
-    margin-inline: auto;
-    padding-inline: 1.25rem;
-  }
-  a {
-    color: var(--accent-soft);
-    text-decoration: none;
-  }
-  a:hover {
-    text-decoration: underline;
-  }
-  .nav {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding-block: 1.1rem;
-    border-bottom: 1px solid var(--line);
-    max-width: 62rem;
-  }
-  .brand {
-    display: flex;
-    gap: 0.55rem;
-    align-items: center;
-    font-weight: 700;
-    font-size: 1.15rem;
-    color: var(--text);
-  }
-  .nav nav {
-    display: flex;
-    gap: 1.4rem;
-    font-size: 0.95rem;
-  }
-  .article {
-    padding-block: 3rem 4rem;
-  }
-  h1 {
-    font-size: clamp(1.7rem, 4.5vw, 2.3rem);
-    line-height: 1.15;
-    letter-spacing: -0.015em;
-    margin-bottom: 1.2rem;
-  }
-  .lede {
-    color: var(--muted);
-    font-size: 1.08rem;
-    margin-bottom: 2.4rem;
+
+  /* ===== post list: route-line rail, rows hang off it ===== */
+  .post-list {
+    padding-block: var(--spacing-lg) calc(var(--section-padding) + 16px);
+    border-top: none;
   }
   .posts {
     list-style: none;
-    padding: 0;
+    padding: 0 0 0 var(--spacing-xl);
+    position: relative;
+    display: grid;
+    gap: var(--spacing-xl);
   }
-  .posts li {
-    border-top: 1px solid var(--line);
-    padding-block: 1.6rem;
+  .posts::before {
+    /* the vertical fold-line rail every post hangs off */
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    border-left: 1.5px dashed var(--color-fold-line);
   }
-  .kicker {
-    color: var(--muted);
-    font-family: ui-monospace, monospace;
-    font-size: 0.85rem;
-    margin-bottom: 0.5rem;
+  .posts::after {
+    /* rail terminus notch */
+    content: '';
+    position: absolute;
+    left: -1px;
+    bottom: -2px;
+    width: 9px;
+    height: 2px;
+    background: var(--color-fold-line);
   }
-  .posts h2 {
-    font-size: 1.25rem;
+  .post-row {
+    position: relative;
+  }
+  .post-row::before {
+    /* fold-line connector: rail -> row */
+    content: '';
+    position: absolute;
+    left: calc(-1 * var(--spacing-xl));
+    top: 0.65em;
+    width: calc(var(--spacing-xl) - 14px);
+    border-top: 1.5px dashed var(--color-fold-line);
+  }
+  .post-row::after {
+    /* notch mark at the junction (pattern-paper vocabulary) */
+    content: '';
+    position: absolute;
+    left: -13px;
+    top: calc(0.65em - 5px);
+    height: 10px;
+    border-left: 1.5px solid var(--color-carrier);
+  }
+  .post-meta {
+    font-family: var(--mono-font-family);
+    font-size: var(--body-sm);
+    letter-spacing: 0.02em;
+    color: var(--color-static);
+    margin-bottom: var(--spacing-sm);
+  }
+  .post-row h2 {
+    font-size: var(--heading-lg);
+    line-height: 1.3;
     letter-spacing: -0.01em;
-    margin-bottom: 0.5rem;
+    margin-bottom: var(--spacing-sm);
   }
-  .posts h2 a {
-    color: var(--text);
+  .post-row h2 a {
+    color: var(--color-fg);
+    display: inline-block;
+    padding-block: 4px;
+    margin-block: -4px;
   }
-  .posts h2 a:hover {
-    color: var(--accent-soft);
-    text-decoration: none;
+  .post-row h2 a:hover {
+    color: var(--color-carrier);
   }
-  .desc {
-    color: var(--muted);
-    font-size: 0.95rem;
+  .post-row .teaser {
+    color: var(--color-static);
   }
-  .foot {
-    display: flex;
-    justify-content: space-between;
-    gap: 1rem;
-    flex-wrap: wrap;
-    padding-block: 1.6rem;
-    border-top: 1px solid var(--line);
-    color: var(--muted);
-    font-size: 0.9rem;
-    max-width: 62rem;
+
+  /* ===== closing: compact Route drench (subordinated to the index h1) ===== */
+  .closing :focus-visible {
+    outline-color: var(--color-bg);
   }
-  .foot nav {
-    display: flex;
-    gap: 1.2rem;
+  .closing {
+    background: var(--color-accent);
+    border-top: none;
+    padding-block: 48px;
+  }
+  .closing .wrap {
+    display: grid;
+    gap: var(--spacing-lg);
+    justify-items: start;
+  }
+  .closing h2 {
+    color: var(--color-bg);
+    font-size: clamp(1.5rem, 2.4vw, 1.9rem);
+  }
+  .closing p {
+    color: var(--color-bg);
+    opacity: 0.92;
+    max-width: 56ch;
+  }
+  .closing .btn-primary {
+    background: var(--color-bg);
+    color: var(--color-carrier);
+  }
+  .closing .btn-primary:hover {
+    background: #1c1f2b;
+  }
+
+  /* ===== responsive (page-specific) ===== */
+  @media (max-width: 640px) {
+    .posts {
+      padding-left: var(--spacing-lg);
+    }
+    .post-row::before {
+      left: calc(-1 * var(--spacing-lg));
+      width: calc(var(--spacing-lg) - 8px);
+    }
+    .post-row::after {
+      left: -9px;
+    }
+    .closing .btn {
+      width: 100%;
+      justify-content: center;
+    }
   }
 </style>

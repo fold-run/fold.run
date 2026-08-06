@@ -1,450 +1,869 @@
 ---
-const useCases = [
-  {
-    title: 'Unify a federation',
-    body: 'Acquisitions, child orgs, and teams each ship their own MCP servers — any language, any SDK. fold presents them as one virtual server with namespaced tools. No team rewrites anything.',
-  },
-  {
-    title: 'Draw the security boundary',
-    body: 'One choke point for authentication, deny-by-default tool allowlists, per-principal visibility, and an audit event for every request — including the denials.',
-  },
-  {
-    title: 'Discover upstreams automatically',
-    body: 'A team ships an MCP server, the registry lists it, and it appears behind the gateway — no config change. On Kubernetes, label a Service fold.run/upstream: "true" and fold-discovery does the rest.',
-  },
-  {
-    title: 'Run tasks across the federation',
-    body: 'Long-running work flows through fold: task polls and updates route to the server that owns the task — remembered at mint, or found by probe — and tasks/list merges every org, scoped per principal.',
-  },
-  {
-    title: 'Broker credentials',
-    body: 'Clients hold one token with fold as audience; fold exchanges it per upstream (RFC 8693) or injects service credentials. API keys never reach agents.',
-  },
-  {
-    title: 'Protect fragile services',
-    body: 'List caching, global and per-upstream rate limits, and circuit breakers stand between agent traffic storms and your internal systems.',
-  },
-  {
-    title: 'Govern vendor MCP servers',
-    body: 'Put third-party and SaaS MCP endpoints behind your own auth, policy, and audit — instead of scattering per-user API keys across every client.',
-  },
-  {
-    title: 'Expose tools outward, carefully',
-    body: 'Offer partners a curated, policy-scoped subset of internal tools on one hardened endpoint — a single static binary, self-hosted in your VPC.',
-  },
-  {
-    title: 'Conformant, provably',
-    body: 'The official MCP conformance suite runs through fold on every merge — 40/40 checks, including sampling, elicitation, and subscriptions bridged through the gateway.',
-  },
-];
+// fold.run home — stardust redesign (stardust/migrated/index.html), transplanted
+// onto the shared Base layout. Markup and copy are the approved migrated design.
+import Base from '../layouts/Base.astro';
 
-const configSnippet = `<span class="c"># every team's servers, one governed endpoint</span>
-{
-  "upstreams": [
-    { "id": "github-tools", "url": "…", "namespace": "gh" },
-    { "id": "ml-search",    "url": "…", "namespace": "search",
-      "rateLimit": { "requestsPerMinute": 600 },
-      "circuitBreaker": { "failureThreshold": 5 } }
+const description =
+  'One governed endpoint between every MCP client and every MCP server. Federation, auth, policy, caching, and audit — built on the official MCP Go SDK.';
+
+const jsonld = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'Organization',
+      name: 'fold',
+      url: 'https://fold.run/',
+      logo: 'https://fold.run/favicon.svg',
+      sameAs: ['https://github.com/fold-run/fold'],
+    },
+    { '@type': 'WebSite', name: 'fold', url: 'https://fold.run/' },
   ],
-  "auth":   { "mode": "required", "…": "…" },
-  "policy": { "defaultDecision": "deny", "…": "…" }
-}`;
-
-const proof = [
-  ['40/40', 'official MCP conformance checks, run through the gateway on every merge'],
-  ['~0.2 ms', 'typical added p50 latency; CI gates every merge at < 5 ms'],
-  ['1 binary', 'static Go binary or ~22 MB distroless container, no local state'],
-  ['Apache-2.0', 'open source, on GitHub'],
-];
-
-const demoSnippet = `<span class="c"># three public MCP servers, one governed endpoint — no signup, no key</span>
-https://demo.fold.run/mcp
-tools/list           → cfdocs__* · git__* · jobs__*
-jobs__start_job      → mints a task on the jobs server
-tasks/get            → routed to the owner — carrying nothing but the id
-/console             → the federation, live (read-only)`;
-
-const demoUpstreams = [
-  {
-    ns: 'cfdocs',
-    body: "Cloudflare's public docs MCP server — a real third-party upstream, governed and namespaced like any internal one.",
-  },
-  {
-    ns: 'git',
-    body: 'GitMCP — a public 2025-era server on the session handshake. Behind the gateway it is just another namespace.',
-  },
-  {
-    ns: 'jobs',
-    body: 'A task-minting demo server. Start a job, then poll it with nothing but the task id — fold routes every poll to the owner.',
-  },
-];
-
-const quickSnippet = `<span class="c"># one upstream, one governed endpoint — 60 seconds</span>
-$ go run github.com/fold-run/fold/cmd/fold@latest --config fold.config.json
-<span class="c"># or the container:</span>
-$ docker run -p 8080:8080 -e FOLD_CONFIG="$(cat fold.config.json)" ghcr.io/fold-run/fold
-<span class="c"># MCP endpoint: http://localhost:8080/mcp · health: /healthz · metrics: /metrics</span>`;
-
-const runOptions = [
-  {
-    ns: 'binary',
-    body: 'A single static Go binary — go install, or grab a prebuilt archive from GitHub releases. Linux and macOS, amd64 and arm64.',
-  },
-  {
-    ns: 'container',
-    body: 'ghcr.io/fold-run/fold — multi-arch and distroless, ~22 MB. Config injected as a file or straight through FOLD_CONFIG.',
-  },
-  {
-    ns: 'kubernetes',
-    body: 'A Helm chart with probes, HPA, and ServiceMonitor — plus fold-discovery, so labeled Services join the federation on their own.',
-  },
-];
+};
 ---
 
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>fold — the enterprise MCP gateway</title>
-    <meta
-      name="description"
-      content="One governed endpoint between every MCP client and every MCP server. Federation, auth, policy, caching, and audit — built on the official MCP Go SDK."
-    />
-    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-    <meta property="og:type" content="website" />
-    <meta property="og:title" content="fold — the enterprise MCP gateway" />
-    <meta
-      property="og:description"
-      content="One governed endpoint between every MCP client and every MCP server. fold is the one. fold.run is the execution."
-    />
-  </head>
-  <body>
-    <header class="wrap nav">
-      <a class="brand" href="/">
-        <img src="/favicon.svg" alt="" width="22" height="22" />
-        <span>fold</span>
-      </a>
-      <nav>
-        <a href="#demo">Live demo</a>
-        <a href="#run">Run it</a>
-        <a href="https://docs.fold.run">Docs</a>
-        <a href="https://docs.fold.run/use-cases/">Use cases</a>
-        <a href="https://github.com/fold-run/fold">GitHub</a>
-      </nav>
-    </header>
-
-    <main>
-      <section class="wrap hero">
-        <p class="kicker">fold is the one. fold.run is the execution.</p>
-        <h1>The enterprise<br />MCP gateway.</h1>
-        <p class="lede">
-          One governed endpoint between every MCP client and every MCP server.
-          Federation, auth, policy, caching, and audit — built on the official
-          MCP Go SDK on both sides of the proxy.
-        </p>
-        <div class="actions">
-          <a class="btn primary" href="https://docs.fold.run/getting-started/">Get started</a>
-          <a class="btn" href="#demo">Try the live demo</a>
-          <a class="btn" href="https://github.com/fold-run/fold">View source</a>
-        </div>
-        <pre class="term"><code set:html={configSnippet} /></pre>
-      </section>
-
-      <section class="wrap proof">
-        {proof.map(([n, label]) => (
-          <div class="stat">
-            <strong>{n}</strong>
-            <span>{label}</span>
+<Base
+  title="fold — the enterprise MCP gateway"
+  description={description}
+  canonical="https://fold.run/"
+  jsonld={jsonld}
+  template="landing"
+>
+  <main id="main">
+    <section
+      class="hero"
+      data-section="hero"
+      data-intent="value proposition + show the topology"
+      data-layout="split-media"
+      data-media="image"
+    >
+      <div class="wrap">
+        <div>
+          <p class="kicker">fold is the one. fold.run is the execution.</p>
+          <h1>The enterprise MCP gateway.</h1>
+          <p class="lede">
+            One governed endpoint between every MCP (Model Context Protocol) client and every MCP
+            server. Federation, auth, policy, caching, and audit — built on the official MCP Go SDK
+            on both sides of the proxy.
+          </p>
+          <div class="cta-row">
+            <a class="btn btn-primary" href="https://docs.fold.run/getting-started/">Get started</a>
+            <a class="btn btn-secondary" href="https://github.com/fold-run/fold">View source</a>
           </div>
-        ))}
-      </section>
+        </div>
+        <div class="diagram-panel">
+          <!-- authored topology diagram: fold-line vocabulary (tailor's pattern paper) -->
+          <svg
+            viewBox="0 0 560 400"
+            role="img"
+            aria-label="Three MCP clients connect to one fold gateway, which applies auth, policy, and audit, and federates three upstream servers: cfdocs, git, and jobs."
+          >
+            <!-- dashed fold-lines: clients into the gateway -->
+            <path class="fold-dash" d="M 118 80  C 200 80, 200 176, 246 184"></path>
+            <path class="fold-dash" d="M 118 328 C 200 328, 200 224, 246 216"></path>
+            <!-- active route: middle client -> fold -> git upstream -->
+            <path class="fold-active draw" d="M 118 200 H 246 M 314 200 C 360 200, 380 200, 442 200"
+            ></path>
+            <!-- grain arrow on the active route -->
+            <path class="fold-arrow" d="M 432 194 L 444 200 L 432 206 Z"></path>
+            <!-- dashed fold-lines: gateway out to upstreams -->
+            <path class="fold-dash" d="M 314 184 C 370 176, 380 96, 442 88"></path>
+            <path class="fold-dash" d="M 314 216 C 370 224, 380 304, 442 312"></path>
+            <!-- notch marks at the governed boundary (auth · policy · audit) -->
+            <path class="fold-notch" d="M 236 192 v 16 M 240 190 v 20"></path>
+            <path class="fold-notch" d="M 320 190 v 20 M 324 192 v 16"></path>
+            <!-- client nodes -->
+            <g>
+              <rect class="fold-node" x="30" y="62" width="88" height="36" rx="2"></rect>
+              <rect class="fold-node" x="30" y="182" width="88" height="36" rx="2"></rect>
+              <rect class="fold-node" x="30" y="310" width="88" height="36" rx="2"></rect>
+              <text class="fold-node-label" x="74" y="84" text-anchor="middle">client</text>
+              <text class="fold-node-label" x="74" y="204" text-anchor="middle">client</text>
+              <text class="fold-node-label" x="74" y="332" text-anchor="middle">client</text>
+            </g>
+            <!-- fold gateway node with folded corner -->
+            <g>
+              <rect
+                x="246"
+                y="168"
+                width="68"
+                height="64"
+                rx="2"
+                fill="#12141c"
+                stroke="#d9a441"
+                stroke-width="1.5"></rect>
+              <path d="M 314 186 V 176 A 2 2 0 0 0 306 168 H 296 Z" fill="#d9a441"></path>
+              <text class="fold-node-label" x="280" y="204" text-anchor="middle" font-weight="700"
+                >fold</text
+              >
+            </g>
+            <!-- upstream nodes: captured demo prefixes -->
+            <g>
+              <rect class="fold-node" x="434" y="70" width="112" height="36" rx="2"></rect>
+              <rect class="fold-node" x="434" y="182" width="112" height="36" rx="2"></rect>
+              <rect class="fold-node" x="434" y="294" width="112" height="36" rx="2"></rect>
+              <text class="fold-node-label" x="490" y="92" text-anchor="middle">cfdocs__*</text>
+              <text class="fold-node-label" x="490" y="204" text-anchor="middle">git__*</text>
+              <text class="fold-node-label" x="490" y="316" text-anchor="middle">jobs__*</text>
+            </g>
+            <!-- annotations: measurement marks, pattern-paper style -->
+            <text class="fold-anno" x="280" y="156" text-anchor="middle">auth · policy · audit</text>
+            <text class="fold-anno" x="280" y="252" text-anchor="middle"
+              >one governed endpoint · /mcp</text
+            >
+            <text class="fold-anno" x="80" y="52" text-anchor="middle">any MCP client</text>
+            <text class="fold-anno" x="470" y="60" text-anchor="middle">upstreams</text>
+          </svg>
+        </div>
+      </div>
+    </section>
 
-      <section class="wrap" id="demo">
+    <section
+      class="proof"
+      data-section="proof-band"
+      data-intent="build trust with receipts"
+      data-layout="grid"
+      data-items="4"
+      data-module="proof-band"
+    >
+      <div class="wrap">
+        <a class="stat" href="https://docs.fold.run/conformance/">
+          <b>40/40</b>
+          <span>official MCP conformance checks, run through the gateway on every merge</span>
+        </a>
+        <a class="stat" href="https://docs.fold.run/benchmarks/">
+          <b>~0.2 ms</b>
+          <span
+            >typical added p50 latency (Apple Silicon, in-process upstream); CI gates every merge at
+            &lt; 5 ms</span
+          >
+        </a>
+        <a class="stat" href="https://github.com/fold-run/fold/releases">
+          <b>1 binary</b>
+          <span>static Go binary or ~22 MB distroless container, no local state</span>
+        </a>
+        <a class="stat" href="https://github.com/fold-run/fold">
+          <b>Apache-2.0</b>
+          <span>open source, on GitHub</span>
+        </a>
+      </div>
+    </section>
+
+    <section
+      class="demo"
+      id="demo"
+      data-section="demo"
+      data-intent="prove it live"
+      data-layout="contained"
+      data-items="3"
+    >
+      <div class="wrap">
         <h2>See it live.</h2>
-        <p class="section-lede">
-          demo.fold.run federates three public MCP servers behind one
-          endpoint — the unmodified release binary, governed by its own
-          config. Point any MCP client at it. Rate-limited, unauthenticated,
-          no warranty; live status on <a href="/status/">/status</a>. Copy-paste
+        <p class="intro">
+          demo.fold.run federates three public MCP servers behind one endpoint — the unmodified
+          release binary, governed by its own config. Point any MCP client at it. Rate-limited,
+          unauthenticated, no warranty; live status on <a href="/status/">/status</a>. Copy-paste
           walkthrough: <a href="https://docs.fold.run/try-the-demo/">try the demo</a>.
         </p>
-        <pre class="term"><code set:html={demoSnippet} /></pre>
-        <div class="grid demo-grid">
-          {demoUpstreams.map((u) => (
-            <article class="card">
-              <h3><code>{u.ns}__*</code></h3>
-              <p>{u.body}</p>
-            </article>
-          ))}
+        <div class="route-rail">
+          <span class="chip">demo.fold.run/mcp</span>
+          <span class="muted" style="font-size: var(--body-sm)">three upstreams · one endpoint</span
+          >
         </div>
-      </section>
+        <div class="termini">
+          <article class="terminus">
+            <h3>cfdocs__*</h3>
+            <p>
+              Cloudflare's public docs MCP server — a real third-party upstream, governed and
+              namespaced like any internal one.
+            </p>
+          </article>
+          <article class="terminus">
+            <h3>git__*</h3>
+            <p>
+              GitMCP — a public 2025-era server on the session handshake. Behind the gateway it is
+              just another namespace.
+            </p>
+          </article>
+          <article class="terminus">
+            <h3>jobs__*</h3>
+            <p>
+              A task-minting demo server. Start a job, then poll it with nothing but the task id —
+              fold routes every poll to the owner.
+            </p>
+          </article>
+        </div>
+      </div>
+    </section>
 
-      <section class="wrap" id="run">
+    <section
+      class="runit"
+      id="run"
+      data-section="run-it"
+      data-intent="drive action"
+      data-layout="contained"
+      data-items="3"
+    >
+      <div class="wrap">
         <h2>Run it in 60 seconds.</h2>
-        <p class="section-lede">
-          fold is a single static binary with no local state. One config file
-          in front of your first server, governance when you're ready.
+        <p class="intro">
+          fold is a single static binary with no local state. One config file in front of your first
+          server, governance when you're ready.
         </p>
-        <pre class="term"><code set:html={quickSnippet} /></pre>
-        <div class="grid demo-grid">
-          {runOptions.map((u) => (
-            <article class="card">
-              <h3><code>{u.ns}</code></h3>
-              <p>{u.body}</p>
-            </article>
-          ))}
-        </div>
-      </section>
 
-      <section class="wrap">
+        <ol class="route-steps">
+          <li class="step">
+            <div class="marker" aria-hidden="true">1</div>
+            <div>
+              <h3>Describe your upstreams</h3>
+              <div class="code-panel">
+                <div class="tag">
+                  <span>fold.config.json</span><button
+                    type="button"
+                    data-copy
+                    aria-label="Copy fold.config.json">copy</button
+                  >
+                </div>
+                <pre
+                  tabindex="0"
+                  role="region"
+                  aria-label="fold.config.json contents"><code>&#123;
+  <span class="k">"upstreams"</span>: [
+    &#123;
+      <span class="k">"id"</span>: "github-tools",
+      <span class="k">"url"</span>: "https://mcp.platform.acme.com/mcp",
+      <span class="k">"namespace"</span>: "gh",
+      <span class="k">"owner"</span>: &#123; <span class="k">"org"</span>: "acme-platform", <span class="k">"team"</span>: "devex" &#125;
+    &#125;
+  ]
+&#125;</code></pre>
+              </div>
+            </div>
+          </li>
+
+          <li class="step">
+            <div class="marker" aria-hidden="true">2</div>
+            <div>
+              <h3>Run it</h3>
+              <div class="code-panel">
+                <div class="tag">
+                  <span>shell</span><button type="button" data-copy aria-label="Copy run commands"
+                    >copy</button
+                  >
+                </div>
+                <pre
+                  tabindex="0"
+                  role="region"
+                  aria-label="Run commands"><code><span class="c"># one upstream, one governed endpoint — 60 seconds</span>
+<span class="k">$</span> go run github.com/fold-run/fold/cmd/fold@latest --config fold.config.json
+<span class="c"># or the container:</span>
+<span class="k">$</span> docker run -p 8080:8080 -e FOLD_CONFIG="$(cat fold.config.json)" ghcr.io/fold-run/fold</code></pre>
+              </div>
+            </div>
+          </li>
+
+          <li class="step">
+            <div class="marker" aria-hidden="true">3</div>
+            <div>
+              <h3>Point a client at it</h3>
+              <p class="muted">
+                Any MCP client connects to <span class="mono">/mcp</span> and sees one virtual
+                server named fold with every team's tools. <span class="mono"
+                  >MCP endpoint: http://localhost:8080/mcp · health: /healthz · metrics: /metrics</span
+                >
+              </p>
+            </div>
+          </li>
+        </ol>
+
+        <div class="paths">
+          <article class="path">
+            <h3>Binary</h3>
+            <p>
+              A single static Go binary — go install, or grab a prebuilt archive from GitHub
+              releases. Linux and macOS, amd64 and arm64.
+              <span class="cmd">go install github.com/fold-run/fold/cmd/fold@latest</span>
+            </p>
+          </article>
+          <article class="path">
+            <h3>Container</h3>
+            <p>
+              Multi-arch and distroless, ~22 MB. Config injected as a file or straight through
+              FOLD_CONFIG.
+              <span class="cmd">ghcr.io/fold-run/fold</span>
+            </p>
+          </article>
+          <article class="path">
+            <h3>Kubernetes</h3>
+            <p>
+              A Helm chart with probes, HPA, and ServiceMonitor — plus fold-discovery, so labeled
+              Services join the federation on their own.
+            </p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section
+      class="problems"
+      data-section="problems"
+      data-intent="map problem to config"
+      data-layout="grid"
+      data-items="9"
+    >
+      <div class="wrap">
         <h2>One gateway. A family of problems.</h2>
-        <p class="section-lede">
-          Most deployments start with one of these and grow into the others —
-          they all ride the same config file.
+        <p class="intro">
+          Most deployments start with one of these and grow into the others — they all ride the same
+          config file.
         </p>
-        <div class="grid">
-          {useCases.map((u) => (
-            <article class="card">
-              <h3>{u.title}</h3>
-              <p>{u.body}</p>
+
+        <div class="cluster">
+          <div class="cluster-rail">
+            <!-- glyph: three fold-lines converging to one -->
+            <svg width="40" height="40" viewBox="0 0 40 40" aria-hidden="true">
+              <path
+                d="M 4 8 C 16 8, 16 20, 24 20 M 4 20 H 24 M 4 32 C 16 32, 16 20, 24 20"
+                stroke="#666d9e"
+                stroke-width="1.5"
+                stroke-dasharray="4 3"
+                fill="none"></path>
+              <path d="M 24 20 H 36" stroke="#d9a441" stroke-width="2" fill="none"></path>
+              <path d="M 32 16 L 37 20 L 32 24 Z" fill="#d9a441"></path>
+            </svg>
+            <h3>Federate</h3>
+          </div>
+          <div class="cluster-cards">
+            <article class="problem">
+              <h4>Unify a federation</h4>
+              <p>
+                Acquisitions, child orgs, and teams each ship their own MCP servers — any language,
+                any SDK. fold presents them as one virtual server with namespaced tools. No team
+                rewrites anything.
+              </p>
             </article>
-          ))}
+            <article class="problem">
+              <h4>Discover upstreams automatically</h4>
+              <p>
+                A team ships an MCP server, the registry lists it, and it appears behind the gateway
+                — no config change. On Kubernetes, label a Service fold.run/upstream: "true" and
+                fold-discovery does the rest.
+              </p>
+            </article>
+            <article class="problem">
+              <h4>Run tasks across the federation</h4>
+              <p>
+                Long-running work flows through fold: task polls and updates route to the server
+                that owns the task — remembered at mint, or found by probe — and tasks/list merges
+                every org, scoped per principal.
+              </p>
+            </article>
+          </div>
         </div>
-      </section>
 
-      <section class="wrap closing">
+        <div class="cluster">
+          <div class="cluster-rail">
+            <!-- glyph: route through a notched gate -->
+            <svg width="40" height="40" viewBox="0 0 40 40" aria-hidden="true">
+              <path d="M 4 20 H 16" stroke="#666d9e" stroke-width="1.5" stroke-dasharray="4 3" fill="none"
+              ></path>
+              <path d="M 18 10 v 20 M 23 12 v 16" stroke="#c4c8ff" stroke-width="1.5"></path>
+              <path d="M 25 20 H 36" stroke="#d9a441" stroke-width="2" fill="none"></path>
+              <path d="M 32 16 L 37 20 L 32 24 Z" fill="#d9a441"></path>
+            </svg>
+            <h3>Govern</h3>
+          </div>
+          <div class="cluster-cards">
+            <article class="problem">
+              <h4>Draw the security boundary</h4>
+              <p>
+                One choke point for authentication, deny-by-default tool allowlists, per-principal
+                visibility, and an audit event for every request — including the denials.
+              </p>
+            </article>
+            <article class="problem">
+              <h4>Broker credentials</h4>
+              <p>
+                Clients hold one token with fold as audience; fold exchanges it per upstream (RFC
+                8693) or injects service credentials. API keys never reach agents.
+              </p>
+            </article>
+            <article class="problem">
+              <h4>Govern vendor MCP servers</h4>
+              <p>
+                Put third-party and SaaS MCP endpoints behind your own auth, policy, and audit —
+                instead of scattering per-user API keys across every client.
+              </p>
+            </article>
+          </div>
+        </div>
+
+        <div class="cluster">
+          <div class="cluster-rail">
+            <!-- glyph: route with gauge ticks -->
+            <svg width="40" height="40" viewBox="0 0 40 40" aria-hidden="true">
+              <path d="M 4 20 H 36" stroke="#d9a441" stroke-width="2" fill="none"></path>
+              <path d="M 12 14 v 5 M 20 12 v 7 M 28 14 v 5" stroke="#666d9e" stroke-width="1.5"
+              ></path>
+              <path d="M 12 26 v -3 M 20 28 v -5 M 28 26 v -3" stroke="#666d9e" stroke-width="1.5"
+              ></path>
+            </svg>
+            <h3>Operate</h3>
+          </div>
+          <div class="cluster-cards">
+            <article class="problem">
+              <h4>Protect fragile services</h4>
+              <p>
+                List caching, global and per-upstream rate limits, and circuit breakers stand
+                between agent traffic storms and your internal systems.
+              </p>
+            </article>
+            <article class="problem">
+              <h4>Expose tools outward, carefully</h4>
+              <p>
+                Offer partners a curated, policy-scoped subset of internal tools on one hardened
+                endpoint — a single static binary, self-hosted in your VPC.
+              </p>
+            </article>
+            <article class="problem">
+              <h4>Conformant, provably</h4>
+              <p>
+                The official MCP conformance suite runs through fold on every merge — 40/40 checks,
+                including sampling, elicitation, and subscriptions bridged through the gateway.
+              </p>
+            </article>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section
+      class="closing"
+      data-section="closing"
+      data-intent="drive action"
+      data-layout="full-bleed"
+      data-module="cta-band"
+    >
+      <div class="wrap">
         <h2>Start where it hurts.</h2>
-        <p class="section-lede">
-          A single passthrough upstream in front of your most-used server is
-          one config file away. Governance grows from there.
+        <p>
+          A single passthrough upstream in front of your most-used server is one config file away.
+          Governance grows from there.
         </p>
-        <div class="actions center">
-          <a class="btn primary" href="https://docs.fold.run/getting-started/">Read the docs</a>
-        </div>
-      </section>
-    </main>
+        <a class="btn btn-primary" href="https://docs.fold.run/getting-started/">Get started</a>
+      </div>
+    </section>
+  </main>
+</Base>
 
-    <footer class="wrap foot">
-      <span>© fold.run · Apache-2.0</span>
-      <nav>
-        <a href="https://docs.fold.run">docs.fold.run</a>
-        <a href="https://github.com/fold-run/fold">github.com/fold-run/fold</a>
-        <a href="https://docs.fold.run/conformance/">Conformance</a>
-        <a href="/blog/">Blog</a>
-        <a href="/status/">Status</a>
-      </nav>
-    </footer>
-  </body>
-</html>
+<script>
+  /* copy buttons: progressive enhancement, no external deps */
+  const live = document.createElement('span');
+  live.setAttribute('role', 'status');
+  live.style.cssText = 'position:absolute;left:-9999px';
+  document.body.appendChild(live);
+  for (const btn of document.querySelectorAll<HTMLButtonElement>('[data-copy]')) {
+    btn.addEventListener('click', async () => {
+      const pre = btn.closest('.code-panel')?.querySelector('pre');
+      if (!pre) return;
+      try {
+        await navigator.clipboard.writeText(pre.innerText);
+        btn.textContent = 'copied';
+        live.textContent = 'Copied to clipboard';
+      } catch {
+        const range = document.createRange();
+        range.selectNodeContents(pre);
+        const sel = getSelection();
+        if (sel) {
+          sel.removeAllRanges();
+          sel.addRange(range);
+        }
+        btn.textContent = 'press ⌘C';
+        live.textContent = 'Clipboard unavailable; text selected, press Control or Command C';
+      }
+      setTimeout(() => {
+        btn.textContent = 'copy';
+      }, 1800);
+    });
+  }
+</script>
 
-<style>
-  :root {
-    --bg: #0c0d12;
-    --panel: #12141c;
-    --line: #23263a;
-    --text: #e8e9f2;
-    --muted: #9a9db5;
-    --accent: #5560ff;
-    --accent-soft: #c4c8ff;
-    color-scheme: dark;
-  }
-  * {
-    box-sizing: border-box;
-    margin: 0;
-  }
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font:
-      16px/1.6 ui-sans-serif,
-      system-ui,
-      sans-serif;
-  }
-  .wrap {
-    max-width: 62rem;
-    margin-inline: auto;
-    padding-inline: 1.25rem;
-  }
-  a {
-    color: var(--accent-soft);
-    text-decoration: none;
-  }
-  a:hover {
-    text-decoration: underline;
-  }
-
-  .nav {
-    display: flex;
-    justify-content: space-between;
+<style is:global>
+  /* ===== hero ===== */
+  .hero .wrap {
+    display: grid;
+    grid-template-columns: 7fr 5fr;
+    gap: var(--spacing-xl);
     align-items: center;
-    padding-block: 1.1rem;
-    border-bottom: 1px solid var(--line);
   }
-  .brand {
-    display: flex;
-    gap: 0.55rem;
-    align-items: center;
-    font-weight: 700;
-    font-size: 1.15rem;
-    color: var(--text);
-  }
-  .nav nav {
-    display: flex;
-    gap: 1.4rem;
-    font-size: 0.95rem;
-  }
-
   .hero {
-    padding-block: 5rem 3.5rem;
+    padding-block: calc(var(--section-padding) + 16px);
   }
   .kicker {
-    color: var(--accent-soft);
-    font-family: ui-monospace, monospace;
-    font-size: 0.85rem;
-    letter-spacing: 0.04em;
-    margin-bottom: 1rem;
+    font-family: var(--mono-font-family);
+    font-size: var(--body-sm);
+    letter-spacing: 0.01em;
+    color: var(--color-carrier);
+    margin-bottom: var(--spacing-md);
   }
-  h1 {
-    font-size: clamp(2.4rem, 6vw, 3.8rem);
-    line-height: 1.05;
-    letter-spacing: -0.02em;
+  .hero h1 {
+    font-size: var(--heading-xxl);
+    font-weight: 800;
+    line-height: 1.02;
+    letter-spacing: -0.025em;
+    margin-bottom: var(--spacing-lg);
   }
-  .lede {
-    color: var(--muted);
-    max-width: 40rem;
-    margin-top: 1.2rem;
-    font-size: 1.1rem;
+  .hero .lede {
+    color: var(--color-static);
+    font-size: 1.0625rem;
+    margin-bottom: var(--spacing-xl);
   }
-  .actions {
+  .cta-row {
     display: flex;
-    gap: 0.8rem;
-    margin-top: 1.8rem;
+    gap: var(--spacing-md);
     flex-wrap: wrap;
   }
-  .actions.center {
-    justify-content: center;
+  .diagram-panel {
+    min-width: 0;
   }
-  .btn {
-    display: inline-block;
-    padding: 0.6rem 1.15rem;
-    border: 1px solid var(--line);
-    border-radius: 0.55rem;
-    color: var(--text);
-    font-weight: 600;
-  }
-  .btn.primary {
-    background: var(--accent);
-    border-color: var(--accent);
-    color: #fff;
-  }
-  .btn:hover {
-    text-decoration: none;
-    border-color: var(--accent);
+  .diagram-panel svg {
+    width: 100%;
+    height: auto;
+    display: block;
   }
 
-  .term {
-    margin-top: 2.6rem;
-    background: var(--panel);
-    border: 1px solid var(--line);
-    border-radius: 0.7rem;
-    padding: 1.1rem 1.3rem;
-    overflow-x: auto;
-    font:
-      0.85rem/1.55 ui-monospace,
-      monospace;
-    color: var(--accent-soft);
+  /* topology diagram: fold-line vocabulary */
+  .fold-dash {
+    stroke: var(--color-fold-line);
+    stroke-width: 1.5;
+    stroke-dasharray: 5 5;
+    fill: none;
   }
-  .term .c {
-    color: var(--muted);
+  .fold-active {
+    stroke: var(--color-accent);
+    stroke-width: 2;
+    fill: none;
+  }
+  .fold-node {
+    fill: var(--color-rack);
+    stroke: var(--color-trace);
+  }
+  .fold-node-label {
+    font-family: var(--mono-font-family);
+    font-size: 16px;
+    fill: var(--color-fg);
+    letter-spacing: 0.02em;
+  }
+  .fold-anno {
+    font-family: var(--mono-font-family);
+    font-size: 13px;
+    fill: var(--color-static);
+    letter-spacing: 0.03em;
+  }
+  .fold-notch {
+    stroke: var(--color-carrier);
+    stroke-width: 1.5;
+  }
+  .fold-arrow {
+    fill: var(--color-accent);
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .fold-active.draw {
+      stroke-dasharray: 720;
+      stroke-dashoffset: 720;
+      animation: fold-draw 1.6s cubic-bezier(0.22, 1, 0.36, 1) 0.3s forwards;
+    }
+    @keyframes fold-draw {
+      to {
+        stroke-dashoffset: 0;
+      }
+    }
   }
 
-  .proof {
+  /* ===== proof band ===== */
+  .proof .wrap {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
-    gap: 1px;
-    background: var(--line);
-    border-block: 1px solid var(--line);
-    padding: 0;
-    max-width: 100%;
+    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+    gap: var(--spacing-md);
+  }
+  .proof {
+    padding-block: 40px;
   }
   .stat {
-    background: var(--bg);
-    padding: 1.4rem 1.25rem;
-  }
-  .stat strong {
     display: block;
+    background: var(--color-rack);
+    border: 1px solid var(--color-trace);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-md) var(--spacing-lg);
+    color: var(--color-fg);
+  }
+  .stat:hover {
+    border-color: var(--color-carrier);
+    text-decoration: none;
+  }
+  .stat b {
+    font-family: var(--mono-font-family);
     font-size: 1.5rem;
-    color: var(--accent-soft);
+    font-weight: 700;
+    display: block;
+    margin-bottom: 4px;
+    letter-spacing: 0;
   }
   .stat span {
-    color: var(--muted);
-    font-size: 0.88rem;
+    color: var(--color-static);
+    font-size: var(--body-sm);
+    display: block;
+    max-width: none;
   }
 
-  section.wrap {
-    padding-block: 3.5rem;
+  /* ===== demo ===== */
+  .demo h2,
+  .runit h2,
+  .problems h2 {
+    margin-bottom: var(--spacing-md);
   }
-  h2 {
-    font-size: 1.8rem;
-    letter-spacing: -0.01em;
+  .demo .intro {
+    margin-bottom: var(--spacing-xl);
+    color: var(--color-static);
   }
-  .section-lede {
-    color: var(--muted);
-    margin-top: 0.5rem;
-    max-width: 38rem;
-  }
-  .grid {
+  .termini {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(17rem, 1fr));
-    gap: 1rem;
-    margin-top: 2rem;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: var(--spacing-md);
   }
-  .card {
-    background: var(--panel);
-    border: 1px solid var(--line);
-    border-radius: 0.7rem;
-    padding: 1.2rem 1.3rem;
+  .terminus {
+    background: var(--color-rack);
+    border: 1px solid var(--color-trace);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-lg);
+    position: relative;
   }
-  .card h3 {
-    font-size: 1.02rem;
-    margin-bottom: 0.45rem;
+  .terminus::before {
+    /* fold-line connector notch: each terminus hangs off the shared route */
+    content: '';
+    position: absolute;
+    top: -13px;
+    left: var(--spacing-lg);
+    width: 1px;
+    height: 12px;
+    border-left: 1.5px dashed var(--color-fold-line);
   }
-  .card p {
-    color: var(--muted);
-    font-size: 0.92rem;
-  }
-  .card h3 code {
-    font-family: ui-monospace, monospace;
-    color: var(--accent-soft);
-  }
-  .demo-grid {
-    grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
-  }
-
-  .closing {
-    text-align: center;
-    border-top: 1px solid var(--line);
-  }
-  .closing .section-lede {
-    margin-inline: auto;
-  }
-  .closing .actions {
-    margin-top: 1.4rem;
-  }
-
-  .foot {
+  .route-rail {
+    border-bottom: 1.5px dashed var(--color-fold-line);
+    margin-bottom: 12px;
+    position: relative;
     display: flex;
     justify-content: space-between;
-    gap: 1rem;
-    flex-wrap: wrap;
-    padding-block: 1.6rem;
-    border-top: 1px solid var(--line);
-    color: var(--muted);
-    font-size: 0.9rem;
+    align-items: flex-end;
+    padding-bottom: 8px;
   }
-  .foot nav {
-    display: flex;
-    gap: 1.2rem;
+  .route-rail .chip {
+    font-family: var(--mono-font-family);
+    font-size: var(--body-sm);
+    color: var(--color-carrier);
+    background: var(--color-rack);
+    border: 1px solid var(--color-trace);
+    border-radius: var(--radius-sm);
+    padding: 3px 10px;
+  }
+  .terminus h3 {
+    font-family: var(--mono-font-family);
+    font-size: 1.05rem;
+    letter-spacing: 0;
+    margin-bottom: var(--spacing-sm);
+    color: var(--color-carrier);
+  }
+  .terminus p {
+    color: var(--color-static);
+    font-size: var(--body-sm);
+  }
+
+  /* ===== run-it: numbered route ===== */
+  .runit .intro {
+    color: var(--color-static);
+    margin-bottom: var(--spacing-xl);
+  }
+  .route-steps {
+    display: grid;
+    gap: var(--spacing-lg);
+    list-style: none;
+    padding: 0;
+  }
+  .step {
+    display: grid;
+    grid-template-columns: 44px 1fr;
+    gap: var(--spacing-md);
+  }
+  .step > div:last-child {
+    min-width: 0;
+  }
+  .step .marker {
+    width: 32px;
+    height: 32px;
+    border-radius: 0;
+    border: 1.5px solid var(--color-trace);
+    display: grid;
+    place-items: center;
+    font-family: var(--mono-font-family);
+    font-size: var(--body-sm);
+    color: var(--color-carrier);
+    position: relative;
+    background: var(--color-bg);
+    z-index: 1;
+  }
+  .step {
+    position: relative;
+  }
+  .step:not(:last-child)::before {
+    content: '';
+    position: absolute;
+    left: 15.5px;
+    top: 36px;
+    bottom: -24px;
+    border-left: 1.5px dashed var(--color-fold-line);
+  }
+  .step h3 {
+    margin-bottom: var(--spacing-sm);
+    font-size: var(--heading-md);
+  }
+  .paths {
+    margin-top: var(--spacing-xl);
+    display: grid;
+  }
+  .path {
+    display: grid;
+    grid-template-columns: 140px 1fr;
+    gap: var(--spacing-md);
+    padding-block: var(--spacing-md);
+    border-top: 1px solid var(--color-trace);
+    align-items: baseline;
+  }
+  .path h3 {
+    font: 700 var(--heading-md) / 1.3 var(--heading-font-family);
+  }
+  .path p {
+    color: var(--color-static);
+    font-size: var(--body-sm);
+  }
+  .path .cmd {
+    display: block;
+    margin-top: 6px;
+    font-family: var(--mono-font-family);
+    font-size: 0.8125rem;
+    color: var(--color-carrier);
+    overflow-wrap: anywhere;
+  }
+  @media (max-width: 640px) {
+    .path {
+      grid-template-columns: 1fr;
+      gap: var(--spacing-xs);
+    }
+  }
+
+  /* ===== problems: 3 cluster bands ===== */
+  .problems .intro {
+    color: var(--color-static);
+    margin-bottom: var(--spacing-xl);
+  }
+  .cluster {
+    display: grid;
+    grid-template-columns: 200px 1fr;
+    gap: var(--spacing-lg);
+    padding-block: var(--spacing-lg);
+  }
+  .cluster + .cluster {
+    border-top: 1px solid var(--color-trace);
+  }
+  .cluster-rail h3 {
+    font-size: var(--heading-lg);
+    margin-top: var(--spacing-sm);
+  }
+  .cluster-rail svg {
+    display: block;
+  }
+  .cluster-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: var(--spacing-md);
+  }
+  .problem {
+    padding: var(--spacing-md) 0;
+  }
+  .problem h4 {
+    font: 700 var(--heading-md) / 1.3 var(--heading-font-family);
+    margin-bottom: 6px;
+  }
+  .problem p {
+    color: var(--color-static);
+    font-size: var(--body-sm);
+  }
+
+  /* ===== closing: the Route drench ===== */
+  .closing :focus-visible {
+    outline-color: var(--color-bg);
+  }
+  .closing {
+    background: var(--color-accent);
+    border-top: none;
+    padding-block: 80px;
+  }
+  .closing .wrap {
+    display: grid;
+    gap: var(--spacing-lg);
+    justify-items: start;
+  }
+  .closing h2 {
+    color: var(--color-bg);
+    font-size: clamp(2rem, 4vw, 3rem);
+  }
+  .closing p {
+    color: var(--color-bg);
+    opacity: 0.92;
+    max-width: 56ch;
+  }
+  .closing .btn-primary {
+    background: var(--color-bg);
+    color: var(--color-carrier);
+  }
+  .closing .btn-primary:hover {
+    background: #1c1f2b;
+  }
+
+  /* ===== responsive (page-specific) ===== */
+  @media (max-width: 1024px) {
+    .hero .wrap {
+      grid-template-columns: 1fr;
+    }
+    .terminus::before {
+      display: none;
+    }
+    .diagram-panel {
+      max-width: 560px;
+    }
+    .cluster {
+      grid-template-columns: 1fr;
+      gap: var(--spacing-md);
+    }
+    .cluster-rail {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-md);
+    }
+    .cluster-rail h3 {
+      margin-top: 0;
+    }
+  }
+  @media (max-width: 640px) {
+    .cta-row .btn {
+      flex: 1;
+      justify-content: center;
+    }
+    .closing .btn {
+      width: 100%;
+      justify-content: center;
+    }
+    .step {
+      grid-template-columns: 32px 1fr;
+      gap: var(--spacing-sm);
+    }
   }
 </style>

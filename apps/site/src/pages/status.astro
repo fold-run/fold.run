@@ -1,273 +1,288 @@
 ---
 // Live status of the public fold.run properties, read client-side from the
 // fold-uptime worker (apps/uptime): checks every 5 minutes, a target is
-// "down" after 2 consecutive failures.
+// "down" after 2 consecutive failures. Visual design from the stardust
+// redesign (stardust/migrated/status/index.html); rows are JS-rendered.
+import Base from '../layouts/Base.astro';
+
 const STATUS_URL = 'https://fold-uptime.bauman.workers.dev/status';
+
+const description =
+  'Live status of the fold.run properties — checked every five minutes by an independent monitor.';
+
+const jsonld = {
+  '@context': 'https://schema.org',
+  '@type': 'WebPage',
+  url: 'https://fold.run/status/',
+};
 ---
 
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Status · fold</title>
-    <meta
-      name="description"
-      content="Live status of the fold.run properties — checked every five minutes by an independent monitor."
-    />
-    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-    <meta property="og:type" content="website" />
-    <meta property="og:title" content="Status · fold" />
-    <meta
-      property="og:description"
-      content="Live status of the fold.run properties — checked every five minutes by an independent monitor."
-    />
-  </head>
-  <body>
-    <header class="wrap nav">
-      <a class="brand" href="/">
-        <img src="/favicon.svg" alt="" width="22" height="22" />
-        <span>fold</span>
-      </a>
-      <nav>
-        <a href="/#run">Run it</a>
-        <a href="https://docs.fold.run">Docs</a>
-        <a href="https://github.com/fold-run/fold">GitHub</a>
-      </nav>
-    </header>
+<Base
+  title="Status · fold"
+  description={description}
+  canonical="https://fold.run/status/"
+  jsonld={jsonld}
+  current="status"
+  template="unique"
+>
+  <main id="main">
+    <section
+      class="status-hero"
+      data-section="status-hero"
+      data-intent="system status at a glance"
+      data-layout="contained"
+      data-module="status-readout"
+    >
+      <div class="wrap">
+        <h1>Status</h1>
+        <p class="lede">
+          Checked every five minutes by an independent monitor; a property is marked down only after
+          two consecutive failures. The raw feed is <a href={STATUS_URL}>JSON</a>.
+        </p>
+        <p id="overall" class="overall checking" role="status" data-status-url={STATUS_URL}>
+          Checking…
+        </p>
+      </div>
+    </section>
 
-    <main class="wrap article">
-      <h1>Status</h1>
-      <p class="lede">
-        Checked every five minutes by an independent monitor; a property is
-        marked down only after two consecutive failures. The raw feed is
-        <a href={STATUS_URL}>JSON</a>.
-      </p>
+    <section
+      class="status-list"
+      data-section="status-list"
+      data-intent="live proof"
+      data-layout="stack"
+    >
+      <h2 class="sr-only">Monitored properties</h2>
+      <div class="wrap">
+        <ul id="targets" class="targets"></ul>
+        <p id="updated" class="updated" aria-live="polite"></p>
+      </div>
+    </section>
+  </main>
+</Base>
 
-      <p id="overall" class="overall checking" data-status-url={STATUS_URL}>
-        Checking…
-      </p>
+<script>
+  interface Target {
+    id: string;
+    url: string;
+    status: 'up' | 'down';
+    lastCheckAt: string;
+    latencyMs?: number;
+    lastError?: string;
+  }
 
-      <ul id="targets" class="targets"></ul>
+  const overall = document.getElementById('overall') as HTMLElement;
+  const list = document.getElementById('targets') as HTMLElement;
+  const updated = document.getElementById('updated') as HTMLElement;
+  const statusUrl = overall.dataset.statusUrl as string;
 
-      <p id="updated" class="updated"></p>
-    </main>
+  function ago(iso: string): string {
+    const s = Math.max(0, Math.round((Date.now() - Date.parse(iso)) / 1000));
+    if (s < 90) return `${s} s ago`;
+    const m = Math.round(s / 60);
+    if (m < 90) return `${m} min ago`;
+    return `${Math.round(m / 60)} h ago`;
+  }
 
-    <footer class="wrap foot">
-      <span>© fold.run · Apache-2.0</span>
-      <nav>
-        <a href="https://docs.fold.run">docs.fold.run</a>
-        <a href="https://github.com/fold-run/fold">github.com/fold-run/fold</a>
-      </nav>
-    </footer>
+  function render(overallState: string, targets: Target[]): void {
+    const up = overallState === 'up';
+    overall.className = `overall ${up ? 'ok' : 'bad'}`;
+    overall.innerHTML = `<span class="${up ? 'up-dot' : 'down-dot'}" aria-hidden="true"></span>${
+      up ? 'All systems operational' : 'Degraded'
+    }`;
+    list.innerHTML = '';
+    for (const t of targets) {
+      const isUp = t.status === 'up';
+      const li = document.createElement('li');
+      li.className = 'target';
+      li.innerHTML = `
+        <span class="name">${t.url.replace('https://', '')}</span>
+        <span class="readout"><span class="${isUp ? 'up-dot' : 'down-dot'}" aria-hidden="true"></span><span
+            class="state${isUp ? '' : ' down'}">${isUp ? 'up' : 'down'}</span><span class="sep" aria-hidden="true">·</span><span
+            class="${isUp ? 'latency' : 'checked'}">${
+              isUp ? `${t.latencyMs ?? '—'} ms` : (t.lastError ?? 'failing')
+            }</span><span class="sep" aria-hidden="true">·</span><span class="checked">checked ${ago(t.lastCheckAt)}</span></span>`;
+      list.appendChild(li);
+    }
+    const time = new Date().toLocaleTimeString(undefined, { timeZoneName: 'short' });
+    updated.textContent = `Updated ${time} — refreshes every minute.`;
+  }
 
-    <script>
-      interface Target {
-        id: string;
-        url: string;
-        status: 'up' | 'down';
-        lastCheckAt: string;
-        latencyMs?: number;
-        lastError?: string;
-      }
+  async function refresh(): Promise<void> {
+    try {
+      const res = await fetch(statusUrl);
+      const data = (await res.json()) as { overall: string; targets: Target[] };
+      render(data.overall, data.targets);
+    } catch {
+      overall.className = 'overall bad';
+      overall.textContent = 'Monitor unreachable — status unknown';
+      updated.textContent = '';
+    }
+  }
 
-      const overall = document.getElementById('overall') as HTMLElement;
-      const list = document.getElementById('targets') as HTMLElement;
-      const updated = document.getElementById('updated') as HTMLElement;
-      const statusUrl = overall.dataset.statusUrl as string;
+  refresh();
+  setInterval(refresh, 60_000);
+</script>
 
-      function ago(iso: string): string {
-        const s = Math.max(0, Math.round((Date.now() - Date.parse(iso)) / 1000));
-        if (s < 90) return `${s} s ago`;
-        const m = Math.round(s / 60);
-        if (m < 90) return `${m} min ago`;
-        return `${Math.round(m / 60)} h ago`;
-      }
-
-      function render(overallState: string, targets: Target[]): void {
-        overall.className = `overall ${overallState === 'up' ? 'ok' : 'bad'}`;
-        overall.textContent =
-          overallState === 'up' ? 'All systems operational' : 'Degraded';
-        list.innerHTML = '';
-        for (const t of targets) {
-          const li = document.createElement('li');
-          const dot = t.status === 'up' ? 'ok' : 'bad';
-          li.innerHTML = `
-            <span class="dot ${dot}"></span>
-            <span class="name">${t.url.replace('https://', '')}</span>
-            <span class="detail">${
-              t.status === 'up'
-                ? `up · ${t.latencyMs ?? '—'} ms · checked ${ago(t.lastCheckAt)}`
-                : `down · ${t.lastError ?? 'failing'} · checked ${ago(t.lastCheckAt)}`
-            }</span>`;
-          list.appendChild(li);
-        }
-        updated.textContent = `Updated ${new Date().toLocaleTimeString()} — refreshes every minute.`;
-      }
-
-      async function refresh(): Promise<void> {
-        try {
-          const res = await fetch(statusUrl);
-          const data = (await res.json()) as { overall: string; targets: Target[] };
-          render(data.overall, data.targets);
-        } catch {
-          overall.className = 'overall bad';
-          overall.textContent = 'Monitor unreachable — status unknown';
-          updated.textContent = '';
-        }
-      }
-
-      refresh();
-      setInterval(refresh, 60_000);
-    </script>
-  </body>
-</html>
-
-<style>
+<style is:global>
   :root {
-    --bg: #0c0d12;
-    --panel: #12141c;
-    --line: #23263a;
-    --text: #e8e9f2;
-    --muted: #9a9db5;
-    --accent: #5560ff;
-    --accent-soft: #c4c8ff;
-    --ok: #4ade80;
-    --bad: #f87171;
-    color-scheme: dark;
+    --color-up: #4ade80; /* Up — RESERVED status semantics; this page only */
+    --color-down: #f87171; /* Down — RESERVED status semantics; this page only */
   }
-  * {
-    box-sizing: border-box;
-    margin: 0;
+
+  /* ===== status hero ===== */
+  .status-hero {
+    padding-block: calc(var(--section-padding) + 16px) var(--spacing-xl);
   }
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font:
-      16px/1.65 ui-sans-serif,
-      system-ui,
-      sans-serif;
+  .status-hero h1 {
+    font-size: var(--heading-xxl);
+    font-weight: 800;
+    line-height: 1.02;
+    letter-spacing: -0.025em;
+    margin-bottom: var(--spacing-lg);
   }
-  .wrap {
-    max-width: 44rem;
-    margin-inline: auto;
-    padding-inline: 1.25rem;
-  }
-  a {
-    color: var(--accent-soft);
-    text-decoration: none;
-  }
-  a:hover {
-    text-decoration: underline;
-  }
-  .nav {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding-block: 1.1rem;
-    border-bottom: 1px solid var(--line);
-    max-width: 62rem;
-  }
-  .brand {
-    display: flex;
-    gap: 0.55rem;
-    align-items: center;
-    font-weight: 700;
-    font-size: 1.15rem;
-    color: var(--text);
-  }
-  .nav nav {
-    display: flex;
-    gap: 1.4rem;
-    font-size: 0.95rem;
-  }
-  .article {
-    padding-block: 3rem 4rem;
-  }
-  h1 {
-    font-size: clamp(1.7rem, 4.5vw, 2.3rem);
-    line-height: 1.15;
-    letter-spacing: -0.015em;
-    margin-bottom: 1.2rem;
-  }
-  .lede {
-    color: var(--muted);
-    font-size: 1.08rem;
-    margin-bottom: 2rem;
+  .status-hero .lede {
+    color: var(--color-static);
+    font-size: 1.0625rem;
+    margin-bottom: var(--spacing-xl);
   }
   .overall {
-    font-weight: 600;
-    font-size: 1.1rem;
-    padding: 0.9rem 1.2rem;
-    border: 1px solid var(--line);
-    border-radius: 0.7rem;
-    background: var(--panel);
-    margin-bottom: 1.5rem;
-  }
-  .overall.ok {
-    color: var(--ok);
-  }
-  .overall.bad {
-    color: var(--bad);
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    background: var(--color-rack);
+    border: 1px solid var(--color-trace);
+    border-radius: var(--radius-lg);
+    padding: 14px 20px;
+    font: 600 var(--heading-md) / 1.3 var(--body-font-family);
   }
   .overall.checking {
-    color: var(--muted);
+    color: var(--color-static);
+  }
+  .overall.bad {
+    color: var(--color-down);
+  }
+
+  /* status dots: the reserved colors, used only for live semantics */
+  .up-dot,
+  .down-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    flex: none;
+    display: inline-block;
+  }
+  .up-dot {
+    background: var(--color-up);
+  }
+  .down-dot {
+    background: var(--color-down);
+  }
+
+  /* ===== status list: rows on a dashed fold-line rail ===== */
+  .status-list {
+    padding-top: 0;
+    border-top: none;
   }
   .targets {
     list-style: none;
-    padding: 0;
+    padding: 0 0 0 28px;
+    margin: 0;
+    display: grid;
+    gap: var(--spacing-md);
+    position: relative;
   }
-  .targets li {
+  .targets:not(:empty)::before {
+    /* the shared route: every monitored property hangs off one fold-line */
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 12px;
+    bottom: 12px;
+    border-left: 1.5px dashed var(--color-fold-line);
+  }
+  .target {
+    background: var(--color-rack);
+    border: 1px solid var(--color-trace);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-md) var(--spacing-lg);
     display: flex;
-    align-items: baseline;
-    gap: 0.75rem;
-    border-top: 1px solid var(--line);
-    padding-block: 0.9rem;
-    font-size: 0.95rem;
+    align-items: center;
+    gap: var(--spacing-md);
+    flex-wrap: wrap;
+    position: relative;
   }
-  .targets li:last-child {
-    border-bottom: 1px solid var(--line);
+  .target::before {
+    /* fold-line connector notch from the rail into the row */
+    content: '';
+    position: absolute;
+    left: -28px;
+    top: 50%;
+    width: 26px;
+    height: 0;
+    border-top: 1.5px dashed var(--color-fold-line);
   }
-  .dot {
-    width: 0.6rem;
-    height: 0.6rem;
-    border-radius: 50%;
-    align-self: center;
-    flex-shrink: 0;
+  .target .name {
+    font-family: var(--mono-font-family);
+    font-size: var(--body-sm);
+    letter-spacing: 0.02em;
+    color: var(--color-fg);
+    font-weight: 450;
+    margin-right: auto;
   }
-  .dot.ok {
-    background: var(--ok);
+  .target .readout {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    font-family: var(--mono-font-family);
+    font-size: var(--body-sm);
+    letter-spacing: 0.02em;
   }
-  .dot.bad {
-    background: var(--bad);
+  .target .state {
+    color: var(--color-up);
+    font-weight: 600;
   }
-  .name {
-    font-family: ui-monospace, monospace;
-    color: var(--text);
+  .target .state.down {
+    color: var(--color-down);
   }
-  .detail {
-    color: var(--muted);
-    margin-left: auto;
-    font-size: 0.88rem;
+  .target .latency {
+    color: var(--color-fg);
+  }
+  .target .checked {
+    color: var(--color-static);
+  }
+  .target .sep {
+    color: var(--color-static);
   }
   .updated {
-    color: var(--muted);
-    font-size: 0.85rem;
-    margin-top: 1.2rem;
+    color: var(--color-static);
+    font-size: var(--body-sm);
+    margin-top: var(--spacing-lg);
   }
-  .foot {
-    display: flex;
-    justify-content: space-between;
-    gap: 1rem;
-    flex-wrap: wrap;
-    padding-block: 1.6rem;
-    border-top: 1px solid var(--line);
-    color: var(--muted);
-    font-size: 0.9rem;
-    max-width: 62rem;
+
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
   }
-  .foot nav {
-    display: flex;
-    gap: 1.2rem;
+
+  /* ===== responsive (page-specific) ===== */
+  @media (max-width: 640px) {
+    .targets {
+      padding-left: 0;
+    }
+    .targets::before,
+    .target::before {
+      display: none;
+    }
+    .target {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: var(--spacing-sm);
+    }
+    .target .name {
+      margin-right: 0;
+    }
   }
 </style>
