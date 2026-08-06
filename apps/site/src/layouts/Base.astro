@@ -312,6 +312,66 @@ const { title, description, canonical, jsonld, current, template } = Astro.props
         border-top: 1px solid var(--color-trace);
         padding-block: var(--spacing-xl);
       }
+      .foot-grid {
+        display: grid;
+        grid-template-columns: 2fr 1fr 1fr 1fr;
+        align-items: start;
+        gap: var(--spacing-xl);
+        padding-bottom: var(--spacing-lg);
+      }
+      .foot-brand .brandmark-sm {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 1.05rem;
+      }
+      .foot-brand p {
+        color: var(--color-static);
+        font-size: var(--body-sm);
+        max-width: 30ch;
+        margin-top: var(--spacing-sm);
+      }
+      @media (max-width: 768px) {
+        .foot-grid {
+          grid-template-columns: 1fr 1fr;
+          gap: var(--spacing-lg);
+        }
+        .foot-brand {
+          grid-column: 1 / -1;
+        }
+      }
+      .foot-col {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+      }
+      .foot-col h2 {
+        font: 600 var(--body-sm) / 1.4 var(--body-font-family);
+        color: var(--color-fg);
+        letter-spacing: 0.01em;
+        margin-bottom: 6px;
+      }
+      .foot-col a {
+        font-size: var(--body-sm);
+        color: var(--color-static);
+        padding-block: 5px;
+      }
+      .foot-col a:hover {
+        color: var(--color-carrier);
+      }
+      .foot-legal {
+        display: flex;
+        gap: var(--spacing-lg);
+        align-items: center;
+        flex-wrap: wrap;
+        border-top: 1px solid var(--color-trace);
+        padding-top: var(--spacing-lg);
+      }
+      .foot-legal .tagline {
+        margin-left: auto;
+        color: var(--color-static);
+        font-size: var(--body-sm);
+      }
       footer.site .wrap {
         display: flex;
         gap: var(--spacing-lg);
@@ -427,6 +487,7 @@ const { title, description, canonical, jsonld, current, template } = Astro.props
           fold
         </a>
         <nav aria-label="Site">
+          <a href="https://docs.fold.run/">Docs</a>
           <a href="/#demo">Live demo</a>
           <a href="https://docs.fold.run/use-cases/">Use cases</a>
           <a href="/blog/" aria-current={current === 'blog' ? 'page' : undefined}>Blog</a>
@@ -440,22 +501,52 @@ const { title, description, canonical, jsonld, current, template } = Astro.props
     <slot />
 
     <footer class="site" data-section="footer" data-intent="navigate" data-layout="contained" data-canon>
-      <div class="wrap">
+      <div class="wrap foot-grid">
+        <div class="foot-brand">
+          <span class="brandmark-sm" aria-hidden="true">
+            <svg width="24" height="24" viewBox="0 0 28 28">
+              <rect x="1.5" y="1.5" width="25" height="25" rx="2" fill="#12141c" stroke="#23263a" stroke-width="1.5"
+              ></rect>
+              <path d="M 3 25 L 25 3" stroke="#23263a" stroke-width="1.5" stroke-dasharray="3.5 3.5" fill="none"
+              ></path>
+              <path d="M 26.5 12 V 7.5 A 2 2 0 0 0 20.5 1.5 H 16 Z" fill="#d9a441"></path>
+            </svg>
+            <b>fold</b>
+          </span>
+          <p>One governed endpoint between every MCP client and every MCP server.</p>
+        </div>
+        <nav aria-label="Product" class="foot-col">
+          <h2>Product</h2>
+          <a href="/#demo">Live demo</a>
+          <a href="https://docs.fold.run/use-cases/">Use cases</a>
+          <a href="https://docs.fold.run/benchmarks/">Benchmarks</a>
+          <a href="https://docs.fold.run/conformance/">Conformance</a>
+        </nav>
+        <nav aria-label="Deploy" class="foot-col">
+          <h2>Deploy</h2>
+          <a href="https://docs.fold.run/getting-started/">Get started</a>
+          <a href="https://docs.fold.run/deployment/">Deployment</a>
+          <a href="https://docs.fold.run/operations/">Operations</a>
+          <a href="https://docs.fold.run/security/">Security model</a>
+        </nav>
+        <nav aria-label="Project" class="foot-col">
+          <h2>Project</h2>
+          <a href="https://github.com/fold-run/fold">GitHub</a>
+          <a href="/blog/" aria-current={current === 'blog' ? 'page' : undefined}>Blog</a>
+          <a href="/status/" aria-current={current === 'status' ? 'page' : undefined}>Status</a>
+          <a href="https://github.com/fold-run/fold/blob/main/LICENSE">Apache-2.0 license</a>
+        </nav>
+      </div>
+      <div class="wrap foot-legal">
         <span class="legal">
           <svg width="20" height="20" viewBox="0 0 28 28" role="img" aria-hidden="true">
             <rect x="1.5" y="1.5" width="25" height="25" rx="2" fill="#12141c" stroke="#23263a" stroke-width="1.5"></rect>
             <path d="M 3 25 L 25 3" stroke="#23263a" stroke-width="1.5" stroke-dasharray="3.5 3.5" fill="none"></path>
             <path d="M 26.5 12 V 7.5 A 2 2 0 0 0 20.5 1.5 H 16 Z" fill="#d9a441"></path>
           </svg>
-          © fold.run · Apache-2.0
+          © fold.run · the enterprise MCP gateway
         </span>
-        <nav aria-label="Footer">
-          <a href="https://docs.fold.run/">docs.fold.run</a>
-          <a href="https://github.com/fold-run/fold">github.com/fold-run/fold</a>
-          <a href="https://docs.fold.run/conformance/">Conformance</a>
-          <a href="/blog/">Blog</a>
-          <a href="/status/" aria-current={current === 'status' ? 'page' : undefined}>Status</a>
-        </nav>
+        <span class="tagline">fold is the one. fold.run is the execution.</span>
       </div>
     </footer>
   </body>
