@@ -366,12 +366,19 @@ const { title, description, canonical, jsonld, current, template } = Astro.props
       }
       footer.site .wrap.foot-grid {
         display: grid;
-        grid-template-columns: minmax(240px, 1.4fr) repeat(3, auto);
-        justify-content: space-between;
-        align-items: start;
-        column-gap: var(--spacing-xl);
-        row-gap: var(--spacing-lg);
-        padding-bottom: var(--spacing-xl);
+        grid-template-columns: minmax(240px, 1.4fr) repeat(3, minmax(160px, 1fr));
+        align-items: stretch;
+        gap: 1px;
+        background: var(--color-trace);
+        border: 1px solid var(--color-trace);
+        padding: 0;
+        max-width: calc(var(--max-width) - 2.5rem);
+        margin-bottom: var(--spacing-lg);
+      }
+      .foot-brand,
+      footer.site .foot-col {
+        background: var(--color-bg);
+        padding: var(--spacing-lg);
       }
       .foot-brand .brandmark-sm {
         display: inline-flex;
@@ -388,8 +395,7 @@ const { title, description, canonical, jsonld, current, template } = Astro.props
       @media (max-width: 768px) {
         footer.site .wrap.foot-grid {
           grid-template-columns: 1fr 1fr;
-          justify-content: stretch;
-          gap: var(--spacing-lg);
+          gap: 1px;
         }
         .foot-brand {
           grid-column: 1 / -1;
@@ -399,6 +405,9 @@ const { title, description, canonical, jsonld, current, template } = Astro.props
         display: flex;
         flex-direction: column;
         gap: 2px;
+      }
+      .foot-col a {
+        align-self: flex-start;
       }
       .foot-col h2 {
         font: 600 var(--body-sm) / 1.4 var(--body-font-family);
@@ -534,11 +543,11 @@ const { title, description, canonical, jsonld, current, template } = Astro.props
       <div class="wrap">
         <a class="brandmark" href="/" aria-label="fold home">
           <!-- authored fold wordmark: fold-line letterform mark -->
-          <svg width="28" height="28" viewBox="0 0 28 28" role="img" aria-hidden="true">
-            <rect x="1.5" y="1.5" width="25" height="25" rx="2" fill="#12141c" stroke="#23263a" stroke-width="1.5"></rect>
-            <path d="M 3 25 L 25 3" stroke="#23263a" stroke-width="1.5" stroke-dasharray="3.5 3.5" fill="none"></path>
-            <path d="M 26.5 12 V 7.5 A 2 2 0 0 0 20.5 1.5 H 16 Z" fill="#d9a441"></path>
-          </svg>
+          <svg width="28" height="28" viewBox="0 0 28 28" aria-hidden="true">
+              <rect x="1" y="1" width="26" height="26" fill="#12141c" stroke="#23263a" stroke-width="1.5"></rect>
+              <path d="M 27 13 V 1 H 15 Z" fill="#d9a441"></path>
+              <path d="M 15 1 L 27 13" stroke="#a87c1f" stroke-width="1.2"></path>
+            </svg>
           fold
         </a>
         <nav aria-label="Site">
@@ -560,11 +569,9 @@ const { title, description, canonical, jsonld, current, template } = Astro.props
         <div class="foot-brand">
           <span class="brandmark-sm">
             <svg width="24" height="24" viewBox="0 0 28 28" aria-hidden="true">
-              <rect x="1.5" y="1.5" width="25" height="25" rx="2" fill="#12141c" stroke="#23263a" stroke-width="1.5"
-              ></rect>
-              <path d="M 3 25 L 25 3" stroke="#23263a" stroke-width="1.5" stroke-dasharray="3.5 3.5" fill="none"
-              ></path>
-              <path d="M 26.5 12 V 7.5 A 2 2 0 0 0 20.5 1.5 H 16 Z" fill="#d9a441"></path>
+              <rect x="1" y="1" width="26" height="26" fill="#12141c" stroke="#23263a" stroke-width="1.5"></rect>
+              <path d="M 27 13 V 1 H 15 Z" fill="#d9a441"></path>
+              <path d="M 15 1 L 27 13" stroke="#a87c1f" stroke-width="1.2"></path>
             </svg>
             <b>fold</b>
           </span>
@@ -594,11 +601,11 @@ const { title, description, canonical, jsonld, current, template } = Astro.props
       </div>
       <div class="wrap foot-legal">
         <span class="legal">
-          <svg width="20" height="20" viewBox="0 0 28 28" role="img" aria-hidden="true">
-            <rect x="1.5" y="1.5" width="25" height="25" rx="2" fill="#12141c" stroke="#23263a" stroke-width="1.5"></rect>
-            <path d="M 3 25 L 25 3" stroke="#23263a" stroke-width="1.5" stroke-dasharray="3.5 3.5" fill="none"></path>
-            <path d="M 26.5 12 V 7.5 A 2 2 0 0 0 20.5 1.5 H 16 Z" fill="#d9a441"></path>
-          </svg>
+          <svg width="20" height="20" viewBox="0 0 28 28" aria-hidden="true">
+              <rect x="1" y="1" width="26" height="26" fill="#12141c" stroke="#23263a" stroke-width="1.5"></rect>
+              <path d="M 27 13 V 1 H 15 Z" fill="#d9a441"></path>
+              <path d="M 15 1 L 27 13" stroke="#a87c1f" stroke-width="1.2"></path>
+            </svg>
           © fold.run · the enterprise MCP gateway
         </span>
         <span class="tagline">fold is the one. fold.run is the execution.</span>
