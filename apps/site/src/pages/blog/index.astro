@@ -97,13 +97,15 @@ const jsonld = {
 
   /* ===== post list: route-line rail, rows hang off it ===== */
   .post-list {
-    padding-block: var(--spacing-lg) calc(var(--section-padding) + 16px);
-    border-top: none;
+    padding-top: var(--spacing-lg);
   }
   .posts {
     list-style: none;
-    padding: 0 0 0 var(--spacing-xl);
-    position: relative;
+    display: grid;
+    gap: 1px;
+    background: var(--color-trace);
+    border: 1px solid var(--color-trace);
+    padding: 0;
     display: grid;
     gap: var(--spacing-xl);
   }
@@ -170,9 +172,7 @@ const jsonld = {
 
   /* ===== responsive (page-specific) ===== */
   @media (max-width: 640px) {
-    .posts {
-      padding-left: var(--spacing-lg);
-    }
+
         .closing .btn {
       width: 100%;
       justify-content: center;

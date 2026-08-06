@@ -78,8 +78,7 @@ tasks/get  &#123; "job-42" &#125;     ──▶ ...which upstream owns this?</co
 
           <p>
             A client calls <code>jobs__start_job</code>; the task is born on the jobs server and its
-            id travels back through fold. Every later <code>tasks/get</code>, <code>tasks/cancel</code>,
-            <code>tasks/result</code>, and <code>tasks/update</code> for that id must reach that server
+            id travels back through fold. Every later <code>tasks/get</code>, <code>tasks/cancel</code>, <code>tasks/result</code>, and <code>tasks/update</code> for that id must reach that server
             — and the request carries nothing but the opaque id. No namespaced tool name, no routing
             hint, and no session to lean on: clients persist task ids and come back for them tomorrow,
             on a fresh connection, possibly through a different gateway instance.
@@ -94,8 +93,7 @@ tasks/get  &#123; "job-42" &#125;     ──▶ ...which upstream owns this?</co
           </p>
           <p>
             <strong>Broadcasting</strong> every task call to all N upstreams costs N× amplification
-            on every poll, and it's a correctness bug, not just a cost: <code>tasks/cancel</code>
-            fanned out is a destructive write sent to N−1 servers that never minted the task, and two
+            on every poll, and it's a correctness bug, not just a cost: <code>tasks/cancel</code> fanned out is a destructive write sent to N−1 servers that never minted the task, and two
             upstreams can independently mint colliding ids.
           </p>
           <p>
@@ -127,8 +125,7 @@ tasks/get  &#123; "job-42" &#125;     ──▶ ...which upstream owns this?</co
               upstream but shows each principal only its own tasks.
             </li>
             <li>
-              <strong>Honest misses.</strong> An id no upstream recognizes answers
-              <code>-32002</code>, and the owning upstream's own errors pass through verbatim — the
+              <strong>Honest misses.</strong> An id no upstream recognizes answers <code>-32002</code>, and the owning upstream's own errors pass through verbatim — the
               gateway stays invisible.
             </li>
           </ul>
@@ -209,8 +206,7 @@ owner := g.locateTaskOwner(ctx, rt, taskID)</code></pre>
           <h2>What about fan-in?</h2>
           <p>
             The extension's companion story is <code>subscriptions/listen</code> — one notification
-            stream south, N streams north, merged. fold doesn't implement it yet, and says so
-            <a href="https://github.com/fold-run/fold#not-implemented">in the README</a> rather than in
+            stream south, N streams north, merged. fold doesn't implement it yet, and says so <a href="https://github.com/fold-run/fold#not-implemented">in the README</a> rather than in
             a footnote: the official Go SDK currently supports the 2026-07-28 protocol on its streamable
             HTTP server only in stateless mode, and fold's session-keyed bridging (sampling, elicitation,
             per-client streams) requires stateful sessions.
@@ -218,8 +214,7 @@ owner := g.locateTaskOwner(ctx, rt, taskID)</code></pre>
           <p>
             What ships today is the fan-in the protocol already exercises: list-changed and
             resource-updated notifications from every upstream fan out to the clients that care,
-            proxied results are origin-tagged (<code>_meta["run.fold/upstream"]</code>), and a
-            <a href={`https://github.com/fold-run/fold/blob/${SHA}/gateway/listen_test.go`}
+            proxied results are origin-tagged (<code>_meta["run.fold/upstream"]</code>), and a <a href={`https://github.com/fold-run/fold/blob/${SHA}/gateway/listen_test.go`}
               >drift canary in the test suite</a
             > fails the moment the SDK lifts the restriction — the gap closes when it can, and CI notices
             before we do.
@@ -246,8 +241,7 @@ owner := g.locateTaskOwner(ctx, rt, taskID)</code></pre>
 
           <h2>Try it</h2>
           <p>
-            <code>go run github.com/fold-run/fold/cmd/fold@latest</code> — or
-            <code>docker run ghcr.io/fold-run/fold</code> — puts the gateway in front of your servers
+            <code>go run github.com/fold-run/fold/cmd/fold@latest</code> — or <code>docker run ghcr.io/fold-run/fold</code> — puts the gateway in front of your servers
             in a minute (<a href="https://docs.fold.run/run-it-locally/">walkthrough</a>). The
             integration suite runs the whole story against real MCP servers from the official Go SDK
             — <a href={`https://github.com/fold-run/fold/blob/${SHA}/gateway/tasks_test.go`}

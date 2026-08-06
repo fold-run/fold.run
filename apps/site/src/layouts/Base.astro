@@ -241,14 +241,13 @@ const { title, description, canonical, jsonld, current, template } = Astro.props
         font-weight: 400;
       }
       .arrow-link {
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
         font-weight: 600;
       }
       .arrow-link::after {
         content: '\2192';
         color: var(--color-accent);
+        margin-left: 8px;
+        display: inline-block;
       }
       /* flush tile grids: hairline gutters */
       .tile-grid {
