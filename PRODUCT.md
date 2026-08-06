@@ -43,9 +43,12 @@ conformance, honest benchmarks) and get an engineer running it in 60 seconds.
   vocabulary — topology and pipeline diagrams drawn like tailor's pattern paper
   (dashed fold lines, notch marks, grain arrows) — gives the brand an ownable
   visual signature beyond type.
-- **Committed, not loud.** One indigo (Route) carries every action across both
-  origins; bolder means larger type conviction, deeper color commitment, and one
-  authored diagram per key surface — never gradients, mascots, or superlatives.
+- **Committed, not loud.** One signature green (Live #00E599) carries every
+  action and proof signal across both origins; near-black instrument-panel
+  neutrals carry everything else. IBM Plex Sans + Geist Mono. Pills for
+  actions, rounded cards, a pointer-tracked glow in the hero — never
+  gradients-as-decoration, mascots, or superlatives.
+
 - **One surface.** Marketing and docs share one token layer, one header, one
   footer, one CTA verb. A gateway that federates N servers into one endpoint
   presents itself as one federated brand.
@@ -72,7 +75,7 @@ conformance, honest benchmarks) and get an engineer running it in 60 seconds.
    count) or an authored diagram over any abstract claim. If a section can embed
    proof, it must.
 2. **Draw the fold.** Diagrams use the pattern-paper vocabulary: Trace hairlines,
-   dashed fold-lines for routes, notch marks for policy points, Route indigo for
+   dashed fold-lines for routes, notch marks for policy points, Live green for
    the active path. This is the brand's signature; no stock illustration ever.
 3. **One system, two grounds.** Dark Backplane is canonical (marketing, docs
    default); Paper-ground (docs light) uses the same hue family via Route Deep.

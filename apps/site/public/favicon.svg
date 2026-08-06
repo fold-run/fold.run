@@ -1,7 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
-  <title>fold</title>
-  <!-- fold mark: a sheet folded along the diagonal -->
-  <rect x="4" y="4" width="24" height="24" rx="5" fill="#3c46e0"/>
-  <path d="M4 9a5 5 0 0 1 5-5h10L4 19Z" fill="#c4c8ff"/>
-  <path d="M19 4h4a5 5 0 0 1 5 5v4L19 4Z" fill="#8a92ff"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 28 28">
+  <rect x="1" y="1" width="26" height="26" fill="#131415" stroke="#242628" stroke-width="1.5"/>
+  <path d="M27 13V1H15Z" fill="#00E599"/>
+  <path d="M15 1L27 13" stroke="#00cc88" stroke-width="1.2"/>
 </svg>

@@ -1,8 +1,6 @@
 ---
-# _provenance: writtenBy=stardust:direct writtenAt=2026-08-06T14:44:00Z
-# TARGET design system (Mode A brand-faithful; current state in stardust/current/DESIGN.md).
-# Hex format retained per brand-faithful inversion (captured surface + Stitch compliance).
-name: fold (variant B — Brass & Ink · Chivo)
+# Final identity — adopted 2026-08-06. Single source of truth.
+name: fold
 description: One governed endpoint between every MCP client and every MCP server.
 colors:
   backplane: "#0c0d0d"
@@ -10,25 +8,24 @@ colors:
   trace: "#242628"
   signal: "#FAFAFA"
   static: "#94979E"
-  brass: "#d9a441"
-  brass-deep: "#a87c1f"
-  brass-soft: "#ecd9a8"
-  paper: "#ffffff"
-  up: "#00E599"
+  live: "#00E599"
+  live-deep: "#00cc88"
+  pulse: "#34D59A"
+  carrier: "#C9CBCF"
   down: "#ff4c79"
 typography:
   display:
     fontFamily: "IBM Plex Sans, ui-sans-serif, system-ui, sans-serif"
     fontSize: "clamp(2.6rem, 6.5vw, 4.5rem)"
-    fontWeight: 800
-    lineHeight: 1.02
-    letterSpacing: "-0.025em"
+    fontWeight: 700
+    lineHeight: 1.05
+    letterSpacing: "-0.02em"
   heading:
     fontFamily: "IBM Plex Sans, ui-sans-serif, system-ui, sans-serif"
     fontSize: "clamp(1.7rem, 3vw, 2.4rem)"
-    fontWeight: 700
+    fontWeight: 600
     lineHeight: 1.12
-    letterSpacing: "-0.015em"
+    letterSpacing: "-0.01em"
   body:
     fontFamily: "IBM Plex Sans, ui-sans-serif, system-ui, sans-serif"
     fontSize: "1rem"
@@ -38,13 +35,14 @@ typography:
   mono:
     fontFamily: "'Geist Mono', ui-monospace, monospace"
     fontSize: "0.875rem"
-    fontWeight: 450
+    fontWeight: 400
     lineHeight: 1.55
-    letterSpacing: "0.02em"
+    letterSpacing: "0"
 rounded:
   sm: "6px"
   md: "10px"
   lg: "14px"
+  pill: "9999px"
 spacing:
   xs: "8px"
   sm: "16px"
@@ -56,148 +54,95 @@ spacing:
   container: "68rem"
 components:
   button-primary:
-    backgroundColor: "{colors.brass}"
+    backgroundColor: "{colors.live}"
     textColor: "{colors.backplane}"
-    rounded: "{rounded.md}"
-    padding: "12px 20px"
+    rounded: "{rounded.pill}"
+    padding: "0 24px"
   button-secondary:
     backgroundColor: "transparent"
-    textColor: "{colors.brass-soft}"
-    rounded: "{rounded.md}"
-    padding: "11px 19px"
+    textColor: "{colors.signal}"
+    rounded: "{rounded.pill}"
+    padding: "0 24px"
   card:
     backgroundColor: "{colors.rack}"
-    rounded: "{rounded.lg}"
-    padding: "20px 24px"
+    rounded: "{rounded.md}"
+    padding: "24px"
   code-panel:
     backgroundColor: "{colors.rack}"
     textColor: "{colors.signal}"
     typography: "{typography.mono}"
-    rounded: "{rounded.lg}"
-    padding: "16px 20px"
-  badge:
-    textColor: "{colors.brass-soft}"
-    typography: "{typography.mono}"
-    rounded: "{rounded.sm}"
-    padding: "2px 8px"
+    rounded: "{rounded.md}"
   link:
-    textColor: "{colors.brass-soft}"
+    textColor: "{colors.carrier}"
 ---
 
 # Design System: fold
 
 ## 1. Overview
 
-Terminal-native dark system, unified across fold.run and docs.fold.run. Backplane
-ground (#0c0d0d) with Rack panels one step lighter, separated by Trace hairlines —
-hierarchy by background-step, never by shadow. One indigo (Route) carries every
-action on both origins; Route Deep is the same hue for light grounds (docs light
-theme on Paper). The signature is the **fold-line drawing vocabulary**: diagrams
-drawn like tailor's pattern paper — dashed fold-lines for routes, notch marks for
-policy points, grain arrows for direction — in Trace with Route for the active
-path. Bolder than the current site through type conviction (800-weight display,
-modular scale) and color commitment, never through gradients or noise.
+The final fold identity: near-black grounds (Backplane #0c0d0d, Rack panels
+#131415, Trace hairlines #242628), one signature green (Live #00E599) reserved
+for actions, active routes, and live-proof signals, IBM Plex Sans + Geist Mono
+(both OFL, self-hosted). Surfaces are spaced rounded cards; CTAs are pills with
+ink text; the hero carries a pointer-tracked aurora glow. The fold-line diagram
+vocabulary (dashed routes, notch marks, the folded-corner mark) remains the
+brand's drawing hand. Unified across fold.run and docs.fold.run.
 
 ## 2. Colors
 
 ### Primary
-- **Brass** `#d9a441` — every primary action, active diagram paths, focus rings; buttons carry ink text (8.6:1).
-  On dark grounds only (3.9:1 on Backplane as large/bold graphic color; never
-  small text on Paper).
-- **Brass Deep** `#a87c1f` — hover/active depth; ink text at 5.2:1 on dark.
-- **Brass Soft** `#ecd9a8` — links, badges, kicker labels, secondary emphasis (13.9:1).
+- **Live** `#00E599` — the one saturated move: primary pills (ink text, 11.7:1),
+  active diagram routes, status-up, arrows, focus rings. **Live Deep** `#00cc88`
+  hover. **Pulse** `#34D59A` soft accents in graphics only.
 
 ### Neutral
-- **Backplane** `#0c0d0d` — canonical page ground, both origins.
-- **Rack** `#131415` — panels, cards, code surfaces.
-- **Trace** `#242628` — 1px hairlines, borders, fold-line diagram strokes.
-- **Signal** `#FAFAFA` — primary text on dark. **Static** `#94979E` — muted text
-  (lifted from captured #9a9db5 for ≥5.2:1 AA headroom).
-- **Paper** `#ffffff` — docs light-theme ground only (brand-faithful retention).
+- **Backplane** `#0c0d0d` ground · **Rack** `#131415` cards/code · **Trace**
+  `#242628` hairlines · **Signal** `#FAFAFA` text · **Static** `#94979E` muted
+  (6.6:1) · **Carrier** `#C9CBCF` links/badges/kicker-meta.
 
 ### Named Rules
-- **Up** `#00E599` / **Down** `#ff4c79` are **reserved** to live status semantics
-  (status page rows, uptime badges). Never decorative, never charts-in-general.
-- No gradients. No new hues. Warmth and energy come from Route density, not
-  added colors.
+- Live doubles as the status-up color (green = alive = the proof-forward brand);
+  **Down** `#ff4c79` is reserved for status failures only.
+- Docs light theme: Paper ground with **Live Ink** `#1d7f5c` as text-accent (4.95:1).
+- No gradients except the hero glow field; no new hues.
 
 ## 3. Typography
 
-Switzer (display + body; Alliance No.2-genre neo-grotesque, ITF free license) and JetBrains Mono — type re-direct 2026-08-06 against the user reference infisical.com (which ships the commercial Alliance No.2 + JetBrains Mono). Prototypes @import Fontshare/Google; migrate self-hosts woff2.
+IBM Plex Sans (400/500/600/700) for all prose and display; Geist Mono for
+everything operational (commands, config, status values, diagram annotations,
+the kicker meta-line). Self-hosted woff2, font-display swap. Display weight 700,
+heading 600. `text-wrap: balance` on h1–h3; 70ch measure.
 
-### Hierarchy
-Modular scale, major-third (1.25), fluid via clamp():
-- Display (home hero): 800 weight, clamp(2.6rem → 4.5rem), -0.025em, lh 1.02
-- H2: 700, clamp(1.7rem → 2.4rem) · H3: 700, 1.25rem · body: 1rem/1.6
-- Mono 0.875rem/1.55 for anything operational: commands, config, status values,
-  tool prefixes, diagram annotations. Never marketing prose.
-- `text-wrap: balance` on h1–h3; body measure capped at 70ch.
-
-### Named Rules
-- **Earned-mono rule:** a mono block must contain runnable or live content
-  (command, config, wire capture, status value). If it can't be copy-pasted or
-  observed live, it isn't mono.
-- Mixed-case headings everywhere (captured convention: 0% uppercase). Terminal
-  periods on section H2s ("See it live.") are brand voice — keep.
+- **Earned-mono rule** (unchanged): mono content must be runnable or live.
+- Mixed-case headings; terminal periods on section H2s are brand voice.
 
 ## 4. Elevation
 
-Flat by conviction. Background-step (Backplane → Rack) plus 1px Trace borders do
-all elevation work. No shadows on dark; docs light theme may keep Starlight's two
-soft shadows only where Starlight requires them. Radius vocabulary: machined 0 / 2px corners (user re-direct 2026-08-06; replaces both the captured fragmentation and the interim 4/8/12px). The folded-corner clip is the only shape accent.
+Hierarchy by background-step + 1px Trace borders; radius vocabulary 6/10/14px,
+pills for actions. The hero glow field (blurred Live + faint blue radials,
+pointer-tracked) is the one permitted luminous element.
 
 ## 5. Components
 
-### Buttons
-- **Primary**: Route fill, white text, 8px radius, 12×20px padding, weight 600.
-  Hover: Route Deep fill. One primary per viewport.
-- **Secondary** (new — the captured site had none): transparent, 1px Trace
-  border, Carrier text; hover raises border to Carrier. Replaces bare-link
-  secondary actions.
-
-### Cards / Containers
-- Rack ground, 1px Trace border, 12px radius. Problem-cluster cards carry a
-  fold-line glyph (24px, Trace stroke, Route active segment) — never icon-font
-  or emoji.
-
-### Code panel (signature)
-- Rack ground, 12px radius, mono 0.875rem, language/context tag top-right in
-  Carrier badge style, copy button on hover. Contents are always real (earned-
-  mono rule).
-
-### Topology diagram (signature)
-- Inline SVG in the fold-line vocabulary: nodes as small Rack rounded-rects with
-  mono labels, routes as dashed Trace lines folding into the gateway node, the
-  active path in Route with a grain arrow, notch marks at policy/auth points.
-  Carries an `aria-label` describing the topology. Used: home hero band, docs
-  architecture, blog posts where routing is discussed.
-
-### Navigation
-- One header on every page of both origins: fold wordmark (fold-line letterform
-  SVG) left; Live demo · Use cases · Blog · Status · GitHub right; primary
-  "Get started" button. Sticky on docs (Starlight convention), static on
-  marketing. One footer: wordmark, © + Apache-2.0, docs / GitHub / Conformance /
-  Blog / Status columns — identical everywhere.
-
-### Inputs
-- Docs search (Starlight): restyled with Trace border, Rack ground, 8px radius,
-  Route focus ring. 2px Route `:focus-visible` ring on all interactive elements.
+- **Buttons**: pill, 46px, Live fill + ink text (primary) or Trace outline +
+  Signal text (secondary); trailing arrow glyph.
+- **Cards**: Rack ground, 1px Trace border, 10px radius, 24px padding; grids
+  spaced (24px gap), interactive cards carry a Live corner arrow.
+- **Code panel**: Rack, 10px radius, Geist Mono, context tag + copy button.
+- **Topology diagram**: fold-line vocabulary; active path in Live with grain
+  arrow; nodes Rack with Trace strokes; aria-label required.
+- **Chrome**: one header (mark + Docs-first nav + pill CTA) and one footer
+  (brand column + Product/Deploy/Project + legal strip) on every page of both
+  origins. The mark: square tile, Live folded corner, Live-Deep crease.
 
 ## 6. Do's and Don'ts
 
 ### Do:
-- Embed proof: live demo output, status rows, conformance counts, honest caveats
-  attached to every number.
-- Draw topology in the fold-line vocabulary; one authored diagram per key surface.
-- Commit to Route: section-level color moments (a Route-drenched CTA band) beat
-  scattered accent dots.
-- Keep captured copy voice: short declaratives, mixed case, no superlatives.
-  New copy prefers periods and colons over em-dashes.
+- Reserve Live for action and proof; let the neutrals carry everything else.
+- Embed receipts (live demo, status, conformance, caveated numbers).
+- Draw topology in the fold-line vocabulary; author every diagram.
 
 ### Don't:
-- No gradients, glassmorphism, stock illustration, mascots, or photography.
-- No mono for marketing prose; no fabricated stats, logos, or testimonials.
-- No per-origin theming: docs and marketing draw from this file's tokens only.
-- No new hues beyond the palette above; Up/Down never leave status semantics.
-- Don't inflate the template (96px+ display, triple CTA) to read "bolder" —
-  boldness is motif + color commitment here.
+- No second saturated hue; no gradients outside the hero glow; no shadows on dark.
+- No mono for marketing prose; no fabricated stats, logos, or badges.
+- No per-origin theming; docs and marketing consume these tokens only.
