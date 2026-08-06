@@ -154,10 +154,10 @@ tasks/get  &#123; "job-42" &#125;     ──▶ ...which upstream owns this?</co
                 width="68"
                 height="64"
                 rx="2"
-                fill="#12141c"
-                stroke="#d9a441"
+                fill="#131415"
+                stroke="#00E599"
                 stroke-width="1.5"></rect>
-              <path d="M 314 114 V 104 A 2 2 0 0 0 306 96 H 296 Z" fill="#d9a441"></path>
+              <path d="M 314 114 V 104 A 2 2 0 0 0 306 96 H 296 Z" fill="#00E599"></path>
               <text class="fold-node-label" x="280" y="132" text-anchor="middle" font-weight="700"
                 >fold</text
               >
@@ -477,11 +477,12 @@ owner := g.locateTaskOwner(ctx, rt, taskID)</code></pre>
 
   /* ===== closing: compact Route drench (subordinated to the article h1) ===== */
   .closing :focus-visible {
-    outline-color: var(--color-bg);
+    outline-color: var(--color-accent);
   }
   .closing {
-    background: var(--color-accent);
-    border-top: none;
+    background: #0d0e12;
+    border-top: 1px solid var(--color-trace);
+    
     padding-block: 48px;
   }
   .closing .wrap {
@@ -490,20 +491,19 @@ owner := g.locateTaskOwner(ctx, rt, taskID)</code></pre>
     justify-items: start;
   }
   .closing h2 {
-    color: var(--color-bg);
+    color: var(--color-fg);
     font-size: clamp(1.5rem, 2.4vw, 1.9rem);
   }
   .closing p {
-    color: var(--color-bg);
-    opacity: 0.92;
-    max-width: 56ch;
+    color: var(--color-static);
+        max-width: 56ch;
   }
   .closing .btn-primary {
-    background: var(--color-bg);
-    color: var(--color-carrier);
+    background: var(--color-accent);
+    color: #0c0d0d;
   }
   .closing .btn-primary:hover {
-    background: #1c1f2b;
+    background: #00cc88;
   }
 
   /* ===== responsive (page-specific) ===== */

@@ -5,46 +5,46 @@
 name: fold (variant B — Brass & Ink · Chivo)
 description: One governed endpoint between every MCP client and every MCP server.
 colors:
-  backplane: "#0c0d12"
-  rack: "#12141c"
-  trace: "#23263a"
-  signal: "#e8e9f2"
-  static: "#a6aac2"
+  backplane: "#0c0d0d"
+  rack: "#131415"
+  trace: "#242628"
+  signal: "#FAFAFA"
+  static: "#94979E"
   brass: "#d9a441"
   brass-deep: "#a87c1f"
   brass-soft: "#ecd9a8"
   paper: "#ffffff"
-  up: "#4ade80"
-  down: "#f87171"
+  up: "#00E599"
+  down: "#ff4c79"
 typography:
   display:
-    fontFamily: "Switzer, ui-sans-serif, system-ui, sans-serif"
+    fontFamily: "IBM Plex Sans, ui-sans-serif, system-ui, sans-serif"
     fontSize: "clamp(2.6rem, 6.5vw, 4.5rem)"
     fontWeight: 800
     lineHeight: 1.02
     letterSpacing: "-0.025em"
   heading:
-    fontFamily: "Switzer, ui-sans-serif, system-ui, sans-serif"
+    fontFamily: "IBM Plex Sans, ui-sans-serif, system-ui, sans-serif"
     fontSize: "clamp(1.7rem, 3vw, 2.4rem)"
     fontWeight: 700
     lineHeight: 1.12
     letterSpacing: "-0.015em"
   body:
-    fontFamily: "Switzer, ui-sans-serif, system-ui, sans-serif"
+    fontFamily: "IBM Plex Sans, ui-sans-serif, system-ui, sans-serif"
     fontSize: "1rem"
     fontWeight: 400
     lineHeight: 1.6
     letterSpacing: "normal"
   mono:
-    fontFamily: "'JetBrains Mono', ui-monospace, monospace"
+    fontFamily: "'Geist Mono', ui-monospace, monospace"
     fontSize: "0.875rem"
     fontWeight: 450
     lineHeight: 1.55
     letterSpacing: "0.02em"
 rounded:
-  sm: "0px"
-  md: "2px"
-  lg: "2px"
+  sm: "6px"
+  md: "10px"
+  lg: "14px"
 spacing:
   xs: "8px"
   sm: "16px"
@@ -89,7 +89,7 @@ components:
 ## 1. Overview
 
 Terminal-native dark system, unified across fold.run and docs.fold.run. Backplane
-ground (#0c0d12) with Rack panels one step lighter, separated by Trace hairlines —
+ground (#0c0d0d) with Rack panels one step lighter, separated by Trace hairlines —
 hierarchy by background-step, never by shadow. One indigo (Route) carries every
 action on both origins; Route Deep is the same hue for light grounds (docs light
 theme on Paper). The signature is the **fold-line drawing vocabulary**: diagrams
@@ -108,15 +108,15 @@ modular scale) and color commitment, never through gradients or noise.
 - **Brass Soft** `#ecd9a8` — links, badges, kicker labels, secondary emphasis (13.9:1).
 
 ### Neutral
-- **Backplane** `#0c0d12` — canonical page ground, both origins.
-- **Rack** `#12141c` — panels, cards, code surfaces.
-- **Trace** `#23263a` — 1px hairlines, borders, fold-line diagram strokes.
-- **Signal** `#e8e9f2` — primary text on dark. **Static** `#a6aac2` — muted text
+- **Backplane** `#0c0d0d` — canonical page ground, both origins.
+- **Rack** `#131415` — panels, cards, code surfaces.
+- **Trace** `#242628` — 1px hairlines, borders, fold-line diagram strokes.
+- **Signal** `#FAFAFA` — primary text on dark. **Static** `#94979E` — muted text
   (lifted from captured #9a9db5 for ≥5.2:1 AA headroom).
 - **Paper** `#ffffff` — docs light-theme ground only (brand-faithful retention).
 
 ### Named Rules
-- **Up** `#4ade80` / **Down** `#f87171` are **reserved** to live status semantics
+- **Up** `#00E599` / **Down** `#ff4c79` are **reserved** to live status semantics
   (status page rows, uptime badges). Never decorative, never charts-in-general.
 - No gradients. No new hues. Warmth and energy come from Route density, not
   added colors.
