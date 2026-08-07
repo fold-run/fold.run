@@ -121,6 +121,19 @@ const jsonld = {
 
   refresh();
   setInterval(refresh, 60_000);
+
+  // skeleton rows while the first fetch is in flight
+  {
+    const list = document.getElementById('targets');
+    if (list && !list.children.length) {
+      list.innerHTML = Array.from({ length: 4 })
+        .map(
+          () =>
+            '<li class="target" aria-hidden="true"><span class="skeleton" style="width: 32%"></span><span class="skeleton" style="width: 38%"></span></li>'
+        )
+        .join('');
+    }
+  }
 </script>
 
 <style is:global>

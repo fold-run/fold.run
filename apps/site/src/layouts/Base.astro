@@ -128,7 +128,8 @@ const { title, description, canonical, jsonld, current, template } = Astro.props
       .wrap {
         max-width: var(--max-width);
         margin-inline: auto;
-        padding-inline: 1.25rem;
+        padding-inline: max(1.25rem, env(safe-area-inset-left))
+          max(1.25rem, env(safe-area-inset-right));
       }
       h1,
       h2,
@@ -549,6 +550,66 @@ const { title, description, canonical, jsonld, current, template } = Astro.props
         max-width: 30ch;
         margin-top: var(--spacing-sm);
       }
+      .status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        margin-top: var(--spacing-md);
+        padding: 7px 14px;
+        border: 1px solid var(--color-trace);
+        border-radius: 9999px;
+        font-size: var(--body-sm);
+        color: var(--color-static);
+      }
+      .status-badge:hover {
+        color: var(--color-fg);
+        text-decoration: none;
+        border-color: #303236;
+      }
+      .status-badge .dot {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: var(--color-accent);
+      }
+      .status-badge.degraded .dot {
+        background: #ff4c79;
+      }
+      .status-badge[hidden] {
+        display: none;
+      }
+      /* skeleton shimmer (status rows pre-hydration) */
+      .skeleton {
+        position: relative;
+        overflow: hidden;
+        background: #17181a;
+        border-radius: var(--radius-sm);
+        min-height: 1.1em;
+      }
+      .skeleton::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        transform: translateX(-100%);
+        background-image: linear-gradient(
+          90deg,
+          rgba(48, 50, 54, 0) 0,
+          rgba(48, 50, 54, 0.35) 20%,
+          rgba(48, 50, 54, 0.75) 60%,
+          rgba(48, 50, 54, 0)
+        );
+        animation: shimmer 2s infinite;
+      }
+      @keyframes shimmer {
+        100% {
+          transform: translateX(100%);
+        }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .skeleton::after {
+          animation: none;
+        }
+      }
       @media (max-width: 768px) {
         footer.site .wrap.foot-grid {
           grid-template-columns: 1fr 1fr;
@@ -746,6 +807,10 @@ const { title, description, canonical, jsonld, current, template } = Astro.props
             <b>fold</b>
           </span>
           <p>One governed endpoint between every MCP client and every MCP server.</p>
+          <a class="status-badge" href="/status/" data-status-badge hidden>
+            <span class="dot" aria-hidden="true"></span>
+            <span data-status-text>All systems operational</span>
+          </a>
         </div>
         <nav aria-label="Product" class="foot-col">
           <h2>Product</h2>
@@ -782,6 +847,35 @@ const { title, description, canonical, jsonld, current, template } = Astro.props
       </div>
     </footer>
       <script>
+      // footer status badge: live uptime feed, session-cached 5 minutes
+      {
+        const badge = document.querySelector('[data-status-badge]');
+        if (badge) {
+          const KEY = 'fold-status';
+          const apply = (d) => {
+            const down = d.targets?.some((t) => t.status === 'down');
+            badge.querySelector('[data-status-text]').textContent = down
+              ? 'Partial outage'
+              : 'All systems operational';
+            badge.classList.toggle('degraded', Boolean(down));
+            badge.hidden = false;
+          };
+          const cached = sessionStorage.getItem(KEY);
+          if (cached) {
+            const { at, data } = JSON.parse(cached);
+            if (Date.now() - at < 300000) apply(data);
+          }
+          if (badge.hidden) {
+            fetch('https://fold-uptime.bauman.workers.dev/status')
+              .then((r) => r.json())
+              .then((data) => {
+                sessionStorage.setItem(KEY, JSON.stringify({ at: Date.now(), data }));
+                apply(data);
+              })
+              .catch(() => {});
+          }
+        }
+      }
       // nav: docs dropdown + mobile menu (progressive enhancement)
       {
         const drop = document.querySelector('.nav-drop > button');
