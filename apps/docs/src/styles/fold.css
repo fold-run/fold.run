@@ -270,10 +270,10 @@ button[data-open-modal] {
   padding: 1.25rem 1.5rem;
   margin-top: 0 !important;
 }
-:root[data-theme='light'] .sl-markdown-content .card {
+:root[data-theme="light"] .sl-markdown-content .card {
   --fold-card-bg: #f6f7fa;
 }
-:root:not([data-theme='light']) .sl-markdown-content .card {
+:root:not([data-theme="light"]) .sl-markdown-content .card {
   --fold-card-bg: #131415;
 }
 .sl-markdown-content .card .title {
