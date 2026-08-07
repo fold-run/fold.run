@@ -5,7 +5,9 @@ description: What enterprises put fold in front of — federation, security, cre
 
 {/* Source: fold README § Use cases — curate, don't fork; keep in sync with github.com/fold-run/fold */}
 
-import { Card, CardGrid } from '@astrojs/starlight/components';
+import { CardGrid } from '@astrojs/starlight/components';
+import Card from '../../components/Card.astro';
+import { BadgeCheck, Gauge, Globe, KeyRound, Network, PackageCheck, Radar, Shield } from 'lucide-astro';
 
 fold is one gateway with one job — govern the path between MCP clients and MCP
 servers — and that single position covers a family of problems. Most
@@ -13,7 +15,7 @@ deployments start with one of these and grow into the others, because they all
 ride the same config.
 
 <CardGrid>
-  <Card title="Unify a federation" icon="puzzle">
+  <Card title="Unify a federation" icon={Network}>
     Acquisitions, child orgs, and regional teams each build their own MCP
     servers — Python from the ML org, TypeScript from platform, Go from last
     year's acquisition. fold presents them as **one virtual server** with
@@ -21,45 +23,45 @@ ride the same config.
     `owner: { org, team }` metadata, and graceful degradation when one team's
     server is down. No team rewrites anything.
   </Card>
-  <Card title="Draw the security boundary" icon="seti:lock">
+  <Card title="Draw the security boundary" icon={Shield}>
     One choke point instead of N: OAuth 2.0 resource server with enterprise
     IdP integration (EMA/ID-JAG), deny-by-default tool allowlists, list
     filtering so callers never see tools they can't call, and an audit event
     for every request — including the 401s, denials, and 429s your SOC team
     actually hunts for.
   </Card>
-  <Card title="Broker credentials" icon="approve-check">
+  <Card title="Broker credentials" icon={KeyRound}>
     Agents hold exactly one token, audience-bound to fold. Per upstream, fold
     exchanges it (RFC 8693) for an upstream-audience token preserving user
     identity, or injects service credentials. Upstream API keys live in the
     gateway's environment and never reach a model's context window.
   </Card>
-  <Card title="Protect fragile services" icon="warning">
+  <Card title="Protect fragile services" icon={Gauge}>
     Agent traffic is bursty and retry-happy. List caching, global and
     per-upstream rate limits with Retry-After, and per-upstream circuit
     breakers stand between an agent storm and the twenty-year-old ERP that
     must not fall over.
   </Card>
-  <Card title="Govern vendor MCP servers" icon="setting">
+  <Card title="Govern vendor MCP servers" icon={PackageCheck}>
     Third-party and SaaS MCP endpoints go behind your auth, your allowlists,
     and your audit trail — instead of every employee pasting a personal API
     key into every client. Swap a vendor without touching a single client
     configuration.
   </Card>
-  <Card title="Discover upstreams automatically" icon="random">
+  <Card title="Discover upstreams automatically" icon={Radar}>
     A team ships an MCP server, the registry lists it, and it appears behind
     the gateway — no fold config change. On Kubernetes, label a Service
     `fold.run/upstream: "true"` and `fold-discovery` does the rest, with
     gateway-side bounds on what a discovered upstream may claim.
     [Discovery →](/discovery/)
   </Card>
-  <Card title="Expose tools outward, carefully" icon="external">
+  <Card title="Expose tools outward, carefully" icon={Globe}>
     Give partners or customers a curated, policy-scoped subset of internal
     tools on one hardened endpoint — DNS-rebinding protection, host
     allowlists, and per-principal rate limits included. A single static
     binary deploys anywhere in your VPC.
   </Card>
-  <Card title="Conformant, provably" icon="rocket">
+  <Card title="Conformant, provably" icon={BadgeCheck}>
     The official MCP conformance suite runs through fold on every merge —
     40/40 checks, including sampling, elicitation, and subscriptions bridged
     through the gateway — alongside a latency gate on the proxy path.
