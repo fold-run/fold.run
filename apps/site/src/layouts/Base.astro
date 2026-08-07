@@ -439,6 +439,9 @@ const { title, description, canonical, jsonld, current, template } = Astro.props
       .nav-drop > button[aria-expanded='true'] .chev {
         transform: rotate(180deg);
       }
+      .drop-panel[hidden] {
+        display: none;
+      }
       .drop-panel {
         position: absolute;
         top: calc(100% + 10px);
