@@ -161,6 +161,17 @@ const { title, description, canonical, jsonld, current, template } = Astro.props
       section {
         padding-block: var(--section-padding);
       }
+      .will-reveal {
+        opacity: 0;
+        transform: translateY(14px);
+        transition:
+          opacity 0.55s cubic-bezier(0.22, 1, 0.36, 1),
+          transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+      }
+      .will-reveal.revealed {
+        opacity: 1;
+        transform: none;
+      }
       section + section {
         border-top: 1px solid var(--color-trace);
       }
@@ -373,6 +384,133 @@ const { title, description, canonical, jsonld, current, template } = Astro.props
       header.site nav a:not(.btn) {
         padding: 12px 8px;
       }
+      /* backdrop-filter makes the header the containing block for fixed
+         descendants; lift it while the mobile panel is open so the panel
+         can size against the viewport */
+      header.site:has(nav.open) {
+        backdrop-filter: none;
+        -webkit-backdrop-filter: none;
+        background: var(--color-bg);
+      }
+      .nav-burger {
+        display: none;
+        flex-direction: column;
+        gap: 5px;
+        background: none;
+        border: 0;
+        padding: 12px;
+        margin-left: auto;
+        cursor: pointer;
+      }
+      .nav-burger span {
+        width: 20px;
+        height: 2px;
+        background: var(--color-fg);
+        transition: transform 0.2s cubic-bezier(0.25, 1, 0.5, 1);
+      }
+      .nav-burger[aria-expanded='true'] span:first-child {
+        transform: translateY(3.5px) rotate(45deg);
+      }
+      .nav-burger[aria-expanded='true'] span:last-child {
+        transform: translateY(-3.5px) rotate(-45deg);
+      }
+      .nav-drop {
+        position: relative;
+      }
+      .nav-drop > button {
+        background: none;
+        border: 0;
+        color: var(--color-carrier);
+        font: inherit;
+        font-size: 0.95rem;
+        padding: 12px 8px;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+      }
+      .nav-drop > button:hover {
+        color: var(--color-fg);
+      }
+      .nav-drop .chev {
+        font-size: 0.7em;
+        transition: transform 0.15s;
+      }
+      .nav-drop > button[aria-expanded='true'] .chev {
+        transform: rotate(180deg);
+      }
+      .drop-panel {
+        position: absolute;
+        top: calc(100% + 10px);
+        left: -12px;
+        min-width: 340px;
+        background: var(--color-rack);
+        border: 1px solid var(--color-trace);
+        border-radius: var(--radius-lg);
+        padding: 8px;
+        display: grid;
+        z-index: 60;
+      }
+      .drop-panel a {
+        display: grid;
+        gap: 2px;
+        padding: 10px 12px;
+        border-radius: var(--radius-sm);
+        color: var(--color-fg);
+      }
+      .drop-panel a:hover {
+        background: #17181a;
+        text-decoration: none;
+      }
+      .drop-panel a b {
+        font-weight: 600;
+        font-size: 0.95rem;
+      }
+      .drop-panel a span {
+        color: var(--color-static);
+        font-size: 0.82rem;
+      }
+      @media (max-width: 900px) {
+        .nav-burger {
+          display: flex;
+        }
+        header.site nav {
+          display: none;
+        }
+        header.site nav.open {
+          display: flex;
+          flex-wrap: nowrap;
+          overflow-x: hidden;
+          position: fixed;
+          inset: 57px 0 0 0;
+          flex-direction: column;
+          align-items: stretch;
+          gap: 0;
+          background: var(--color-bg);
+          padding: var(--spacing-md) var(--spacing-md) var(--spacing-xl);
+          overflow-y: auto;
+          z-index: 55;
+        }
+        header.site nav.open a:not(.btn),
+        header.site nav.open .nav-drop > button {
+          padding: 14px 8px;
+          font-size: 1.05rem;
+          border-bottom: 1px solid var(--color-trace);
+          width: 100%;
+          text-align: left;
+        }
+        header.site nav.open .btn {
+          margin-top: var(--spacing-md);
+          justify-content: center;
+        }
+        .drop-panel {
+          position: static;
+          min-width: 0;
+          border: 0;
+          background: transparent;
+          padding: 0 0 0 var(--spacing-md);
+        }
+      }
       header.site nav a[aria-current='page'] {
         color: var(--color-fg);
       }
@@ -566,8 +704,21 @@ const { title, description, canonical, jsonld, current, template } = Astro.props
             </svg>
           fold
         </a>
-        <nav aria-label="Site">
-          <a href="https://docs.fold.run/">Docs</a>
+        <button class="nav-burger" aria-expanded="false" aria-controls="site-nav" aria-label="Open menu">
+          <span></span><span></span>
+        </button>
+        <nav aria-label="Site" id="site-nav">
+          <div class="nav-drop">
+            <button aria-expanded="false" aria-controls="docs-menu">Docs <span aria-hidden="true" class="chev">&#x25BE;</span></button>
+            <div class="drop-panel" id="docs-menu" hidden>
+              <a href="https://docs.fold.run/getting-started/"><b>Getting started</b><span>Run a governed endpoint in 60 seconds</span></a>
+              <a href="https://docs.fold.run/use-cases/"><b>Use cases</b><span>Federation, governance, tasks, discovery</span></a>
+              <a href="https://docs.fold.run/architecture/"><b>Architecture</b><span>The request pipeline, end to end</span></a>
+              <a href="https://docs.fold.run/configuration/"><b>Configuration</b><span>One config file, validated</span></a>
+              <a href="https://docs.fold.run/security/"><b>Security model</b><span>AuthN, policy, audit, credential brokering</span></a>
+              <a href="https://docs.fold.run/benchmarks/"><b>Benchmarks</b><span>Honest numbers, caveats attached</span></a>
+            </div>
+          </div>
           <a href="/#demo">Live demo</a>
           <a href="https://docs.fold.run/use-cases/">Use cases</a>
           <a href="/blog/" aria-current={current === 'blog' ? 'page' : undefined}>Blog</a>
@@ -627,5 +778,70 @@ const { title, description, canonical, jsonld, current, template } = Astro.props
         <span class="tagline">fold is the one. fold.run is the execution.</span>
       </div>
     </footer>
+      <script>
+      // nav: docs dropdown + mobile menu (progressive enhancement)
+      {
+        const drop = document.querySelector('.nav-drop > button');
+        const panel = document.getElementById('docs-menu');
+        if (drop && panel) {
+          const close = () => {
+            drop.setAttribute('aria-expanded', 'false');
+            panel.hidden = true;
+          };
+          drop.addEventListener('click', () => {
+            const open = drop.getAttribute('aria-expanded') === 'true';
+            drop.setAttribute('aria-expanded', String(!open));
+            panel.hidden = open;
+          });
+          document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') close();
+          });
+          document.addEventListener('click', (e) => {
+            if (!drop.closest('.nav-drop').contains(e.target)) close();
+          });
+        }
+        const burger = document.querySelector('.nav-burger');
+        const nav = document.getElementById('site-nav');
+        if (burger && nav) {
+          burger.addEventListener('click', () => {
+            const open = nav.classList.toggle('open');
+            burger.setAttribute('aria-expanded', String(open));
+            document.documentElement.style.overflow = open ? 'hidden' : '';
+          });
+          nav.addEventListener('click', (e) => {
+            if (e.target.closest('a')) {
+              nav.classList.remove('open');
+              burger.setAttribute('aria-expanded', 'false');
+              document.documentElement.style.overflow = '';
+            }
+          });
+        }
+      }
+      // scroll reveal: sections rise in; default state stays fully visible without JS
+      {
+        const calm = matchMedia('(prefers-reduced-motion: reduce)').matches;
+        if (!calm && 'IntersectionObserver' in window) {
+          const targets = document.querySelectorAll('main section > .wrap > h2, .tile-grid > *, .stat, .terminus, .problem, .path, .post-row, .target');
+          const io = new IntersectionObserver(
+            (entries) => {
+              for (const en of entries) {
+                if (en.isIntersecting) {
+                  en.target.classList.add('revealed');
+                  io.unobserve(en.target);
+                }
+              }
+            },
+            { rootMargin: '0px 0px -8% 0px' }
+          );
+          let i = 0;
+          for (const t of targets) {
+            if (t.getBoundingClientRect().top < innerHeight) continue;
+            t.classList.add('will-reveal');
+            t.style.transitionDelay = `${(i++ % 4) * 60}ms`;
+            io.observe(t);
+          }
+        }
+      }
+    </script>
   </body>
 </html>

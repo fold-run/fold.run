@@ -7,7 +7,7 @@
   "name": "fold-site",
   "compatibility_date": "2026-07-01",
   "observability": { "enabled": true },
-  "assets": { "directory": "./dist", "not_found_handling": "single-page-application" },
+  "assets": { "directory": "./dist", "not_found_handling": "404-page" },
   // Custom domains: wrangler owns the DNS records + TLS for both hostnames
   // (the stale apex A records were removed to make room).
   "routes": [
