@@ -57,7 +57,7 @@ const jsonld = {
             and every claim links to the code.
           </p>
 
-          <h2>The problem, concretely</h2>
+          <h2 id="the-problem-concretely">The problem, concretely<a class="h-anchor" href="#the-problem-concretely" aria-label="Link to this section">#</a></h2>
           <p>
             fold presents many MCP servers as one governed virtual server: one endpoint, one merged
             tool list, namespaced names (<code>gh__create_pr</code>, <code>jobs__start_job</code>).
@@ -84,7 +84,7 @@ tasks/get  &#123; "job-42" &#125;     ──▶ ...which upstream owns this?</co
             on a fresh connection, possibly through a different gateway instance.
           </p>
 
-          <h2>The answers that don't work</h2>
+          <h2 id="the-answers-that-don-t-work">The answers that don't work<a class="h-anchor" href="#the-answers-that-don-t-work" aria-label="Link to this section">#</a></h2>
           <p>
             <strong>Rewriting the id</strong> — smuggling the owner into the id the client sees —
             breaks every client that persists one the moment your encoding changes, and turns an
@@ -103,7 +103,7 @@ tasks/get  &#123; "job-42" &#125;     ──▶ ...which upstream owns this?</co
             deployment it does.
           </p>
 
-          <h2>The mechanism: an affinity index with a probe fallback</h2>
+          <h2 id="the-mechanism-an-affinity-index-with-a-probe-fallback">The mechanism: an affinity index with a probe fallback<a class="h-anchor" href="#the-mechanism-an-affinity-index-with-a-probe-fallback" aria-label="Link to this section">#</a></h2>
           <p>Ownership is remembered instead of encoded:</p>
           <ul>
             <li>
@@ -203,7 +203,7 @@ owner := g.locateTaskOwner(ctx, rt, taskID)</code></pre>
             request.
           </p>
 
-          <h2>What about fan-in?</h2>
+          <h2 id="what-about-fan-in">What about fan-in?<a class="h-anchor" href="#what-about-fan-in" aria-label="Link to this section">#</a></h2>
           <p>
             The extension's companion story is <code>subscriptions/listen</code> — one notification
             stream south, N streams north, merged. fold doesn't implement it yet, and says so <a href="https://github.com/fold-run/fold#not-implemented">in the README</a> rather than in
@@ -220,7 +220,7 @@ owner := g.locateTaskOwner(ctx, rt, taskID)</code></pre>
             before we do.
           </p>
 
-          <h2>The transferable lesson</h2>
+          <h2 id="the-transferable-lesson">The transferable lesson<a class="h-anchor" href="#the-transferable-lesson" aria-label="Link to this section">#</a></h2>
           <p>
             None of this is MCP-specific. Federating any protocol whose resources outlive their
             transport reduces to the same shape: an ownership index for stateful resources, recorded
@@ -239,7 +239,7 @@ owner := g.locateTaskOwner(ctx, rt, taskID)</code></pre>
             <li>Fail closed on index misses, and audit them.</li>
           </ul>
 
-          <h2>Try it</h2>
+          <h2 id="try-it">Try it<a class="h-anchor" href="#try-it" aria-label="Link to this section">#</a></h2>
           <p>
             <code>go run github.com/fold-run/fold/cmd/fold@latest</code> — or <code>docker run ghcr.io/fold-run/fold</code> — puts the gateway in front of your servers
             in a minute (<a href="https://docs.fold.run/run-it-locally/">walkthrough</a>). The
@@ -258,7 +258,13 @@ owner := g.locateTaskOwner(ctx, rt, taskID)</code></pre>
           <a class="chip" href="/blog/">← Blog</a>
         </nav>
       </div>
-    </section>
+    </section>      <div class="share-row">
+        <span>Share:</span>
+        <a href="https://twitter.com/intent/tweet?text=Federating+MCP+tasks%3A+affinity+routing+over+opaque+ids&url=https%3A%2F%2Ffold.run%2Fblog%2Ffederating-mcp-tasks%2F">X</a>
+        <a href="https://news.ycombinator.com/submitlink?u=https%3A%2F%2Ffold.run%2Fblog%2Ffederating-mcp-tasks%2F&t=Federating+MCP+tasks%3A+affinity+routing+over+opaque+ids">Hacker News</a>
+        <button type="button" class="copy-link" data-copy-link="https://fold.run/blog/federating-mcp-tasks/">Copy link</button>
+      </div>
+
 
     <section
       class="closing"
@@ -517,5 +523,40 @@ owner := g.locateTaskOwner(ctx, rt, taskID)</code></pre>
     content: '\2190';
     color: var(--color-accent);
     margin-right: 8px;
+  }
+  .h-anchor {
+    opacity: 0;
+    margin-left: 10px;
+    color: var(--color-static);
+    font-weight: 400;
+    transition: opacity 0.15s;
+  }
+  h2:hover .h-anchor,
+  .h-anchor:focus-visible {
+    opacity: 1;
+  }
+  .share-row {
+    display: flex;
+    gap: var(--spacing-md);
+    align-items: center;
+    margin-top: var(--spacing-xl);
+    padding-top: var(--spacing-lg);
+    border-top: 1px solid var(--color-trace);
+    font-size: var(--body-sm);
+  }
+  .share-row span {
+    color: var(--color-static);
+  }
+  .copy-link {
+    background: none;
+    border: 0;
+    color: var(--color-carrier);
+    font: inherit;
+    font-size: var(--body-sm);
+    cursor: pointer;
+    padding: 4px 0;
+  }
+  .copy-link:hover {
+    color: var(--color-fg);
   }
 </style>

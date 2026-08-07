@@ -18,6 +18,7 @@ export default defineConfig({
       description:
         'The enterprise MCP gateway. Every team keeps building its own MCP servers — fold presents them as one governed virtual server. fold is the one; fold.run is the execution.',
       favicon: '/favicon.svg',
+      logo: { src: './src/assets/logo.svg', alt: '' },
       customCss: ['./src/styles/fold.css'],
       // /llms.txt + /llms-full.txt for AI agents and answer engines.
       plugins: [starlightLlmsTxt()],

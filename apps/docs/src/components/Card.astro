@@ -1,0 +1,13 @@
+---
+// Starlight-compatible card that takes a lucide-astro icon component,
+// so every card across the docs draws from one icon set.
+const { title, icon: Icon } = Astro.props;
+---
+
+<article class="card sl-flex">
+  <p class="title sl-flex">
+    {Icon && <span class="icon"><Icon size={22} stroke-width={1.75} aria-hidden="true" /></span>}
+    <span set:html={title} />
+  </p>
+  <div class="body"><slot /></div>
+</article>

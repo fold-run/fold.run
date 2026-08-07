@@ -22,29 +22,31 @@ hero:
       variant: minimal
 ---
 
-import { Card, CardGrid } from '@astrojs/starlight/components';
+import { CardGrid } from '@astrojs/starlight/components';
+import Card from '../../components/Card.astro';
+import { BadgeCheck, Container, Network, ShieldCheck } from 'lucide-astro';
 
 <CardGrid stagger>
-  <Card title="Federation with namespaces" icon="puzzle">
+  <Card title="Federation with namespaces" icon={Network}>
     Register any number of upstreams — internal teams or vendors, any
     language, any SDK. fold fans out lists, merges and namespaces results
     (`gh__create_pr`), routes named calls to their owner, and degrades
     gracefully when an upstream is down. Upstreams can even
     [register themselves](/discovery/).
   </Card>
-  <Card title="Enterprise governance" icon="seti:lock">
+  <Card title="Enterprise governance" icon={ShieldCheck}>
     OAuth 2.0 resource server, Enterprise-Managed Authorization (ID-JAG),
     RFC 8693 token exchange per upstream, deny-by-default allowlists with
     per-principal visibility, and an audit event for every request —
     including the denials.
   </Card>
-  <Card title="Provably conformant" icon="approve-check">
+  <Card title="Provably conformant" icon={BadgeCheck}>
     The official MCP conformance suite runs through fold on every merge —
     [40/40 checks](/conformance/), including sampling, elicitation, and
     subscriptions bridged through the gateway — plus a CI gate on added
     proxy latency (&lt; 5 ms p50; ~0.2 ms typical).
   </Card>
-  <Card title="Built to operate" icon="rocket">
+  <Card title="Built to operate" icon={Container}>
     A single ~22 MB distroless container or static Go binary. Hot config
     reload without dropping the listener, Redis-shared state so a fleet
     behaves as one, Prometheus metrics, OpenTelemetry tracing, and health

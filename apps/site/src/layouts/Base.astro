@@ -128,7 +128,8 @@ const { title, description, canonical, jsonld, current, template } = Astro.props
       .wrap {
         max-width: var(--max-width);
         margin-inline: auto;
-        padding-inline: 1.25rem;
+        padding-inline: max(1.25rem, env(safe-area-inset-left))
+          max(1.25rem, env(safe-area-inset-right));
       }
       h1,
       h2,
@@ -160,6 +161,17 @@ const { title, description, canonical, jsonld, current, template } = Astro.props
       }
       section {
         padding-block: var(--section-padding);
+      }
+      .will-reveal {
+        opacity: 0;
+        transform: translateY(14px);
+        transition:
+          opacity 0.55s cubic-bezier(0.22, 1, 0.36, 1),
+          transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+      }
+      .will-reveal.revealed {
+        opacity: 1;
+        transform: none;
       }
       section + section {
         border-top: 1px solid var(--color-trace);
@@ -220,6 +232,81 @@ const { title, description, canonical, jsonld, current, template } = Astro.props
         bottom: var(--spacing-md);
         color: var(--color-accent);
         font-size: 1.25rem;
+        transition: transform 0.2s cubic-bezier(0.25, 1, 0.5, 1);
+      }
+      a.tile:hover::after {
+        transform: translateX(4px);
+      }
+      /* card surfaces: gradient hairline via masked border, brightening on hover */
+      .stat,
+      .terminus,
+      .problem,
+      .cluster-rail,
+      .path,
+      .post-row,
+      .target,
+      a.tile {
+        border: 1px solid transparent;
+        background:
+          linear-gradient(var(--color-rack), var(--color-rack)) padding-box,
+          linear-gradient(165deg, #303236, var(--color-trace) 45%) border-box;
+        transition: background 0.25s cubic-bezier(0.25, 1, 0.5, 1);
+      }
+      .stat:hover,
+      a.tile:hover {
+        background:
+          linear-gradient(#17181a, #17181a) padding-box,
+          linear-gradient(165deg, color-mix(in srgb, var(--color-accent) 45%, #303236), var(--color-trace) 60%)
+            border-box;
+      }
+      .stat::after {
+        transition: transform 0.2s cubic-bezier(0.25, 1, 0.5, 1);
+      }
+      .stat:hover::after {
+        transform: translateX(4px);
+      }
+      /* traveling light: a ring segment orbiting the primary pill */
+      @property --orbit {
+        syntax: '<angle>';
+        inherits: false;
+        initial-value: 0deg;
+      }
+      .btn-live {
+        position: relative;
+      }
+      .btn-live::before {
+        content: '';
+        position: absolute;
+        inset: -3px;
+        border-radius: 9999px;
+        padding: 1.5px;
+        background: conic-gradient(
+          from var(--orbit),
+          transparent 0deg,
+          transparent 300deg,
+          var(--color-accent) 330deg,
+          transparent 360deg
+        );
+        mask:
+          linear-gradient(#fff 0 0) content-box,
+          linear-gradient(#fff 0 0);
+        mask-composite: exclude;
+        pointer-events: none;
+      }
+      @media (prefers-reduced-motion: no-preference) {
+        .btn-live::before {
+          animation: orbit 3.2s linear infinite;
+        }
+        @keyframes orbit {
+          to {
+            --orbit: 360deg;
+          }
+        }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .btn-live::before {
+          display: none;
+        }
       }
       .btn-primary {
         background: var(--color-accent);
@@ -256,8 +343,19 @@ const { title, description, canonical, jsonld, current, template } = Astro.props
 
       /* ===== header ===== */
       header.site {
+        position: sticky;
+        top: 0;
+        z-index: 50;
+        background: color-mix(in srgb, var(--color-bg) 88%, transparent);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
         border-bottom: 1px solid var(--color-trace);
-        padding-block: 1rem;
+        padding-block: 0.75rem;
+      }
+      @supports not (backdrop-filter: blur(12px)) {
+        header.site {
+          background: var(--color-bg);
+        }
       }
       header.site .wrap {
         display: flex;
@@ -286,6 +384,136 @@ const { title, description, canonical, jsonld, current, template } = Astro.props
       }
       header.site nav a:not(.btn) {
         padding: 12px 8px;
+      }
+      /* backdrop-filter makes the header the containing block for fixed
+         descendants; lift it while the mobile panel is open so the panel
+         can size against the viewport */
+      header.site:has(nav.open) {
+        backdrop-filter: none;
+        -webkit-backdrop-filter: none;
+        background: var(--color-bg);
+      }
+      .nav-burger {
+        display: none;
+        flex-direction: column;
+        gap: 5px;
+        background: none;
+        border: 0;
+        padding: 12px;
+        margin-left: auto;
+        cursor: pointer;
+      }
+      .nav-burger span {
+        width: 20px;
+        height: 2px;
+        background: var(--color-fg);
+        transition: transform 0.2s cubic-bezier(0.25, 1, 0.5, 1);
+      }
+      .nav-burger[aria-expanded='true'] span:first-child {
+        transform: translateY(3.5px) rotate(45deg);
+      }
+      .nav-burger[aria-expanded='true'] span:last-child {
+        transform: translateY(-3.5px) rotate(-45deg);
+      }
+      .nav-drop {
+        position: relative;
+      }
+      .nav-drop > button {
+        background: none;
+        border: 0;
+        color: var(--color-carrier);
+        font: inherit;
+        font-size: 0.95rem;
+        padding: 12px 8px;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+      }
+      .nav-drop > button:hover {
+        color: var(--color-fg);
+      }
+      .nav-drop .chev {
+        font-size: 0.7em;
+        transition: transform 0.15s;
+      }
+      .nav-drop > button[aria-expanded='true'] .chev {
+        transform: rotate(180deg);
+      }
+      .drop-panel[hidden] {
+        display: none;
+      }
+      .drop-panel {
+        position: absolute;
+        top: calc(100% + 10px);
+        left: -12px;
+        min-width: 340px;
+        background: var(--color-rack);
+        border: 1px solid var(--color-trace);
+        border-radius: var(--radius-lg);
+        padding: 8px;
+        display: grid;
+        z-index: 60;
+      }
+      .drop-panel a {
+        display: grid;
+        gap: 2px;
+        padding: 10px 12px;
+        border-radius: var(--radius-sm);
+        color: var(--color-fg);
+      }
+      .drop-panel a:hover {
+        background: #17181a;
+        text-decoration: none;
+      }
+      .drop-panel a b {
+        font-weight: 600;
+        font-size: 0.95rem;
+      }
+      .drop-panel a span {
+        color: var(--color-static);
+        font-size: 0.82rem;
+      }
+      @media (max-width: 900px) {
+        .nav-burger {
+          display: flex;
+        }
+        header.site nav {
+          display: none;
+        }
+        header.site nav.open {
+          display: flex;
+          flex-wrap: nowrap;
+          overflow-x: hidden;
+          position: fixed;
+          inset: 57px 0 0 0;
+          flex-direction: column;
+          align-items: stretch;
+          gap: 0;
+          background: var(--color-bg);
+          padding: var(--spacing-md) var(--spacing-md) var(--spacing-xl);
+          overflow-y: auto;
+          z-index: 55;
+        }
+        header.site nav.open a:not(.btn),
+        header.site nav.open .nav-drop > button {
+          padding: 14px 8px;
+          font-size: 1.05rem;
+          border-bottom: 1px solid var(--color-trace);
+          width: 100%;
+          text-align: left;
+        }
+        header.site nav.open .btn {
+          margin-top: var(--spacing-md);
+          justify-content: center;
+        }
+        .drop-panel {
+          position: static;
+          min-width: 0;
+          border: 0;
+          background: transparent;
+          padding: 0 0 0 var(--spacing-md);
+        }
       }
       header.site nav a[aria-current='page'] {
         color: var(--color-fg);
@@ -321,6 +549,66 @@ const { title, description, canonical, jsonld, current, template } = Astro.props
         font-size: var(--body-sm);
         max-width: 30ch;
         margin-top: var(--spacing-sm);
+      }
+      .status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        margin-top: var(--spacing-md);
+        padding: 7px 14px;
+        border: 1px solid var(--color-trace);
+        border-radius: 9999px;
+        font-size: var(--body-sm);
+        color: var(--color-static);
+      }
+      .status-badge:hover {
+        color: var(--color-fg);
+        text-decoration: none;
+        border-color: #303236;
+      }
+      .status-badge .dot {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: var(--color-accent);
+      }
+      .status-badge.degraded .dot {
+        background: #ff4c79;
+      }
+      .status-badge[hidden] {
+        display: none;
+      }
+      /* skeleton shimmer (status rows pre-hydration) */
+      .skeleton {
+        position: relative;
+        overflow: hidden;
+        background: #17181a;
+        border-radius: var(--radius-sm);
+        min-height: 1.1em;
+      }
+      .skeleton::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        transform: translateX(-100%);
+        background-image: linear-gradient(
+          90deg,
+          rgba(48, 50, 54, 0) 0,
+          rgba(48, 50, 54, 0.35) 20%,
+          rgba(48, 50, 54, 0.75) 60%,
+          rgba(48, 50, 54, 0)
+        );
+        animation: shimmer 2s infinite;
+      }
+      @keyframes shimmer {
+        100% {
+          transform: translateX(100%);
+        }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .skeleton::after {
+          animation: none;
+        }
       }
       @media (max-width: 768px) {
         footer.site .wrap.foot-grid {
@@ -480,8 +768,21 @@ const { title, description, canonical, jsonld, current, template } = Astro.props
             </svg>
           fold
         </a>
-        <nav aria-label="Site">
-          <a href="https://docs.fold.run/">Docs</a>
+        <button class="nav-burger" aria-expanded="false" aria-controls="site-nav" aria-label="Open menu">
+          <span></span><span></span>
+        </button>
+        <nav aria-label="Site" id="site-nav">
+          <div class="nav-drop">
+            <button aria-expanded="false" aria-controls="docs-menu">Docs <span aria-hidden="true" class="chev">&#x25BE;</span></button>
+            <div class="drop-panel" id="docs-menu" hidden>
+              <a href="https://docs.fold.run/getting-started/"><b>Getting started</b><span>Run a governed endpoint in 60 seconds</span></a>
+              <a href="https://docs.fold.run/use-cases/"><b>Use cases</b><span>Federation, governance, tasks, discovery</span></a>
+              <a href="https://docs.fold.run/architecture/"><b>Architecture</b><span>The request pipeline, end to end</span></a>
+              <a href="https://docs.fold.run/configuration/"><b>Configuration</b><span>One config file, validated</span></a>
+              <a href="https://docs.fold.run/security/"><b>Security model</b><span>AuthN, policy, audit, credential brokering</span></a>
+              <a href="https://docs.fold.run/benchmarks/"><b>Benchmarks</b><span>Honest numbers, caveats attached</span></a>
+            </div>
+          </div>
           <a href="/#demo">Live demo</a>
           <a href="https://docs.fold.run/use-cases/">Use cases</a>
           <a href="/blog/" aria-current={current === 'blog' ? 'page' : undefined}>Blog</a>
@@ -506,6 +807,10 @@ const { title, description, canonical, jsonld, current, template } = Astro.props
             <b>fold</b>
           </span>
           <p>One governed endpoint between every MCP client and every MCP server.</p>
+          <a class="status-badge" href="/status/" data-status-badge hidden>
+            <span class="dot" aria-hidden="true"></span>
+            <span data-status-text>All systems operational</span>
+          </a>
         </div>
         <nav aria-label="Product" class="foot-col">
           <h2>Product</h2>
@@ -541,5 +846,99 @@ const { title, description, canonical, jsonld, current, template } = Astro.props
         <span class="tagline">fold is the one. fold.run is the execution.</span>
       </div>
     </footer>
+      <script>
+      // footer status badge: live uptime feed, session-cached 5 minutes
+      {
+        const badge = document.querySelector('[data-status-badge]');
+        if (badge) {
+          const KEY = 'fold-status';
+          const apply = (d) => {
+            const down = d.targets?.some((t) => t.status === 'down');
+            badge.querySelector('[data-status-text]').textContent = down
+              ? 'Partial outage'
+              : 'All systems operational';
+            badge.classList.toggle('degraded', Boolean(down));
+            badge.hidden = false;
+          };
+          const cached = sessionStorage.getItem(KEY);
+          if (cached) {
+            const { at, data } = JSON.parse(cached);
+            if (Date.now() - at < 300000) apply(data);
+          }
+          if (badge.hidden) {
+            fetch('https://fold-uptime.bauman.workers.dev/status')
+              .then((r) => r.json())
+              .then((data) => {
+                sessionStorage.setItem(KEY, JSON.stringify({ at: Date.now(), data }));
+                apply(data);
+              })
+              .catch(() => {});
+          }
+        }
+      }
+      // nav: docs dropdown + mobile menu (progressive enhancement)
+      {
+        const drop = document.querySelector('.nav-drop > button');
+        const panel = document.getElementById('docs-menu');
+        if (drop && panel) {
+          const close = () => {
+            drop.setAttribute('aria-expanded', 'false');
+            panel.hidden = true;
+          };
+          drop.addEventListener('click', () => {
+            const open = drop.getAttribute('aria-expanded') === 'true';
+            drop.setAttribute('aria-expanded', String(!open));
+            panel.hidden = open;
+          });
+          document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') close();
+          });
+          document.addEventListener('click', (e) => {
+            if (!drop.closest('.nav-drop').contains(e.target)) close();
+          });
+        }
+        const burger = document.querySelector('.nav-burger');
+        const nav = document.getElementById('site-nav');
+        if (burger && nav) {
+          burger.addEventListener('click', () => {
+            const open = nav.classList.toggle('open');
+            burger.setAttribute('aria-expanded', String(open));
+            document.documentElement.style.overflow = open ? 'hidden' : '';
+          });
+          nav.addEventListener('click', (e) => {
+            if (e.target.closest('a')) {
+              nav.classList.remove('open');
+              burger.setAttribute('aria-expanded', 'false');
+              document.documentElement.style.overflow = '';
+            }
+          });
+        }
+      }
+      // scroll reveal: sections rise in; default state stays fully visible without JS
+      {
+        const calm = matchMedia('(prefers-reduced-motion: reduce)').matches;
+        if (!calm && 'IntersectionObserver' in window) {
+          const targets = document.querySelectorAll('main section > .wrap > h2, .tile-grid > *, .stat, .terminus, .problem, .path, .post-row, .target');
+          const io = new IntersectionObserver(
+            (entries) => {
+              for (const en of entries) {
+                if (en.isIntersecting) {
+                  en.target.classList.add('revealed');
+                  io.unobserve(en.target);
+                }
+              }
+            },
+            { rootMargin: '0px 0px -8% 0px' }
+          );
+          let i = 0;
+          for (const t of targets) {
+            if (t.getBoundingClientRect().top < innerHeight) continue;
+            t.classList.add('will-reveal');
+            t.style.transitionDelay = `${(i++ % 4) * 60}ms`;
+            io.observe(t);
+          }
+        }
+      }
+    </script>
   </body>
 </html>
