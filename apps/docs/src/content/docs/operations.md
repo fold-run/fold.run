@@ -12,7 +12,7 @@ Day-2 reference: the endpoints a running gateway serves, every metric and audit 
 | Endpoint | When | Notes |
 |---|---|---|
 | `POST/GET /mcp` | always | The MCP endpoint (path configurable via `server.mcpPath`). |
-| `GET /healthz` | always | Pings every upstream concurrently (5 s internal budget); `503` when none is reachable. Detailed fields (URLs, owners, labels, error text) appear only when auth is disabled, so an unauthenticated caller on a public deployment cannot enumerate the federation. Multi-endpoint upstreams include a per-replica `endpoints` array with the balancer's rotation state. |
+| `GET /health` | always | Pings every upstream concurrently (5 s internal budget); `503` when none is reachable. The fan-out is single-flighted and reused for a second, so polling this unauthenticated endpoint in a loop can't multiply into upstream traffic (a reload or discovery sync invalidates it immediately). `/healthz` — the path through v1.4 — still answers identically as a deprecated alias, with a `Deprecation: true` header and one log line on first use; it goes away no sooner than the next major. Detailed fields (URLs, owners, labels, error text) appear only when auth is disabled, so an unauthenticated caller on a public deployment cannot enumerate the federation. Multi-endpoint upstreams include a per-replica `endpoints` array with the balancer's rotation state. |
 | `GET /metrics` | always | Prometheus exposition (below). |
 | `GET /console/` | `server.console.enabled` | The read-only [console](/console/): dashboard assets, plus `GET /console/api/state`, which authenticates like `/mcp`. |
 | `GET /.well-known/oauth-protected-resource` | `auth.mode: required` | RFC 9728 resource metadata; announces the EMA extension when configured. |
@@ -24,7 +24,7 @@ Every endpoint sits behind the `allowedHosts` check — health checkers and scra
 Quick checks against a running gateway:
 
 ```bash
-curl -fsS http://localhost:8080/healthz
+curl -fsS http://localhost:8080/health
 curl -fsS http://localhost:8080/metrics
 ```
 

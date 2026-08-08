@@ -37,7 +37,7 @@ does the same without Docker — see [Getting started](/getting-started/).)
 
 ```bash
 # Health: per-upstream connectivity, latency, breaker state
-curl -s http://localhost:8080/healthz | jq
+curl -s http://localhost:8080/health | jq
 
 # Prometheus metrics
 curl -s http://localhost:8080/metrics | grep fold_requests_total
@@ -64,7 +64,7 @@ docker compose --profile redis up
 ```
 
 The image is distroless — no shell inside — so check health from the host:
-`curl -fsS http://localhost:8080/healthz`.
+`curl -fsS http://localhost:8080/health`.
 
 ## Turn on governance
 

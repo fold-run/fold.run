@@ -114,7 +114,7 @@ with the gateway config:
 | `--min-health-interval-ms` | `1000` | Floor for a Service's `healthCheck.intervalMs`, so a registration cannot turn the gateway into a probe flood. |
 | `--log-format`, `--log-level`, `--version` | `text`, `info` | As in `fold`. |
 
-`GET /healthz` reports sync status (`503` before the first successful list); any other `GET` serves the document. On the gateway side, sync outcomes show up in `fold_discovery_syncs_total` and the reload logs.
+`GET /health` reports sync status (`503` before the first successful list); any other `GET` serves the document. On the gateway side, sync outcomes show up in `fold_discovery_syncs_total` and the reload logs.
 
 ## Gateway-side backstops, restated
 
