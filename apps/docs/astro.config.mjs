@@ -3,6 +3,7 @@ import starlight from '@astrojs/starlight';
 import { defineConfig } from 'astro/config';
 import remarkGfm from 'remark-gfm';
 import starlightLlmsTxt from 'starlight-llms-txt';
+import { foldDark, foldLight } from './code-theme.mjs';
 
 const SITE = process.env.FOLD_DOCS_URL ?? 'https://docs.fold.run';
 
@@ -20,6 +21,8 @@ export default defineConfig({
       favicon: '/favicon.svg',
       logo: { src: './src/assets/logo.svg', alt: '' },
       customCss: ['./src/styles/fold.css'],
+      // Code surfaces run on the brand palette, not Starlight's teal default.
+      expressiveCode: { themes: [foldDark, foldLight] },
       // /llms.txt + /llms-full.txt for AI agents and answer engines.
       plugins: [starlightLlmsTxt()],
       lastUpdated: true,

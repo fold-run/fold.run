@@ -3,15 +3,15 @@
 name: fold
 description: One governed endpoint between every MCP client and every MCP server.
 colors:
-  backplane: "#0c0d0d"
-  rack: "#131415"
-  trace: "#242628"
-  signal: "#FAFAFA"
-  static: "#94979E"
-  live: "#00E599"
-  live-deep: "#00cc88"
-  pulse: "#34D59A"
-  carrier: "#C9CBCF"
+  backplane: "#121212"
+  rack: "#1a1a1a"
+  trace: "#2b2b2b"
+  signal: "#FFFFFF"
+  static: "#BCBCBC"
+  live: "#D6FF00"
+  live-deep: "#b4d600"
+  pulse: "#E9FF80"
+  carrier: "#E0E0E0"
   down: "#ff4c79"
 typography:
   display:
@@ -80,8 +80,8 @@ components:
 
 ## 1. Overview
 
-The final fold identity: near-black grounds (Backplane #0c0d0d, Rack panels
-#131415, Trace hairlines #242628), one signature green (Live #00E599) reserved
+The final fold identity: near-black grounds (Backplane #121212, Rack panels
+#1a1a1a, Trace hairlines #2b2b2b), one signature acid lime (Live #D6FF00) reserved
 for actions, active routes, and live-proof signals, IBM Plex Sans + Geist Mono
 (both OFL, self-hosted). Surfaces are spaced rounded cards; CTAs are pills with
 ink text; the hero carries a pointer-tracked aurora glow. The fold-line diagram
@@ -91,19 +91,22 @@ brand's drawing hand. Unified across fold.run and docs.fold.run.
 ## 2. Colors
 
 ### Primary
-- **Live** `#00E599` — the one saturated move: primary pills (ink text, 11.7:1),
-  active diagram routes, status-up, arrows, focus rings. **Live Deep** `#00cc88`
-  hover. **Pulse** `#34D59A` soft accents in graphics only.
+- **Live** `#D6FF00` — the one saturated move: primary pills (ink text, 16.2:1),
+  active diagram routes, status-up, arrows, focus rings. **Live Deep** `#b4d600`
+  hover. **Pulse** `#E9FF80` soft accents in graphics only.
 
 ### Neutral
-- **Backplane** `#0c0d0d` ground · **Rack** `#131415` cards/code · **Trace**
-  `#242628` hairlines · **Signal** `#FAFAFA` text · **Static** `#94979E` muted
-  (6.6:1) · **Carrier** `#C9CBCF` links/badges/kicker-meta.
+- **Backplane** `#121212` ground · **Rack** `#1a1a1a` cards/code · **Trace**
+  `#2b2b2b` hairlines · **Signal** `#FFFFFF` text (18.7:1) · **Static** `#BCBCBC`
+  muted (9.9:1) · **Carrier** `#E0E0E0` links/badges/kicker-meta (14.2:1).
 
 ### Named Rules
-- Live doubles as the status-up color (green = alive = the proof-forward brand);
-  **Down** `#ff4c79` is reserved for status failures only.
-- Docs light theme: Paper ground with **Live Ink** `#1d7f5c` as text-accent (4.95:1).
+- Live doubles as the status-up color (lime = alive = the proof-forward brand);
+  **Down** `#ff4c79` is reserved for status failures only — the one hue outside
+  the four-color palette, and status semantics are its only license.
+- Live never carries text on a light ground (1.16:1 on Paper) and never carries
+  light text on a dark one — it is a fill, and fills take ink.
+- Docs light theme: Paper ground with **Live Ink** `#5a6b00` as text-accent (5.9:1).
 - No gradients except the hero glow field; no new hues.
 
 ## 3. Typography

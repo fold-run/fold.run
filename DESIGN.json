@@ -11,53 +11,53 @@
       "roles": [
         {
           "name": "Backplane",
-          "hex": "#0c0d0d",
+          "hex": "#121212",
           "use": "page ground, both origins"
         },
         {
           "name": "Rack",
-          "hex": "#131415",
+          "hex": "#1a1a1a",
           "use": "cards, panels, code surfaces"
         },
         {
           "name": "Trace",
-          "hex": "#242628",
+          "hex": "#2b2b2b",
           "use": "hairlines, borders, diagram strokes"
         },
         {
           "name": "Signal",
-          "hex": "#FAFAFA",
+          "hex": "#FFFFFF",
           "use": "primary text"
         },
         {
           "name": "Static",
-          "hex": "#94979E",
+          "hex": "#BCBCBC",
           "use": "muted text"
         },
         {
           "name": "Carrier",
-          "hex": "#C9CBCF",
+          "hex": "#E0E0E0",
           "use": "links, badges, kicker meta"
         },
         {
           "name": "Live",
-          "hex": "#00E599",
+          "hex": "#D6FF00",
           "use": "primary actions (ink text), active routes, status-up, arrows, focus"
         },
         {
           "name": "Live Deep",
-          "hex": "#00cc88",
+          "hex": "#b4d600",
           "use": "hover depth"
         },
         {
           "name": "Pulse",
-          "hex": "#34D59A",
+          "hex": "#E9FF80",
           "use": "soft accent in graphics only"
         },
         {
           "name": "Live Ink",
-          "hex": "#1d7f5c",
-          "use": "docs light-theme text accent (4.95:1 on Paper)"
+          "hex": "#5a6b00",
+          "use": "docs light-theme text accent (5.94:1 on Paper)"
         },
         {
           "name": "Down",
@@ -117,7 +117,7 @@
     }
   },
   "narrative": {
-    "northStar": "The gateway that proves itself: one governed endpoint, one live-green thread of proof through near-black instrument panels.",
+    "northStar": "The gateway that proves itself: one governed endpoint, one live-lime thread of proof through near-black instrument panels.",
     "rules": [
       "Live is reserved for action and proof",
       "One chrome across both origins",
