@@ -47,18 +47,19 @@ import Base from '../layouts/Base.astro';
   .lost .code {
     font-family: var(--mono-font-family);
     color: var(--color-accent);
-    font-size: 1rem;
+    font-size: var(--body-sm);
+    letter-spacing: var(--tracking-meta);
+    font-variant-numeric: tabular-nums slashed-zero;
     margin-bottom: var(--spacing-sm);
   }
   .lost h1 {
-    font-size: clamp(2rem, 5vw, 3.4rem);
-    font-weight: 700;
-    letter-spacing: -0.02em;
+    font-size: var(--heading-xxl);
+    font-weight: var(--weight-heading);
+    line-height: var(--line-height-heading);
+    letter-spacing: var(--tracking-display);
     margin-bottom: var(--spacing-md);
   }
   .lost .lede {
-    color: var(--color-static);
-    max-width: 55ch;
     margin-bottom: var(--spacing-lg);
   }
   .lost svg {

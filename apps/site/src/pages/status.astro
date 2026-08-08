@@ -148,14 +148,12 @@ const jsonld = {
   }
   .status-hero h1 {
     font-size: var(--heading-xxl);
-    font-weight: 800;
-    line-height: 1.02;
-    letter-spacing: -0.025em;
+    font-weight: var(--weight-heading);
+    line-height: var(--line-height-heading);
+    letter-spacing: var(--tracking-display);
     margin-bottom: var(--spacing-lg);
   }
   .status-hero .lede {
-    color: var(--color-static);
-    font-size: 1.0625rem;
     margin-bottom: var(--spacing-xl);
   }
   .overall {
@@ -166,7 +164,9 @@ const jsonld = {
     border: 1px solid var(--color-trace);
     border-radius: var(--radius-lg);
     padding: 14px 20px;
-    font: 600 var(--heading-md) / 1.3 var(--body-font-family);
+    font: var(--weight-heading) var(--heading-md) / var(--line-height-card)
+      var(--body-font-family);
+    letter-spacing: var(--tracking-card);
   }
   .overall.checking {
     color: var(--color-static);
@@ -216,18 +216,20 @@ const jsonld = {
   .target .name {
     font-family: var(--mono-font-family);
     font-size: var(--body-sm);
-    letter-spacing: 0.02em;
+    letter-spacing: 0;
     color: var(--color-fg);
-    font-weight: 450;
+    font-weight: 400; /* Geist Mono ships 400 and 600; 450 rounded down anyway */
     margin-right: auto;
   }
+  /* Latencies are read down the column, so they get figures of one width. */
   .target .readout {
     display: inline-flex;
     align-items: center;
     gap: 10px;
     font-family: var(--mono-font-family);
     font-size: var(--body-sm);
-    letter-spacing: 0.02em;
+    letter-spacing: 0;
+    font-variant-numeric: tabular-nums slashed-zero;
   }
   .target .state {
     color: var(--color-up);

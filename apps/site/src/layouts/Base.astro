@@ -54,17 +54,43 @@ const { title, description, canonical, jsonld, current, template } = Astro.props
       :root {
         --heading-font-family: 'IBM Plex Sans', ui-sans-serif, system-ui, sans-serif;
         --body-font-family: 'IBM Plex Sans', ui-sans-serif, system-ui, sans-serif;
-        --mono-font-family: 'JetBrains Mono', ui-monospace, monospace;
+        /* Geist Mono is the face that is actually served from /fonts. */
+        --mono-font-family: 'Geist Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
 
-        --heading-xxl: clamp(2.6rem, 6.5vw, 4.5rem); /* display, weight 800 */
-        --heading-xl: clamp(1.7rem, 3vw, 2.4rem);
-        --heading-lg: 1.25rem;
-        --heading-md: 1.0625rem;
+        /* Type ramp: 14 · 16 · 18 · 20 · 24 · 30–38 · 40–56.
+           Sizes that sit next to each other are at least a 1.25 step apart
+           (body 16 → card heading 20 → section head 30+). The 18/20 pair are
+           different roles — lead prose against a heading — held apart by
+           weight and colour rather than by size. */
+        --heading-xxl: clamp(2.5rem, 4.6vw + 0.6rem, 3.5rem); /* display, weight 600 */
+        --heading-xl: clamp(1.875rem, 1.6vw + 1.3rem, 2.375rem);
+        --heading-lg: 1.5rem;
+        --heading-md: 1.25rem;
+        --body-lg: 1.125rem; /* lede and section intros */
         --body: 1rem;
-        --body-sm: 0.875rem;
+        --body-sm: 0.875rem; /* metadata, captions, mono labels — not prose */
 
-        --line-height-heading: 1.08;
-        --line-height-body: 1.6;
+        /* Leading. Light type on a dark ground reads lighter, so every step
+           carries a little more than it would on paper. */
+        --line-height-heading: 1.04;
+        --line-height-title: 1.14;
+        --line-height-card: 1.3;
+        --line-height-body: 1.65;
+        --line-height-meta: 1.5;
+
+        /* Tracking: negative as size grows, positive as it shrinks. */
+        --tracking-display: -0.021em;
+        --tracking-title: -0.014em;
+        --tracking-card: -0.008em;
+        --tracking-body: 0.01em;
+        --tracking-meta: 0.02em;
+
+        /* Weights. 400 prose · 500 UI labels · 600 every heading ·
+           700 reserved for the wordmark and the proof numerals. */
+        --weight-body: 400;
+        --weight-label: 500;
+        --weight-heading: 600;
+        --weight-numeral: 700;
 
         /* colors — brand-native roles per DESIGN.md */
         --color-bg: #121212; /* Backplane */
@@ -85,8 +111,8 @@ const { title, description, canonical, jsonld, current, template } = Astro.props
         --spacing-xl: 48px;
         --spacing-2xl: 64px;
 
-        --section-padding: 64px; /* balanced tier; 48 tablet / 32 mobile below */
-        --max-width: 68rem;
+        --section-padding: 72px; /* balanced tier; 48 tablet / 32 mobile below */
+        --max-width: 72rem;
         --radius: 2px; /* machined (user re-direct) */
         --radius-sm: 0px;
         --radius-lg: 2px;
@@ -103,8 +129,12 @@ const { title, description, canonical, jsonld, current, template } = Astro.props
       body {
         background: var(--color-bg);
         color: var(--color-fg);
-        font: 400 var(--body) / var(--line-height-body) var(--body-font-family);
-        letter-spacing: 0.01em; /* light-on-dark compensation */
+        font: var(--weight-body) var(--body) / var(--line-height-body) var(--body-font-family);
+        letter-spacing: var(--tracking-body); /* light-on-dark compensation */
+        font-kerning: normal;
+        font-optical-sizing: auto;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
       }
       a {
         color: var(--color-carrier);
@@ -133,23 +163,40 @@ const { title, description, canonical, jsonld, current, template } = Astro.props
       }
       h1,
       h2,
-      h3 {
+      h3,
+      h4 {
         font-family: var(--heading-font-family);
+        font-weight: var(--weight-heading);
         text-wrap: balance;
       }
       h2 {
         font-size: var(--heading-xl);
-        font-weight: 700;
-        line-height: 1.12;
-        letter-spacing: -0.015em;
+        line-height: var(--line-height-title);
+        letter-spacing: var(--tracking-title);
       }
       h3 {
         font-size: var(--heading-lg);
-        font-weight: 700;
-        line-height: 1.3;
+        line-height: var(--line-height-card);
+        letter-spacing: var(--tracking-card);
+      }
+      h4 {
+        font-size: var(--heading-md);
+        line-height: var(--line-height-card);
+        letter-spacing: var(--tracking-card);
       }
       p {
         max-width: 70ch;
+        text-wrap: pretty;
+      }
+      /* Lead paragraphs — the sentence directly under a heading. Larger and
+         brighter than card prose, and held to a shorter measure so the eye
+         reads it as one statement rather than as a block. */
+      .lede,
+      .intro {
+        font-size: var(--body-lg);
+        line-height: 1.6;
+        color: var(--color-carrier);
+        max-width: 64ch;
       }
       .muted {
         color: var(--color-static);
@@ -158,6 +205,7 @@ const { title, description, canonical, jsonld, current, template } = Astro.props
         font-family: var(--mono-font-family);
         font-size: var(--body-sm);
         letter-spacing: 0;
+        font-variant-numeric: tabular-nums slashed-zero;
       }
       section {
         padding-block: var(--section-padding);
@@ -183,7 +231,8 @@ const { title, description, canonical, jsonld, current, template } = Astro.props
         align-items: center;
         gap: 12px;
         min-height: 46px;
-        font: 600 var(--body) / 1 var(--body-font-family);
+        font: var(--weight-heading) var(--body) / 1 var(--body-font-family);
+        letter-spacing: -0.004em;
         border-radius: 9999px;
         padding: 0 24px;
         transition:
@@ -195,7 +244,7 @@ const { title, description, canonical, jsonld, current, template } = Astro.props
         font-weight: 400;
       }
       .arrow-link {
-        font-weight: 600;
+        font-weight: var(--weight-label);
       }
       .arrow-link::after {
         content: '\2192';
@@ -374,8 +423,9 @@ const { title, description, canonical, jsonld, current, template } = Astro.props
         align-items: center;
         gap: 10px;
         color: var(--color-fg);
-        font-weight: 700;
-        font-size: 1.2rem;
+        font-weight: var(--weight-numeral);
+        font-size: 1.1875rem;
+        letter-spacing: -0.022em;
       }
       .brandmark:hover {
         text-decoration: none;
@@ -386,10 +436,12 @@ const { title, description, canonical, jsonld, current, template } = Astro.props
         gap: var(--spacing-sm);
         margin-left: auto;
         flex-wrap: wrap;
-        font-size: 0.95rem;
+        font-size: 0.9375rem;
       }
       header.site nav a:not(.btn) {
-        padding: 12px 8px;
+        padding: 12px 10px;
+        font-weight: var(--weight-label);
+        letter-spacing: 0;
       }
       /* backdrop-filter makes the header the containing block for fixed
          descendants; lift it while the mobile panel is open so the panel
@@ -429,8 +481,10 @@ const { title, description, canonical, jsonld, current, template } = Astro.props
         border: 0;
         color: var(--color-carrier);
         font: inherit;
-        font-size: 0.95rem;
-        padding: 12px 8px;
+        font-size: 0.9375rem;
+        font-weight: var(--weight-label);
+        letter-spacing: 0;
+        padding: 12px 10px;
         cursor: pointer;
         display: inline-flex;
         align-items: center;
@@ -473,12 +527,14 @@ const { title, description, canonical, jsonld, current, template } = Astro.props
         text-decoration: none;
       }
       .drop-panel a b {
-        font-weight: 600;
-        font-size: 0.95rem;
+        font-weight: var(--weight-heading);
+        font-size: 0.9375rem;
+        letter-spacing: -0.006em;
       }
       .drop-panel a span {
         color: var(--color-static);
-        font-size: 0.82rem;
+        font-size: var(--body-sm);
+        line-height: var(--line-height-meta);
       }
       @media (max-width: 900px) {
         .nav-burger {
@@ -539,7 +595,7 @@ const { title, description, canonical, jsonld, current, template } = Astro.props
       }
       footer.site .wrap.foot-grid {
         display: grid;
-        grid-template-columns: minmax(240px, 1.4fr) repeat(3, minmax(160px, 1fr));
+        grid-template-columns: minmax(220px, 1.4fr) repeat(3, minmax(140px, 1fr));
         align-items: start;
         gap: var(--spacing-xl);
         padding-bottom: var(--spacing-xl);
@@ -548,12 +604,15 @@ const { title, description, canonical, jsonld, current, template } = Astro.props
         display: inline-flex;
         align-items: center;
         gap: 10px;
-        font-size: 1.05rem;
+        font-size: 1.0625rem;
+        font-weight: var(--weight-numeral);
+        letter-spacing: -0.02em;
       }
       .foot-brand p {
         color: var(--color-static);
         font-size: var(--body-sm);
-        max-width: 30ch;
+        line-height: var(--line-height-meta);
+        max-width: 32ch;
         margin-top: var(--spacing-sm);
       }
       .status-badge {
@@ -565,6 +624,7 @@ const { title, description, canonical, jsonld, current, template } = Astro.props
         border: 1px solid var(--color-trace);
         border-radius: 9999px;
         font-size: var(--body-sm);
+        font-weight: var(--weight-label);
         color: var(--color-static);
       }
       .status-badge:hover {
@@ -616,7 +676,9 @@ const { title, description, canonical, jsonld, current, template } = Astro.props
           animation: none;
         }
       }
-      @media (max-width: 768px) {
+      /* Four columns need 220 + 3×140 + 3×48 of gutter; below ~900px that no
+         longer fits the viewport and the last column pushed the page sideways. */
+      @media (max-width: 900px) {
         footer.site .wrap.foot-grid {
           grid-template-columns: 1fr 1fr;
           gap: var(--spacing-lg);
@@ -634,13 +696,14 @@ const { title, description, canonical, jsonld, current, template } = Astro.props
         align-self: flex-start;
       }
       .foot-col h2 {
-        font: 600 var(--body-sm) / 1.4 var(--body-font-family);
+        font: var(--weight-heading) var(--body-sm) / 1.4 var(--body-font-family);
         color: var(--color-fg);
-        letter-spacing: 0.01em;
-        margin-bottom: 6px;
+        letter-spacing: 0.02em;
+        margin-bottom: 8px;
       }
       .foot-col a {
         font-size: var(--body-sm);
+        font-weight: var(--weight-label);
         color: var(--color-static);
         padding-block: 5px;
       }
@@ -702,6 +765,7 @@ const { title, description, canonical, jsonld, current, template } = Astro.props
       .code-panel .tag span {
         font-family: var(--mono-font-family);
         font-size: 0.75rem;
+        letter-spacing: var(--tracking-meta);
         color: var(--color-carrier);
         border: 1px solid var(--color-trace);
         border-radius: var(--radius-sm);
@@ -709,7 +773,7 @@ const { title, description, canonical, jsonld, current, template } = Astro.props
       }
       .code-panel button {
         font: 600 0.75rem/1 var(--mono-font-family);
-        letter-spacing: 0.02em;
+        letter-spacing: var(--tracking-meta);
         color: var(--color-carrier);
         background: transparent;
         border: 1px solid var(--color-trace);
@@ -729,7 +793,10 @@ const { title, description, canonical, jsonld, current, template } = Astro.props
       .code-panel pre {
         overflow-x: auto;
         padding: var(--spacing-sm) var(--spacing-lg) var(--spacing-md);
-        font: 400 0.78rem/1.6 var(--mono-font-family);
+        font: 400 0.8125rem / 1.7 var(--mono-font-family);
+        letter-spacing: 0;
+        font-variant-ligatures: none;
+        font-variant-numeric: slashed-zero;
         color: var(--color-fg);
       }
       .code-panel code .c {
@@ -924,7 +991,7 @@ const { title, description, canonical, jsonld, current, template } = Astro.props
       {
         const calm = matchMedia('(prefers-reduced-motion: reduce)').matches;
         if (!calm && 'IntersectionObserver' in window) {
-          const targets = document.querySelectorAll('main section > .wrap > h2, .tile-grid > *, .stat, .terminus, .problem, .path, .post-row, .target');
+          const targets = document.querySelectorAll('main section > .wrap > h2, main section > .wrap > .section-head, .tile-grid > *, .stat, .terminus, .problem, .path, .post-row, .target');
           const io = new IntersectionObserver(
             (entries) => {
               for (const en of entries) {
