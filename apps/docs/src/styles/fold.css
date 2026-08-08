@@ -121,27 +121,27 @@
 /* ===== DARK (canonical) — Starlight styles dark via bare :root ===== */
 :root {
   /* neutral ramp: Signal → Backplane */
-  --sl-color-white: #fafafa; /* Signal */
-  --sl-color-gray-1: #d0d3e2;
-  --sl-color-gray-2: #94979e; /* Static — body text */
-  --sl-color-gray-3: #7c81a0;
-  --sl-color-gray-4: #4a4e6a;
-  --sl-color-gray-5: #242628; /* Trace — hairlines */
-  --sl-color-gray-6: #131415; /* Rack — panels, nav, sidebar */
-  --sl-color-black: #0c0d0d; /* Backplane — page ground */
+  --sl-color-white: #ffffff; /* Signal (18.73:1 on Backplane) */
+  --sl-color-gray-1: #e0e0e0; /* Carrier */
+  --sl-color-gray-2: #bcbcbc; /* Static — body text (9.86:1) */
+  --sl-color-gray-3: #8a8a8a;
+  --sl-color-gray-4: #4d4d4d;
+  --sl-color-gray-5: #2b2b2b; /* Trace — hairlines */
+  --sl-color-gray-6: #1a1a1a; /* Rack — panels, nav, sidebar */
+  --sl-color-black: #121212; /* Backplane — page ground */
 
-  /* brass accent family */
-  --sl-color-accent-low: #33290f; /* dark brass surface tint */
-  --sl-color-accent: #00e599; /* Brass */
-  --sl-color-accent-high: #34d59a; /* Brass Soft */
-  --sl-color-text-accent: #00e599; /* links, current nav (8.63:1 on Backplane) */
-  --sl-color-bg-accent: #00e599; /* brass buttons… */
-  --sl-color-text-invert: #0c0d0d; /* …carry ink text (8.6:1) */
+  /* Live accent family */
+  --sl-color-accent-low: #2a3300; /* dark Live surface tint */
+  --sl-color-accent: #d6ff00; /* Live */
+  --sl-color-accent-high: #e9ff80; /* Pulse — Live, softened */
+  --sl-color-text-accent: #d6ff00; /* links, current nav (16.2:1 on Backplane) */
+  --sl-color-bg-accent: #d6ff00; /* Live buttons… */
+  --sl-color-text-invert: #121212; /* …carry ink text (16.2:1) */
 
   /* hairlines are Trace, everywhere */
-  --sl-color-hairline-light: #242628;
-  --sl-color-hairline: #242628;
-  --sl-color-hairline-shade: #0c0d0d;
+  --sl-color-hairline-light: #2b2b2b;
+  --sl-color-hairline: #2b2b2b;
+  --sl-color-hairline-shade: #121212;
 
   /* flat by conviction: no shadows on dark */
   --sl-shadow-sm: none;
@@ -152,48 +152,49 @@
   --sl-search-corners: 2px;
 
   /* fold-local tokens (theme-flipped below) */
-  --fold-rail: #00e599; /* current-page rail: Brass */
-  --fold-rail-fill: #131415; /* current-page fill: Rack */
-  --fold-inline-code-bg: #131415; /* Rack */
-  --fold-inline-code-border: #242628; /* Trace */
+  --fold-rail: #d6ff00; /* current-page rail: Live */
+  --fold-rail-fill: #1a1a1a; /* current-page fill: Rack */
+  --fold-inline-code-bg: #1a1a1a; /* Rack */
+  --fold-inline-code-border: #2b2b2b; /* Trace */
 }
 
-/* ===== LIGHT — Paper ground, ink ramp, AA brass =====
- * Light accent #1d7f5c: contrast vs #ffffff = 5.31:1 (WCAG AA ≥ 4.5:1, computed
- * from relative luminance; the spec's starting value already passes, unadjusted). */
+/* ===== LIGHT — Paper ground, ink ramp, AA Live Ink =====
+ * Live #d6ff00 is unusable as text on Paper (1.16:1), so light theme uses Live
+ * Ink #5a6b00: contrast vs #ffffff = 5.94:1 (WCAG AA ≥ 4.5:1, computed from
+ * relative luminance). Live itself stays for fills only. */
 :root[data-theme="light"] {
   /* neutral ramp: ink → Paper */
-  --sl-color-white: #111218;
-  --sl-color-gray-1: #1e2029;
-  --sl-color-gray-2: #363a4e;
-  --sl-color-gray-3: #5b6078;
-  --sl-color-gray-4: #8f93ab;
-  --sl-color-gray-5: #d8dae5;
-  --sl-color-gray-6: #edeef4;
-  --sl-color-gray-7: #f6f7fa;
+  --sl-color-white: #121212;
+  --sl-color-gray-1: #1f1f1f;
+  --sl-color-gray-2: #3d3d3d;
+  --sl-color-gray-3: #5c5c5c;
+  --sl-color-gray-4: #8a8a8a;
+  --sl-color-gray-5: #d4d4d4;
+  --sl-color-gray-6: #ededed;
+  --sl-color-gray-7: #f6f6f6;
   --sl-color-black: #ffffff; /* Paper */
 
-  /* brass, darkened for light grounds */
-  --sl-color-accent-low: #f6eed9; /* soft brass tint surface */
-  --sl-color-accent: #1d7f5c; /* AA brass — 5.31:1 on white */
-  --sl-color-accent-high: #5e450e;
-  --sl-color-text-accent: #1d7f5c; /* 5.31:1 on #ffffff — passes AA */
-  --sl-color-bg-accent: #1d7f5c;
-  --sl-color-text-invert: #ffffff;
+  /* Live, darkened for light grounds */
+  --sl-color-accent-low: #f4ffbf; /* soft Live tint surface */
+  --sl-color-accent: #5a6b00; /* Live Ink — 5.94:1 on white */
+  --sl-color-accent-high: #3f4a00; /* 9.59:1 on white */
+  --sl-color-text-accent: #5a6b00; /* 5.94:1 on #ffffff — passes AA */
+  --sl-color-bg-accent: #5a6b00;
+  --sl-color-text-invert: #ffffff; /* 5.94:1 on Live Ink */
 
-  --sl-color-hairline-light: #e3e5ee;
-  --sl-color-hairline: #e3e5ee;
-  --sl-color-hairline-shade: #e3e5ee;
+  --sl-color-hairline-light: #e5e5e5;
+  --sl-color-hairline: #e5e5e5;
+  --sl-color-hairline-shade: #e5e5e5;
 
   /* keep only Starlight's functional light shadows, softened */
   --sl-shadow-sm: 0px 1px 1px hsla(0, 0%, 0%, 0.04);
   --sl-shadow-md: 0px 3px 2px hsla(0, 0%, 0%, 0.04), 0px 1px 1px hsla(0, 0%, 0%, 0.05);
   --sl-shadow-lg: 0px 9px 5px hsla(223, 13%, 10%, 0.06), 0px 4px 4px hsla(0, 0%, 0%, 0.1);
 
-  --fold-rail: #1d7f5c;
-  --fold-rail-fill: #edeef4;
-  --fold-inline-code-bg: #edeef4;
-  --fold-inline-code-border: #d8dae5;
+  --fold-rail: #5a6b00;
+  --fold-rail-fill: #ededed;
+  --fold-inline-code-bg: #ededed;
+  --fold-inline-code-border: #d4d4d4;
 }
 
 /* ===== machined corners: 0–2px everywhere Starlight rounds ===== */
@@ -204,10 +205,10 @@
   --ec-brdRad: 1px;
   --ec-brdCol: var(--sl-color-hairline);
   --ec-frm-frameBoxShdCssVal: none;
-  --ec-codeBg: #131415; /* Rack — code surfaces */
+  --ec-codeBg: #1a1a1a; /* Rack — code surfaces */
 }
 :root:root[data-theme="light"] {
-  --ec-codeBg: #f6f7fa;
+  --ec-codeBg: #f6f6f6;
 }
 
 .sl-markdown-content .card,
@@ -271,10 +272,10 @@ button[data-open-modal] {
   margin-top: 0 !important;
 }
 :root[data-theme="light"] .sl-markdown-content .card {
-  --fold-card-bg: #f6f7fa;
+  --fold-card-bg: #f6f6f6;
 }
 :root:not([data-theme="light"]) .sl-markdown-content .card {
-  --fold-card-bg: #131415;
+  --fold-card-bg: #1a1a1a;
 }
 .sl-markdown-content .card .title {
   display: flex;

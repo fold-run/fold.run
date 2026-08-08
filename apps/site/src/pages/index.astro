@@ -37,6 +37,13 @@ const jsonld = {
       data-layout="split-media"
       data-media="image"
     >
+      <!-- pattern-paper ground: a ruled sheet that lights under the pointer.
+           Nothing moves on its own — the only motion is the visitor's own.
+           Decorative. -->
+      <div class="hero-grid" aria-hidden="true">
+        <div class="hero-rules"></div>
+        <div class="hero-cursor"></div>
+      </div>
       <div class="hero-field" aria-hidden="true">
         <span class="glow glow-a"></span>
         <span class="glow glow-b"></span>
@@ -97,10 +104,10 @@ const jsonld = {
                 width="68"
                 height="64"
                 rx="2"
-                fill="#131415"
-                stroke="#00E599"
+                fill="#1a1a1a"
+                stroke="#D6FF00"
                 stroke-width="1.5"></rect>
-              <path d="M 314 186 V 176 A 2 2 0 0 0 306 168 H 296 Z" fill="#00E599"></path>
+              <path d="M 314 186 V 176 A 2 2 0 0 0 306 168 H 296 Z" fill="#D6FF00"></path>
               <text class="fold-node-label" x="280" y="204" text-anchor="middle" font-weight="700"
                 >fold</text
               >
@@ -332,12 +339,12 @@ const jsonld = {
             <svg width="40" height="40" viewBox="0 0 40 40" aria-hidden="true">
               <path
                 d="M 4 8 C 16 8, 16 20, 24 20 M 4 20 H 24 M 4 32 C 16 32, 16 20, 24 20"
-                stroke="#71717A"
+                stroke="#6E6E6E"
                 stroke-width="1.5"
                 stroke-dasharray="4 3"
                 fill="none"></path>
-              <path d="M 24 20 H 36" stroke="#00E599" stroke-width="2" fill="none"></path>
-              <path d="M 32 16 L 37 20 L 32 24 Z" fill="#00E599"></path>
+              <path d="M 24 20 H 36" stroke="#D6FF00" stroke-width="2" fill="none"></path>
+              <path d="M 32 16 L 37 20 L 32 24 Z" fill="#D6FF00"></path>
             </svg>
             <h3>Federate</h3>
           </div>
@@ -373,11 +380,11 @@ const jsonld = {
           <div class="cluster-rail">
             <!-- glyph: route through a notched gate -->
             <svg width="40" height="40" viewBox="0 0 40 40" aria-hidden="true">
-              <path d="M 4 20 H 16" stroke="#71717A" stroke-width="1.5" stroke-dasharray="4 3" fill="none"
+              <path d="M 4 20 H 16" stroke="#6E6E6E" stroke-width="1.5" stroke-dasharray="4 3" fill="none"
               ></path>
-              <path d="M 18 10 v 20 M 23 12 v 16" stroke="#c4c8ff" stroke-width="1.5"></path>
-              <path d="M 25 20 H 36" stroke="#00E599" stroke-width="2" fill="none"></path>
-              <path d="M 32 16 L 37 20 L 32 24 Z" fill="#00E599"></path>
+              <path d="M 18 10 v 20 M 23 12 v 16" stroke="#bcbcbc" stroke-width="1.5"></path>
+              <path d="M 25 20 H 36" stroke="#D6FF00" stroke-width="2" fill="none"></path>
+              <path d="M 32 16 L 37 20 L 32 24 Z" fill="#D6FF00"></path>
             </svg>
             <h3>Govern</h3>
           </div>
@@ -410,10 +417,10 @@ const jsonld = {
           <div class="cluster-rail">
             <!-- glyph: route with gauge ticks -->
             <svg width="40" height="40" viewBox="0 0 40 40" aria-hidden="true">
-              <path d="M 4 20 H 36" stroke="#00E599" stroke-width="2" fill="none"></path>
-              <path d="M 12 14 v 5 M 20 12 v 7 M 28 14 v 5" stroke="#71717A" stroke-width="1.5"
+              <path d="M 4 20 H 36" stroke="#D6FF00" stroke-width="2" fill="none"></path>
+              <path d="M 12 14 v 5 M 20 12 v 7 M 28 14 v 5" stroke="#6E6E6E" stroke-width="1.5"
               ></path>
-              <path d="M 12 26 v -3 M 20 28 v -5 M 28 26 v -3" stroke="#71717A" stroke-width="1.5"
+              <path d="M 12 26 v -3 M 20 28 v -5 M 28 26 v -3" stroke="#6E6E6E" stroke-width="1.5"
               ></path>
             </svg>
             <h3>Operate</h3>
@@ -495,18 +502,30 @@ const jsonld = {
     });
   }
 
+  /* The hero answers to the pointer and to nothing else: one handler, throttled
+     to a frame, publishing the cursor twice — normalised (--mx/--my) for the
+     glow parallax, and in hero-local pixels (--cx/--cy) for the lit patch of
+     grid. Everything downstream is CSS, so there is no loop running when the
+     visitor is still. `is-tracking` gates the light on the same conditions, so
+     a coarse pointer or a reduced-motion visitor never gets one with nothing to
+     follow. */
   {
-    const hero = document.querySelector('[data-glow]');
+    const hero = document.querySelector<HTMLElement>('[data-glow]');
     const fine = matchMedia('(pointer: fine)');
     const calm = matchMedia('(prefers-reduced-motion: reduce)');
     if (hero && fine.matches && !calm.matches) {
       let raf = 0;
-      hero.addEventListener('pointermove', (e) => {
+      hero.classList.add('is-tracking');
+      hero.addEventListener('pointermove', (e: PointerEvent) => {
         if (raf) return;
         raf = requestAnimationFrame(() => {
           const r = hero.getBoundingClientRect();
-          hero.style.setProperty('--mx', String((e.clientX - r.left) / r.width - 0.5));
-          hero.style.setProperty('--my', String((e.clientY - r.top) / r.height - 0.5));
+          const x = e.clientX - r.left;
+          const y = e.clientY - r.top;
+          hero.style.setProperty('--mx', String(x / r.width - 0.5));
+          hero.style.setProperty('--my', String(y / r.height - 0.5));
+          hero.style.setProperty('--cx', `${x}px`);
+          hero.style.setProperty('--cy', `${y}px`);
           raf = 0;
         });
       });
@@ -531,6 +550,70 @@ const jsonld = {
     transform: translate3d(calc(var(--mx, 0) * 28px), calc(var(--my, 0) * 20px), 0);
     transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
   }
+  /* The pattern-paper ground: a dark ruled sheet, and the same rules again in
+     Live revealed only under the pointer. Both layers are plain CSS gradients,
+     so the compositor carries them and there is no canvas and no frame loop
+     behind the hero at all. Masked so the sheet dissolves before it reaches the
+     copy on the left. */
+  .hero-grid {
+    /* Bleeds the sheet past the section's edges, so the light stays a full disc
+       when the pointer is near a corner. It is also the offset --cx/--cy need,
+       since those arrive hero-local. */
+    --grid-bleed: 80px;
+    position: absolute;
+    inset: calc(-1 * var(--grid-bleed));
+    pointer-events: none;
+    mask-image: radial-gradient(112% 108% at 76% 28%, #000 24%, transparent 86%);
+    -webkit-mask-image: radial-gradient(112% 108% at 76% 28%, #000 24%, transparent 86%);
+  }
+  .hero-rules {
+    position: absolute;
+    inset: 0;
+    opacity: 0.7;
+    background-image:
+      linear-gradient(to right, var(--color-trace) 1px, transparent 1px),
+      linear-gradient(to bottom, var(--color-trace) 1px, transparent 1px);
+    background-size: 64px 64px;
+  }
+  /* Revealed in a soft disc under the pointer: the sheet lights where you are
+     and goes dark again behind you. Sharing a parent and a background-size with
+     .hero-rules is what keeps the lit rules exactly over the dark ones. */
+  .hero-cursor {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    transition: opacity 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+    background-image:
+      radial-gradient(
+        170px 170px at calc(var(--cx, 50%) + var(--grid-bleed))
+          calc(var(--cy, 50%) + var(--grid-bleed)),
+        color-mix(in srgb, var(--color-accent) 18%, transparent),
+        transparent 70%
+      ),
+      linear-gradient(to right, var(--color-accent) 1px, transparent 1px),
+      linear-gradient(to bottom, var(--color-accent) 1px, transparent 1px);
+    background-size:
+      100% 100%,
+      64px 64px,
+      64px 64px;
+    mask-image: radial-gradient(
+      220px 220px at calc(var(--cx, 50%) + var(--grid-bleed))
+        calc(var(--cy, 50%) + var(--grid-bleed)),
+      #000,
+      transparent 72%
+    );
+    -webkit-mask-image: radial-gradient(
+      220px 220px at calc(var(--cx, 50%) + var(--grid-bleed))
+        calc(var(--cy, 50%) + var(--grid-bleed)),
+      #000,
+      transparent 72%
+    );
+  }
+  /* `is-tracking` is set by the script, so a coarse pointer or a reduced-motion
+     visitor never gets a light that has nothing to follow. */
+  .hero.is-tracking:hover .hero-cursor {
+    opacity: 0.8;
+  }
   .glow {
     position: absolute;
     border-radius: 50%;
@@ -541,14 +624,14 @@ const jsonld = {
     height: 420px;
     right: -6%;
     top: 4%;
-    background: radial-gradient(closest-side, rgba(0, 229, 153, 0.2), transparent 70%);
+    background: radial-gradient(closest-side, rgba(214, 255, 0, 0.18), transparent 70%);
   }
   .glow-b {
     width: 420px;
     height: 360px;
     left: 30%;
     bottom: -22%;
-    background: radial-gradient(closest-side, rgba(37, 157, 244, 0.1), transparent 70%);
+    background: radial-gradient(closest-side, rgba(188, 188, 188, 0.1), transparent 70%);
   }
   @media (prefers-reduced-motion: no-preference) {
     .glow-a {
@@ -573,11 +656,17 @@ const jsonld = {
       transition: none;
       transform: none;
     }
+    .hero-cursor {
+      display: none;
+    }
   }
   .hero .wrap {
     position: relative;
     display: grid;
-    grid-template-columns: 7fr 5fr;
+    /* The copy column is sized to the headline rather than to a share of the
+       row: it needs enough for "The enterprise / MCP gateway." on two lines and
+       nothing more, and everything left over goes to the diagram. */
+    grid-template-columns: minmax(0, 31rem) minmax(0, 1fr);
     gap: var(--spacing-xl);
     align-items: center;
   }
@@ -608,16 +697,10 @@ const jsonld = {
     gap: var(--spacing-md);
     flex-wrap: wrap;
   }
+  /* No rule between the columns: the grid's own gap separates them, and the
+     ruled sheet behind the diagram already gives that side its own ground. */
   .diagram-panel {
     min-width: 0;
-    border-left: 1px solid var(--color-trace);
-    padding-left: var(--spacing-xl);
-  }
-  @media (max-width: 1024px) {
-    .diagram-panel {
-      border-left: 0;
-      padding-left: 0;
-    }
   }
   .diagram-panel svg {
     width: 100%;
@@ -911,7 +994,7 @@ const jsonld = {
     outline-color: var(--color-accent);
   }
   .closing {
-    background: #0d0e12;
+    background: #121212;
     border-top: 1px solid var(--color-trace);
     
     padding-block: 80px;
@@ -931,10 +1014,10 @@ const jsonld = {
   }
   .closing .btn-primary {
     background: var(--color-accent);
-    color: #0c0d0d;
+    color: #121212;
   }
   .closing .btn-primary:hover {
-    background: #00cc88;
+    background: #b4d600;
   }
 
   /* ===== responsive (page-specific) ===== */
