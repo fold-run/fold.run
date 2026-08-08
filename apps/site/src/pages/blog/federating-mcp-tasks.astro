@@ -299,7 +299,7 @@ owner := g.locateTaskOwner(ctx, rt, taskID)</code></pre>
     display: inline-block;
     font-family: var(--mono-font-family);
     font-size: var(--body-sm);
-    letter-spacing: 0.03em;
+    letter-spacing: var(--tracking-meta);
     color: var(--color-static);
     padding: 8px 0;
     margin-bottom: var(--spacing-sm);
@@ -310,16 +310,16 @@ owner := g.locateTaskOwner(ctx, rt, taskID)</code></pre>
   .kicker {
     font-family: var(--mono-font-family);
     font-size: var(--body-sm);
-    letter-spacing: 0.01em;
+    letter-spacing: var(--tracking-meta);
+    font-variant-numeric: tabular-nums slashed-zero;
     color: var(--color-carrier);
     margin-bottom: var(--spacing-md);
   }
   .article-header h1 {
     font-size: var(--heading-xl);
-    font-weight: 800;
-    line-height: var(--line-height-heading);
-    letter-spacing: -0.02em;
-    max-width: 65ch;
+    font-weight: var(--weight-heading);
+    line-height: var(--line-height-title);
+    letter-spacing: var(--tracking-title);
   }
 
   .article-body {
@@ -327,23 +327,28 @@ owner := g.locateTaskOwner(ctx, rt, taskID)</code></pre>
     padding-block: var(--spacing-lg) var(--section-padding);
   }
   .article-body .article-col {
-    font-size: 1.0625rem;
+    font-size: var(--body-lg);
     line-height: 1.7;
   }
   .article-col > * + * {
     margin-top: 1.15em;
   }
   .article-col h2 {
-    font-size: clamp(1.4rem, 2.2vw, 1.8rem);
+    font-size: clamp(1.5rem, 1.1vw + 1.15rem, 1.875rem);
+    letter-spacing: var(--tracking-card);
     margin-top: 2.1em;
     margin-bottom: 0.55em;
   }
   .article-col p {
     max-width: none;
   }
+  /* Standfirst: the body of this page is already Signal, so a lede in Carrier
+     would read as a step down rather than as the way in. Size and leading
+     carry it instead. */
   .article-col .lede {
-    color: var(--color-static);
-    font-size: 1.125rem;
+    font-size: 1.3125rem;
+    line-height: 1.55;
+    color: var(--color-fg);
   }
   .article-col a {
     text-decoration: underline;
@@ -356,11 +361,13 @@ owner := g.locateTaskOwner(ctx, rt, taskID)</code></pre>
   .article-col code {
     font-family: var(--mono-font-family);
     font-size: 0.85em;
-    letter-spacing: 0.01em;
+    letter-spacing: 0;
     background: var(--color-rack);
     border: 1px solid var(--color-trace);
     border-radius: var(--radius-sm);
-    padding: 0.1em 0.4em;
+    /* Tight side padding: at 0.4em the chip pushes following punctuation far
+       enough away that a comma after a token reads as a typo. */
+    padding: 0.12em 0.26em;
     color: var(--color-carrier);
     overflow-wrap: anywhere;
   }
@@ -498,11 +505,13 @@ owner := g.locateTaskOwner(ctx, rt, taskID)</code></pre>
   }
   .closing h2 {
     color: var(--color-fg);
-    font-size: clamp(1.5rem, 2.4vw, 1.9rem);
+    font-size: clamp(1.5rem, 1.4vw + 1.1rem, 1.9rem);
   }
   .closing p {
-    color: var(--color-static);
-        max-width: 56ch;
+    color: var(--color-carrier);
+    font-size: var(--body-lg);
+    line-height: 1.6;
+    max-width: 54ch;
   }
   .closing .btn-primary {
     background: var(--color-accent);

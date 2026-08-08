@@ -16,27 +16,51 @@ colors:
 typography:
   display:
     fontFamily: "IBM Plex Sans, ui-sans-serif, system-ui, sans-serif"
-    fontSize: "clamp(2.6rem, 6.5vw, 4.5rem)"
-    fontWeight: 700
-    lineHeight: 1.05
-    letterSpacing: "-0.02em"
+    fontSize: "clamp(2.5rem, 4.6vw + 0.6rem, 3.5rem)"
+    fontWeight: 600
+    lineHeight: 1.04
+    letterSpacing: "-0.021em"
+  title:
+    fontFamily: "IBM Plex Sans, ui-sans-serif, system-ui, sans-serif"
+    fontSize: "clamp(1.875rem, 1.6vw + 1.3rem, 2.375rem)"
+    fontWeight: 600
+    lineHeight: 1.14
+    letterSpacing: "-0.014em"
+  subtitle:
+    fontFamily: "IBM Plex Sans, ui-sans-serif, system-ui, sans-serif"
+    fontSize: "1.5rem"
+    fontWeight: 600
+    lineHeight: 1.3
+    letterSpacing: "-0.008em"
   heading:
     fontFamily: "IBM Plex Sans, ui-sans-serif, system-ui, sans-serif"
-    fontSize: "clamp(1.7rem, 3vw, 2.4rem)"
+    fontSize: "1.25rem"
     fontWeight: 600
-    lineHeight: 1.12
-    letterSpacing: "-0.01em"
+    lineHeight: 1.3
+    letterSpacing: "-0.008em"
+  lead:
+    fontFamily: "IBM Plex Sans, ui-sans-serif, system-ui, sans-serif"
+    fontSize: "1.125rem"
+    fontWeight: 400
+    lineHeight: 1.6
+    letterSpacing: "0.01em"
   body:
     fontFamily: "IBM Plex Sans, ui-sans-serif, system-ui, sans-serif"
     fontSize: "1rem"
     fontWeight: 400
-    lineHeight: 1.6
-    letterSpacing: "normal"
+    lineHeight: 1.65
+    letterSpacing: "0.01em"
+  meta:
+    fontFamily: "IBM Plex Sans, ui-sans-serif, system-ui, sans-serif"
+    fontSize: "0.875rem"
+    fontWeight: 500
+    lineHeight: 1.5
+    letterSpacing: "0.02em"
   mono:
-    fontFamily: "'Geist Mono', ui-monospace, monospace"
+    fontFamily: "'Geist Mono', ui-monospace, SFMono-Regular, Menlo, monospace"
     fontSize: "0.875rem"
     fontWeight: 400
-    lineHeight: 1.55
+    lineHeight: 1.7
     letterSpacing: "0"
 rounded:
   sm: "6px"
@@ -48,10 +72,10 @@ spacing:
   sm: "16px"
   md: "24px"
   lg: "40px"
-  section-desktop: "64px"
+  section-desktop: "72px"
   section-tablet: "48px"
   section-mobile: "32px"
-  container: "68rem"
+  container: "72rem"
 components:
   button-primary:
     backgroundColor: "{colors.live}"
@@ -113,11 +137,35 @@ brand's drawing hand. Unified across fold.run and docs.fold.run.
 
 IBM Plex Sans (400/500/600/700) for all prose and display; Geist Mono for
 everything operational (commands, config, status values, diagram annotations,
-the kicker meta-line). Self-hosted woff2, font-display swap. Display weight 700,
-heading 600. `text-wrap: balance` on h1–h3; 70ch measure.
+the kicker meta-line). Self-hosted woff2, font-display swap.
+
+**Ramp** — 14 · 16 · 18 · 20 · 24 · 30–38 · 40–56. Sizes that sit next to each
+other are at least a 1.25 step apart (body 16 → card heading 20 → section head
+30+). Lead prose at 18 and headings at 20 are held apart by weight and colour,
+not by size.
+
+**Weights** — 400 prose · 500 UI labels (nav, footer links, badges) · 600 every
+heading from the display down to card headings · 700 reserved for the wordmark
+and the proof numerals. The display step is 600, not 800: at 56px the size
+carries the hierarchy, and the lighter weight is what reads institutional
+rather than launch-day.
+
+**Leading and tracking** — light type on a dark ground reads lighter, so every
+step carries more leading than it would on paper (body 1.65) and body-size
+prose gets +0.01em. Tracking goes negative as size grows (-0.021em display,
+-0.014em title, -0.008em headings) and positive at meta size (+0.02em).
+
+**Measure** — prose 70ch, lead paragraphs 64ch, captions 34ch. Section heads
+run as a split band: title in a 26rem column, standfirst beside it on the same
+first baseline.
 
 - **Earned-mono rule** (unchanged): mono content must be runnable or live.
+- Mono carries `tabular-nums slashed-zero` wherever it sets a number — stats,
+  latencies, versions, dates — so figures line up down a column and read as
+  measurements.
 - Mixed-case headings; terminal periods on section H2s are brand voice.
+- `text-wrap: balance` on h1–h4, `pretty` on prose. A heading whose balanced
+  break splits a phrase takes an authored `<br>` at the sentence instead.
 
 ## 4. Elevation
 

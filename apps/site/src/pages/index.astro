@@ -50,11 +50,15 @@ const jsonld = {
       </div>
       <div class="wrap">
         <div>
-          <p class="kicker">
-            <a href="https://github.com/fold-run/fold/releases">v1.5.0</a>
-            <span aria-hidden="true">·</span> Apache-2.0 <span aria-hidden="true">·</span>
-            <a href="https://docs.fold.run/conformance/">40/40 MCP conformant</a>
-          </p>
+          <!-- Separators are spaced by CSS, not by source whitespace: Astro
+               collapses the newlines between inline elements and the marks
+               end up fused to the words. -->
+          <p class="kicker"><a href="https://github.com/fold-run/fold/releases">v1.5.0</a><span
+              class="sep"
+              aria-hidden="true">·</span
+            >Apache-2.0<span class="sep" aria-hidden="true">·</span><a
+              href="https://docs.fold.run/conformance/">40/40 MCP conformant</a
+            ></p>
           <h1>The enterprise MCP gateway.</h1>
           <p class="lede">
             One governed endpoint between every MCP (Model Context Protocol) client and every MCP
@@ -173,13 +177,15 @@ const jsonld = {
       data-items="3"
     >
       <div class="wrap">
-        <h2>See it live.</h2>
-        <p class="intro">
-          demo.fold.run federates three public MCP servers behind one endpoint — the unmodified
-          release binary, governed by its own config. Point any MCP client at it. Rate-limited,
-          unauthenticated, no warranty; live status on <a href="/status/">/status</a>. Copy-paste
-          walkthrough: <a href="https://docs.fold.run/try-the-demo/">try the demo</a>.
-        </p>
+        <div class="section-head">
+          <h2>See it live.</h2>
+          <p class="intro">
+            demo.fold.run federates three public MCP servers behind one endpoint — the unmodified
+            release binary, governed by its own config. Point any MCP client at it. Rate-limited,
+            unauthenticated, no warranty; live status on <a href="/status/">/status</a>. Copy-paste
+            walkthrough: <a href="https://docs.fold.run/try-the-demo/">try the demo</a>.
+          </p>
+        </div>
         <div class="route-rail">
           <span class="chip">demo.fold.run/mcp</span>
           <span class="muted" style="font-size: var(--body-sm)">three upstreams · one endpoint</span
@@ -220,11 +226,13 @@ const jsonld = {
       data-items="3"
     >
       <div class="wrap">
-        <h2>Run it in 60 seconds.</h2>
-        <p class="intro">
-          fold is a single static binary with no local state. One config file in front of your first
-          server, governance when you're ready.
-        </p>
+        <div class="section-head">
+          <h2>Run it in 60 seconds.</h2>
+          <p class="intro">
+            fold is a single static binary with no local state. One config file in front of your
+            first server, governance when you're ready.
+          </p>
+        </div>
 
         <ol class="route-steps">
           <li class="step">
@@ -327,11 +335,16 @@ const jsonld = {
       data-items="9"
     >
       <div class="wrap">
-        <h2>One gateway. A family of problems.</h2>
-        <p class="intro">
-          Most deployments start with one of these and grow into the others — they all ride the same
-          config file.
-        </p>
+        <div class="section-head">
+          <!-- Broken at the sentence, not wherever the box runs out: balance
+               would otherwise leave "One gateway. A" hanging on line one.
+               Both sentences fit a line on their own at every width. -->
+          <h2 class="no-balance">One gateway.<br />A family of problems.</h2>
+          <p class="intro">
+            Most deployments start with one of these and grow into the others — they all ride the
+            same config file.
+          </p>
+        </div>
 
         <div class="cluster">
           <div class="cluster-rail">
@@ -676,21 +689,25 @@ const jsonld = {
   .kicker {
     font-family: var(--mono-font-family);
     font-size: var(--body-sm);
-    letter-spacing: 0.01em;
+    letter-spacing: var(--tracking-meta);
+    font-variant-numeric: tabular-nums slashed-zero;
     color: var(--color-carrier);
-    margin-bottom: var(--spacing-md);
+    margin-bottom: var(--spacing-lg);
+  }
+  .kicker .sep {
+    color: var(--color-fold-line);
+    margin-inline: 0.7em;
   }
   .hero h1 {
     font-size: var(--heading-xxl);
-    font-weight: 800;
-    line-height: 1.02;
-    letter-spacing: -0.025em;
+    font-weight: var(--weight-heading);
+    line-height: var(--line-height-heading);
+    letter-spacing: var(--tracking-display);
     margin-bottom: var(--spacing-lg);
   }
   .hero .lede {
-    color: var(--color-static);
-    font-size: 1.0625rem;
     margin-bottom: var(--spacing-xl);
+    max-width: 46ch;
   }
   .cta-row {
     display: flex;
@@ -789,30 +806,52 @@ const jsonld = {
     background: var(--color-rack);
     text-decoration: none;
   }
+  /* The proof numerals. Mono, tabular and slashed-zero so "40/40" and
+     "~0.2 ms" read as measurements rather than as marketing. */
   .stat b {
     font-family: var(--mono-font-family);
-    font-size: 1.5rem;
-    font-weight: 700;
+    font-size: 1.625rem;
+    font-weight: var(--weight-numeral);
+    font-variant-numeric: tabular-nums slashed-zero;
     display: block;
-    margin-bottom: 4px;
-    letter-spacing: 0;
+    margin-bottom: 8px;
+    letter-spacing: -0.015em;
+    line-height: 1.15;
   }
+  /* The caveat under each numeral is a caption, so it stays at meta size. */
   .stat span {
     color: var(--color-static);
     font-size: var(--body-sm);
+    line-height: var(--line-height-meta);
     display: block;
-    max-width: none;
+    max-width: 34ch;
   }
 
-  /* ===== demo ===== */
-  .demo h2,
-  .runit h2,
-  .problems h2 {
-    margin-bottom: var(--spacing-md);
-  }
-  .demo .intro {
+  /* Section head: the title hangs in a narrow left column and the standfirst
+     runs beside it, so the head uses the full measure of the page instead of
+     leaving the right half of every section empty. Baselines align on the
+     first line, which is what makes the pairing look set rather than stacked. */
+  .section-head {
+    display: grid;
+    grid-template-columns: minmax(0, 26rem) minmax(0, 1fr);
+    gap: var(--spacing-md) var(--spacing-xl);
+    align-items: baseline;
     margin-bottom: var(--spacing-xl);
-    color: var(--color-static);
+  }
+  .section-head h2 {
+    margin: 0;
+  }
+  .no-balance {
+    text-wrap: initial;
+  }
+  .section-head .intro {
+    margin: 0;
+  }
+  @media (max-width: 900px) {
+    .section-head {
+      grid-template-columns: 1fr;
+      gap: var(--spacing-md);
+    }
   }
   .termini {
     display: grid;
@@ -848,29 +887,31 @@ const jsonld = {
   .route-rail .chip {
     font-family: var(--mono-font-family);
     font-size: var(--body-sm);
+    letter-spacing: 0;
     color: var(--color-carrier);
     background: var(--color-rack);
     border: 1px solid var(--color-trace);
     border-radius: var(--radius-sm);
     padding: 3px 10px;
   }
+  /* The namespace prefixes are literal wire strings, so they keep the mono —
+     the one place a heading earns it. */
   .terminus h3 {
     font-family: var(--mono-font-family);
-    font-size: 1.05rem;
+    font-size: 1.0625rem;
+    font-weight: var(--weight-heading);
     letter-spacing: 0;
+    line-height: var(--line-height-card);
     margin-bottom: var(--spacing-sm);
-    color: var(--color-carrier);
+    color: var(--color-fg);
   }
   .terminus p {
     color: var(--color-static);
-    font-size: var(--body-sm);
+    font-size: var(--body);
+    line-height: 1.6;
   }
 
   /* ===== run-it: numbered route ===== */
-  .runit .intro {
-    color: var(--color-static);
-    margin-bottom: var(--spacing-xl);
-  }
   .route-steps {
     display: grid;
     gap: var(--spacing-lg);
@@ -894,6 +935,9 @@ const jsonld = {
     place-items: center;
     font-family: var(--mono-font-family);
     font-size: var(--body-sm);
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0;
     color: var(--color-carrier);
     position: relative;
     background: var(--color-bg);
@@ -914,6 +958,9 @@ const jsonld = {
     margin-bottom: var(--spacing-sm);
     font-size: var(--heading-md);
   }
+  .step .muted {
+    font-size: var(--body);
+  }
   .paths {
     margin-top: var(--spacing-xl);
     display: grid;
@@ -927,31 +974,31 @@ const jsonld = {
     padding: var(--spacing-lg);
   }
   .path h3 {
-    font: 700 var(--heading-md) / 1.3 var(--heading-font-family);
+    font: var(--weight-heading) var(--heading-md) / var(--line-height-card)
+      var(--heading-font-family);
+    letter-spacing: var(--tracking-card);
     margin-bottom: var(--spacing-sm);
   }
   .path p {
     color: var(--color-static);
-    font-size: var(--body-sm);
+    font-size: var(--body);
+    line-height: 1.6;
   }
   .path .cmd {
     display: block;
-    margin-top: 6px;
+    margin-top: 10px;
     font-family: var(--mono-font-family);
     font-size: 0.8125rem;
+    letter-spacing: 0;
     color: var(--color-carrier);
     overflow-wrap: anywhere;
   }
 
 
   /* ===== problems: 3 cluster bands ===== */
-  .problems .intro {
-    color: var(--color-static);
-    margin-bottom: var(--spacing-xl);
-  }
   .cluster {
     display: grid;
-    grid-template-columns: 220px 1fr 1fr 1fr;
+    grid-template-columns: 200px repeat(3, minmax(0, 1fr));
     gap: var(--spacing-md);
   }
   .cluster + .cluster {
@@ -966,7 +1013,8 @@ const jsonld = {
   }
   .cluster-rail h3 {
     font-size: var(--heading-lg);
-    margin-top: var(--spacing-sm);
+    letter-spacing: var(--tracking-title);
+    margin-top: var(--spacing-md);
   }
   .cluster-rail svg {
     display: block;
@@ -981,12 +1029,12 @@ const jsonld = {
     padding: var(--spacing-lg);
   }
   .problem h4 {
-    font: 700 var(--heading-md) / 1.3 var(--heading-font-family);
-    margin-bottom: 6px;
+    margin-bottom: 8px;
   }
   .problem p {
     color: var(--color-static);
-    font-size: var(--body-sm);
+    font-size: var(--body);
+    line-height: 1.6;
   }
 
   /* ===== closing: the Route drench ===== */
@@ -999,18 +1047,30 @@ const jsonld = {
     
     padding-block: 80px;
   }
+  /* The statement holds the left, the action sits at the end of the line.
+     On the wide container a single left-aligned stack leaves half the band
+     empty; this makes the width part of the composition. */
   .closing .wrap {
     display: grid;
-    gap: var(--spacing-lg);
-    justify-items: start;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: var(--spacing-lg) var(--spacing-2xl);
+    align-items: center;
   }
   .closing h2 {
     color: var(--color-fg);
-    font-size: clamp(2rem, 4vw, 3rem);
+    font-size: clamp(2rem, 2.2vw + 1.2rem, 2.75rem);
+    max-width: 18ch;
   }
   .closing p {
-    color: var(--color-static);
-        max-width: 56ch;
+    color: var(--color-carrier);
+    font-size: var(--body-lg);
+    line-height: 1.6;
+    max-width: 52ch;
+  }
+  .closing .btn {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+    justify-self: end;
   }
   .closing .btn-primary {
     background: var(--color-accent);
@@ -1042,6 +1102,17 @@ const jsonld = {
     }
     .cluster-rail h3 {
       margin-top: 0;
+    }
+  }
+  @media (max-width: 840px) {
+    .closing .wrap {
+      grid-template-columns: 1fr;
+      justify-items: start;
+    }
+    .closing .btn {
+      grid-column: 1;
+      grid-row: auto;
+      justify-self: start;
     }
   }
   @media (max-width: 640px) {
