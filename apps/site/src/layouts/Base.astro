@@ -316,12 +316,18 @@ const { title, description, canonical, jsonld, current, template } = Astro.props
         background: var(--color-route-deep);
         text-decoration: none;
       }
+      /* A filled panel rather than an outline, so the pair reads as two solid
+         buttons of different weight — Live for the primary action, Rack for the
+         secondary — instead of a button beside a ghost. The hairline stays: on
+         Backplane the Rack fill alone does not describe an edge. */
       .btn-secondary {
+        background: var(--color-rack);
         border: 1px solid var(--color-trace);
         color: var(--color-carrier);
         padding: 11px 19px;
       }
       .btn-secondary:hover {
+        background: #202020;
         border-color: var(--color-carrier);
         text-decoration: none;
       }
