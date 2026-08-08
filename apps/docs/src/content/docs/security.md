@@ -50,9 +50,13 @@ Rules match subjects, groups, issuers, and verified token claims (ABAC). Subject
 
 Task ownership follows the same principle: a task minted through the gateway is bound to the minting principal, and another caller's requests for it answer exactly like an unknown id — no existence leak.
 
+That binding is an authorization record rather than a routing hint, so it lives in shared state: with Redis configured every instance of a fleet reads the same ownership, and it survives a rolling restart — a caller can't reach another principal's task by landing on an instance that didn't serve the mint. Records key on a digest of the task id and hold a digest of the owning principal, so neither the id a caller names nor its subject claims enter shared state verbatim, and a Redis outage falls back to the records that instance mirrored locally rather than to none. Two limits worth knowing: records expire after 24 hours, and a gateway *without* Redis is still per-instance. In both cases the task falls through to the locate-by-probe path and becomes reachable by any caller, exactly as one fold never saw minted always was.
+
 ## Credentials never travel further than configured
 
-Upstream credentials (API keys, exchanged tokens, passthrough bearers) attach per outgoing request and only to requests bound for a configured endpoint host of that upstream. Two layers enforce it: the HTTP client refuses cross-host redirects outright, and the transport re-checks the destination host before attaching anything — a hostile upstream answering 3xx can't capture a credential. The token-endpoint client refuses redirects entirely, not just cross-host ones: Go replays POST bodies on 307/308, and those requests carry the client secret and, under token-exchange, the caller's own bearer token as `subject_token` — so a redirecting token endpoint would otherwise hand both to the host it names.
+Upstream credentials (API keys, exchanged tokens, passthrough bearers) attach per outgoing request and only to requests bound for a configured endpoint host of that upstream. Two layers enforce it: the HTTP client refuses cross-host redirects outright, and the transport re-checks the destination host before attaching anything — a hostile upstream answering 3xx can't capture a credential. The token-endpoint client refuses redirects entirely, not just cross-host ones: Go replays POST bodies on 307/308, and those requests carry the client secret and, under token-exchange, the caller's own bearer token as `subject_token` — so a redirecting token endpoint would otherwise hand both to the host it names. Its response body is size-bounded, and concurrent first-time callers for one identity share a single grant request instead of becoming a burst of them against the IdP.
+
+The same redirect rule covers fold's other two credentialed outbound clients. The discovery poller refuses every redirect — the document decides where traffic routes, and Go only strips a bearer credential when a redirect leaves the *domain*, so a sibling host or a plain-http same-host target would still have received it. The audit webhook refuses them too: its POST carries the sink's configured headers and a batch of records naming principals and tools.
 
 Each upstream picks one credential strategy:
 
@@ -66,7 +70,7 @@ Each upstream picks one credential strategy:
 
 `passthrough` and `token-exchange` derive per-principal credentials, so both require `auth.mode: "required"` — without a verified caller identity there's no subject to exchange for, and passthrough would forward whatever header an anonymous caller supplied. Exchanged tokens cache per `(upstream, issuer, subject)`; per-caller strategies disable list caching, so one caller's per-user list can never serve another.
 
-Secrets never appear in the config document — `secretRef` fields name environment variables — and `/healthz` withholds URLs, owners, and error text (which can name env vars or internal hosts) unless auth is disabled, i.e. on deployments already private by posture.
+Secrets never appear in the config document — `secretRef` fields name environment variables — and `/health` withholds URLs, owners, and error text (which can name env vars or internal hosts) unless auth is disabled, i.e. on deployments already private by posture.
 
 ## Audit: every terminal response, one exit door
 

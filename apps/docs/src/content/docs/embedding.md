@@ -42,7 +42,7 @@ func main() {
 ## Notes
 
 - **Config** comes from `config.Parse` (bytes), `config.Load` (file path), or a `config.Config` you construct; `gateway.New` validates either way. `config.Schema()` returns the JSON Schema if you want to lint documents in your own tooling — see [Configuration](/configuration/) for the full document reference.
-- **`Handler()`** serves the MCP endpoint plus the operational endpoints (`/healthz`, `/metrics`, and the OAuth endpoints when auth/EMA are configured) — mount it at the root of a listener, not under a prefix. fold does not terminate TLS; that's your server's job.
+- **`Handler()`** serves the MCP endpoint plus the operational endpoints (`/health`, `/metrics`, and the OAuth endpoints when auth/EMA are configured) — mount it at the root of a listener, not under a prefix. fold does not terminate TLS; that's your server's job.
 - **`WithLogger`** supplies a `*slog.Logger` for operational events; without it the gateway is silent. Per-request accounting is in `/metrics` and the audit sinks, not the log stream.
 - **`Close()`** drains upstream sessions, stops background loops (sweeper, discovery, health probes), and flushes buffered trace spans. It's safe to call more than once.
 
@@ -70,7 +70,7 @@ The stable embedding surface is defined by fold's v1 compatibility contract, in 
 
 - **The config document** — field names, meanings, defaults, and validation semantics. The machine-readable contract is [`config/fold.config.schema.json`](https://github.com/fold-run/fold/blob/main/config/fold.config.schema.json) (`fold --schema`), kept in lockstep with the code by test. Defaults are part of the freeze — every one was reviewed as a deliberate decision before v1.0 (see [Defaults](/defaults/)).
 - **The `fold` CLI** — flags, exit codes, and `FOLD_CONFIG` semantics.
-- **The wire surface** — gateway-minted JSON-RPC error codes, HTTP endpoints (`/mcp`, `/healthz`, `/metrics`, `/.well-known/*`, `/oauth/token`), metric names and label sets, and the audit event JSON shape.
+- **The wire surface** — gateway-minted JSON-RPC error codes, HTTP endpoints (`/mcp`, `/health`, `/metrics`, `/.well-known/*`, `/oauth/token`), metric names and label sets, and the audit event JSON shape.
 - **Go, for embedders** — the `gateway` package (`New`, `Option`, `WithLogger`, `Gateway.Handler`/`Reload`/`Close`, `Version`), the `config` package's document structs and `Load`/`Parse`/`Validate`/`Schema`, plus the contract types the gateway hands outward: `auth.Principal` with `WithPrincipal`/`PrincipalFromContext`, and `audit.Event`/`Outcome`. See the [package example](https://pkg.go.dev/github.com/fold-run/fold/gateway).
 
 **Wiring, not API** (may change in any release): the constructors the gateway threads through its packages — `auth.Verifier`/`EMA`/`UpstreamCredentials`, `policy.Engine`, `audit.Logger`/`Sink`. They're exported so the gateway can reach them across package boundaries, not as an extension surface. `internal/` packages are never API.
