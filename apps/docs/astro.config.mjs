@@ -23,6 +23,9 @@ export default defineConfig({
       customCss: ['./src/styles/fold.css'],
       // Code surfaces run on the brand palette, not Starlight's teal default.
       expressiveCode: { themes: [foldDark, foldLight] },
+      // The splash hero gets fold.run's pattern-paper ground; the override only
+      // wraps Starlight's own hero, it does not replace it.
+      components: { Hero: './src/components/Hero.astro' },
       // /llms.txt + /llms-full.txt for AI agents and answer engines.
       plugins: [starlightLlmsTxt()],
       lastUpdated: true,
