@@ -6,3 +6,7 @@ dist/
 
 # stardust redesign pipeline artifacts (local record, not source)
 stardust/
+
+# agent working directories (local record, not source)
+.claude/
+.impeccable/
