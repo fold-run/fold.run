@@ -42,9 +42,22 @@ curl -fsS http://localhost:8080/metrics
 | `fold_upstream_endpoint_healthy` | `upstream`, `endpoint` | Multi-endpoint upstreams only: 1 in rotation, 0 ejected after a connect failure (or by an active health probe). |
 | `fold_http_rejections_total` | `reason` | Requests refused before the MCP layer: `body_too_large`, `forbidden_host`, `forbidden_origin`, `unauthenticated`, `rate_limited`, `oauth_token_rate_limited`. |
 | `fold_discovery_syncs_total` | `outcome` | Discovery polls: `applied`, `unchanged`, `rejected` (document failed parse or merged validation), `error` (fetch failed). |
+| `fold_request_upstream_calls` | — | Histogram of the upstream fan-out per request — the unit budgets are charged in, which makes the cost of a `tools/list` visible against a ping. |
+| `fold_budget_degraded_total` | — | Budget checks that could not reach shared state and fell back to per-instance enforcement. See below. |
 | `fold_build_info` | `version` | Always 1. |
 
+With [`tenants`](/tenancy/) configured, two more carry the tenant dimension:
+
+| Metric | Labels | Meaning |
+|---|---|---|
+| `fold_tenant_requests_total` | `tenant`, `outcome` | Requests by the tenant's principals. |
+| `fold_tenant_upstream_calls_total` | `tenant` | Upstream invocations charged to the tenant — an allowance being spent, watchable. |
+
+These are separate series rather than a `tenant` label on the metrics above, because label sets are frozen by the [compatibility contract](/embedding/#what-is-api) and a new label would break every dashboard built on them.
+
 Plus the standard Go process/runtime collectors. Alerting starters: `fold_upstream_breaker_state == 2` sustained, any `fold_http_rejections_total` rate spike, and — with discovery — any `rejected`/`error` sync outcomes. See [/discovery/](/discovery/) for what a discovery sync does.
+
+**Alert on any non-zero `fold_budget_degraded_total` rate.** A budget check that cannot reach shared state degrades to per-instance enforcement rather than to none, which means a fleet is no longer enforcing one allowance — three instances become three copies of it. The gateway also warns at startup when a budget is configured without `server.redisUrl`. See [/consumption/](/consumption/).
 
 ## Audit events
 
@@ -58,9 +71,13 @@ One JSON event per terminal response — including 401s, 403-equivalents, and 42
 | `name` | Namespaced tool/prompt name or resource URI. |
 | `upstream` | Routed upstream id. |
 | `decision`, `ruleId` | Policy outcome (`allow`/`deny`) and the matching rule. |
-| `outcome` | `ok`, `error`, `denied`, `rate_limited`, `unauthenticated`, `upstream_down`, `forbidden`. |
+| `outcome` | `ok`, `error`, `denied`, `rate_limited`, `unauthenticated`, `upstream_down`, `forbidden`, `budget_exhausted`. |
 | `error` | Error text, when the request failed. |
 | `latencyMs` | End-to-end latency. |
+| `tenant` | The principal's [tenant](/tenancy/), when one is configured and resolves. Present on denials too. |
+| `upstreamCalls` | Upstream invocations this request caused — the unit budgets are charged in. |
+| `itemsServed` | For list methods: what was handed to *this* caller, after policy filtering. |
+| `usage` | Carried verbatim from an upstream's result `_meta`. fold reports it, it does not compute it — there is no tokenizer in the gateway. |
 
 Example event on the `stdout` sink:
 
@@ -80,6 +97,7 @@ What client teams see when the gateway itself refuses a request (upstream errors
 | `-32041` | Upstream unavailable (circuit open / unreachable / all down) | Retry later; transient. |
 | `-32042` | Policy denied the invocation | Not transient — the principal lacks a grant. |
 | `-32043` | Name resolves to no configured namespace | Refetch the tool list. |
+| `-32044` | Consumption budget exhausted for the period | Not transient — the message names the reset instant, not a retry delay. Distinct from `-32040` because a rate limit clears in seconds and a budget does not clear until the period rolls. |
 | `-32002` | Task id not owned by any upstream | The task is unknown or belongs to another principal. |
 | `-32602` | Invalid or expired list cursor | Restart the list from the beginning. |
 
