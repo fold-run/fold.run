@@ -26,12 +26,15 @@ One entry per MCP server folded into the gateway.
 | `timeouts` | `5s/60s` | `connectMs`, `requestMs`. |
 | `circuitBreaker` | `5 / 30s` | `failureThreshold` consecutive failures open the circuit; a probe is admitted after `halfOpenAfterMs`. |
 | `rateLimit` | none | `{ requestsPerMinute }` for this upstream only. |
+| `budget` | none | `{ period, upstreamCalls }` — a consumption allowance for this upstream over a calendar period. See [/consumption/](/consumption/). |
 | `healthCheck` | none | `{ intervalMs }` — actively probe every endpoint (full MCP connect) on this interval, ejecting dead replicas before client traffic hits them and restoring recovered ones immediately. Absent → passive health (connect failures eject, cooldown restores). |
 | `cacheTtlMs` | `30000` | TTL for cached list results. Negative disables caching. |
 
 List freshness works end to end: when an upstream emits a `list_changed` notification, the gateway invalidates its cache **and re-emits the notification to every connected client**, so clients refetch and see the change immediately. TTLs remain the backstop when no notification arrives.
 
 A single upstream with no `namespace` runs **passthrough** — tool and prompt names pass through unmodified. Any additional upstream requires every upstream to carry a `namespace`, so names never collide across the federation.
+
+**Stdio servers.** `url` is always an HTTP endpoint — the gateway never runs a process. To federate an MCP server that speaks stdio (which is most of them), put [`fold-stdio`](/stdio/) in front of it: the shim runs the server and exposes it over streamable HTTP, so the upstream entry is an ordinary `url` and every strategy, guard, and policy rule applies unchanged. The command is fixed at the shim's argv and never travels over the network, which is why stdio is not a field here.
 
 ## Upstream auth strategies
 
@@ -128,7 +131,8 @@ One JSON event per terminal response — including 401s, 403-equivalents, and 42
 |---|---|---|
 | `mcpPath` | `/mcp` | Path the gateway serves MCP on. |
 | `allowedHosts` | localhost set | DNS-rebinding protection: allowed Host/Origin hostnames. Set to your public hostname(s) in production, or `["*"]` only behind a trusted proxy. |
-| `rateLimit` | none | Global `{ requestsPerMinute }` across all upstreams, plus optional `perPrincipalPerMinute` capping each authenticated principal on its own bucket (one tenant's flood cannot 429 the others). |
+| `rateLimit` | none | Global `{ requestsPerMinute }` across all upstreams, plus optional `perPrincipalPerMinute` capping each authenticated principal on its own bucket, so one caller's flood cannot 429 the others. For a bucket shared by a *team* rather than one per person, see [`tenants`](#tenants). |
+| `budget` | none | `{ period, upstreamCalls }` — a consumption allowance across every upstream, accumulating until the calendar period rolls over. Construction-wired like the rest of this section: a reload rejects a change to it, so an allowance cannot be widened under a running gateway. See [/consumption/](/consumption/). |
 | `maxBodyBytes` | 1 MiB | Request body cap; larger bodies are answered `413` (chunked bodies are cut off at the cap). |
 | `redisUrl` | `REDIS_URL` env | `redis://` URL sharing cache, rate-limit, and breaker state across gateway instances. Absent → in-process state. Redis outages fail open (bounded 500 ms per operation). |
 
@@ -147,6 +151,34 @@ Discovery lets fold poll a URL for `{"upstreams": [...]}` (same schema as the st
 
 The full field reference — `url`, `intervalMs`, `bearerSecretRef`, and the `allowed*` credential-containment fields for a partially trusted registry — lives on [/discovery/](/discovery/).
 
+## `tenants`
+
+Groups principals for governance: a shared allowance, a shared rate-limit bucket, a bounded view of the federation, and a name in the audit trail. A tenant is resolved from claims the IdP already asserts — it never travels alongside a token. **A tenant groups principals; it does not authenticate them**, and policy remains the authority on what may be invoked.
+
+```jsonc
+"tenants": [
+  {
+    "id": "acme",
+    "subjects": { "claims": { "org_id": "acme-prod" } },  // same shape policy rules use
+    "budget": { "period": "month", "upstreamCalls": 500000 },
+    "rateLimit": { "requestsPerMinute": 2000 },           // one bucket for the whole tenant
+    "upstreams": ["billing", "crm"]                        // optional: all upstreams if omitted
+  }
+]
+```
+
+| Field | Default | Notes |
+|---|---|---|
+| `id` | — | Lowercase alphanumeric + hyphens. Appears in every audit event the tenant's principals produce, and as the `tenant` label on `fold_tenant_*` metrics. |
+| `subjects` | — | Required. Which principals belong, using the same shape policy rules use. A tenant with no selector would capture every caller, so it is rejected. |
+| `budget` | none | `{ period, upstreamCalls }` for the tenant as a whole; exhaustion mints `-32044` naming the tenant. |
+| `rateLimit` | none | `{ requestsPerMinute }`, one bucket shared by the tenant's principals. |
+| `upstreams` | all | Optional visibility subset by upstream id, evaluated before policy. |
+
+A principal belongs to at most one tenant, and ambiguous overlap is refused rather than guessed. Unlike `server.budget`, tenants are **reloadable** — they change when a customer signs up. Declare none and nothing changes.
+
+The full treatment — charge ordering, what visibility filtering does to the fan-out, resolution cost at ten thousand tenants — is on [/tenancy/](/tenancy/).
+
 ## `tracing`
 
 ```jsonc
@@ -163,7 +195,9 @@ Absent, fold still propagates the caller's W3C trace context. Present, fold emit
 
 `kill -HUP` the process (or run with `--watch` to poll the config file) and fold revalidates and applies the new document without dropping the listener: the upstream set and policy engine swap atomically, in-flight requests finish against the snapshot they started on, and connected clients get `list_changed` notifications so they refetch. Embedders get the same behavior via `gw.Reload(cfg)`.
 
-The `auth`, `server`, `routing`, `audit`, `tracing`, and `discovery` sections are wired in at construction and **cannot hot-swap** — changing any of them makes the reload fail loudly while the running configuration keeps serving; a rejected reload never takes anything down. Everything else — `upstreams`, `policy` — reloads live.
+The `auth`, `server`, `routing`, `audit`, `tracing`, and `discovery` sections are wired in at construction and **cannot hot-swap** — changing any of them makes the reload fail loudly while the running configuration keeps serving; a rejected reload never takes anything down. Everything else — `upstreams`, `policy`, `tenants` — reloads live.
+
+`tenants` is deliberately on the reloadable side while `server.budget` is not: tenants change when a customer signs up, whereas a gateway-wide allowance that could be widened under a running process would not be much of a ceiling.
 
 See [/operations/](/operations/) for how reloads and discovery syncs surface in logs and metrics.
 
@@ -177,5 +211,7 @@ Gateway-minted JSON-RPC errors — everything else passes through from the upstr
 | `-32041` | Upstream unavailable (circuit open / unreachable / all upstreams down) |
 | `-32042` | Policy denied the invocation |
 | `-32043` | Name does not resolve to a configured namespace |
+| `-32044` | Consumption budget exhausted for the period (server, upstream, or tenant) |
+| `-32002` | Task id not owned by any upstream |
 
 Next: [/deployment/](/deployment/) for running fold in production, or [/security/](/security/) for the trust model behind `auth`, `policy`, and `discovery`.
