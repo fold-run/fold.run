@@ -31,22 +31,18 @@ const jsonld = {
   <main id="main">
     <section
       class="hero"
-      data-glow="true"
       data-section="hero"
       data-intent="value proposition + show the topology"
       data-layout="split-media"
       data-media="image"
     >
-      <!-- pattern-paper ground: a ruled sheet that lights under the pointer.
-           Nothing moves on its own — the only motion is the visitor's own.
-           Decorative. -->
+      <!-- Pattern-paper ground: a ruled sheet behind the drawing, masked so it
+           dissolves before it reaches the copy. Static. The pointer-tracked lit
+           grid and the two drifting blur fields that used to sit here are gone
+           — a page that reacts to the cursor with light is a demo of CSS, and
+           this page's argument is the topology, not the chrome. Decorative. -->
       <div class="hero-grid" aria-hidden="true">
         <div class="hero-rules"></div>
-        <div class="hero-cursor"></div>
-      </div>
-      <div class="hero-field" aria-hidden="true">
-        <span class="glow glow-a"></span>
-        <span class="glow glow-b"></span>
       </div>
       <div class="wrap">
         <div>
@@ -66,7 +62,7 @@ const jsonld = {
             on both sides of the proxy.
           </p>
           <div class="cta-row">
-            <a class="btn btn-primary btn-live" href="https://docs.fold.run/getting-started/">Get started</a>
+            <a class="btn btn-primary" href="https://docs.fold.run/getting-started/">Get started</a>
             <a class="btn btn-secondary" href="https://github.com/fold-run/fold">View source</a>
           </div>
         </div>
@@ -146,22 +142,22 @@ const jsonld = {
       data-module="proof-band"
     >
       <div class="wrap">
-        <a class="stat" href="https://docs.fold.run/conformance/">
+        <a class="proof-cell" href="https://docs.fold.run/conformance/">
           <b>40/40</b>
           <span>official MCP conformance checks, run through the gateway on every merge</span>
         </a>
-        <a class="stat" href="https://docs.fold.run/benchmarks/">
+        <a class="proof-cell" href="https://docs.fold.run/benchmarks/">
           <b>~0.2 ms</b>
           <span
             >typical added p50 latency (Apple Silicon, in-process upstream); CI gates every merge at
             &lt; 5 ms</span
           >
         </a>
-        <a class="stat" href="https://github.com/fold-run/fold/releases">
+        <a class="proof-cell" href="https://github.com/fold-run/fold/releases">
           <b>1 binary</b>
           <span>static Go binary or ~22 MB distroless container, no local state</span>
         </a>
-        <a class="stat" href="https://github.com/fold-run/fold">
+        <a class="proof-cell" href="https://github.com/fold-run/fold">
           <b>Apache-2.0</b>
           <span>open source, on GitHub</span>
         </a>
@@ -346,122 +342,134 @@ const jsonld = {
           </p>
         </div>
 
-        <div class="cluster">
-          <div class="cluster-rail">
-            <!-- glyph: three fold-lines converging to one -->
-            <svg width="40" height="40" viewBox="0 0 40 40" aria-hidden="true">
-              <path
-                d="M 4 8 C 16 8, 16 20, 24 20 M 4 20 H 24 M 4 32 C 16 32, 16 20, 24 20"
-                stroke="#6E6E6E"
-                stroke-width="1.5"
-                stroke-dasharray="4 3"
-                fill="none"></path>
-              <path d="M 24 20 H 36" stroke="#D6FF00" stroke-width="2" fill="none"></path>
-              <path d="M 32 16 L 37 20 L 32 24 Z" fill="#D6FF00"></path>
-            </svg>
-            <h3>Federate</h3>
+        <!-- A capability index, not nine boxes. Each band is one verb; the rows
+             under it are separated by the same hairline the sections use, so
+             the whole section reads as one table an evaluator can scan down a
+             column of. The card grid this replaced put twenty-seven borders on
+             screen and gave every capability identical visual weight. -->
+        <dl class="capabilities">
+          <div class="cap-band">
+            <dt class="cap-verb">
+              <!-- glyph: three fold-lines converging to one -->
+              <svg width="34" height="34" viewBox="0 0 40 40" aria-hidden="true">
+                <path
+                  d="M 4 8 C 16 8, 16 20, 24 20 M 4 20 H 24 M 4 32 C 16 32, 16 20, 24 20"
+                  stroke="#6E6E6E"
+                  stroke-width="1.5"
+                  stroke-dasharray="4 3"
+                  fill="none"></path>
+                <path d="M 24 20 H 36" stroke="#E0E0E0" stroke-width="2" fill="none"></path>
+                <path d="M 32 16 L 37 20 L 32 24 Z" fill="#E0E0E0"></path>
+              </svg>
+              <span>Federate</span>
+            </dt>
+            <dd class="cap-rows">
+              <div class="cap-row">
+                <h3>Unify a federation</h3>
+                <p>
+                  Acquisitions, child orgs, and teams each ship their own MCP servers — any
+                  language, any SDK. fold presents them as one virtual server with namespaced tools.
+                  No team rewrites anything.
+                </p>
+              </div>
+              <div class="cap-row">
+                <h3>Discover upstreams automatically</h3>
+                <p>
+                  A team ships an MCP server, the registry lists it, and it appears behind the
+                  gateway — no config change. On Kubernetes, label a Service fold.run/upstream:
+                  "true" and fold-discovery does the rest.
+                </p>
+              </div>
+              <div class="cap-row">
+                <h3>Run tasks across the federation</h3>
+                <p>
+                  Long-running work flows through fold: task polls and updates route to the server
+                  that owns the task — remembered at mint, or found by probe — and tasks/list merges
+                  every org, scoped per principal.
+                </p>
+              </div>
+            </dd>
           </div>
-          <div class="cluster-cards">
-            <article class="problem">
-              <h4>Unify a federation</h4>
-              <p>
-                Acquisitions, child orgs, and teams each ship their own MCP servers — any language,
-                any SDK. fold presents them as one virtual server with namespaced tools. No team
-                rewrites anything.
-              </p>
-            </article>
-            <article class="problem">
-              <h4>Discover upstreams automatically</h4>
-              <p>
-                A team ships an MCP server, the registry lists it, and it appears behind the gateway
-                — no config change. On Kubernetes, label a Service fold.run/upstream: "true" and
-                fold-discovery does the rest.
-              </p>
-            </article>
-            <article class="problem">
-              <h4>Run tasks across the federation</h4>
-              <p>
-                Long-running work flows through fold: task polls and updates route to the server
-                that owns the task — remembered at mint, or found by probe — and tasks/list merges
-                every org, scoped per principal.
-              </p>
-            </article>
-          </div>
-        </div>
 
-        <div class="cluster">
-          <div class="cluster-rail">
-            <!-- glyph: route through a notched gate -->
-            <svg width="40" height="40" viewBox="0 0 40 40" aria-hidden="true">
-              <path d="M 4 20 H 16" stroke="#6E6E6E" stroke-width="1.5" stroke-dasharray="4 3" fill="none"
-              ></path>
-              <path d="M 18 10 v 20 M 23 12 v 16" stroke="#bcbcbc" stroke-width="1.5"></path>
-              <path d="M 25 20 H 36" stroke="#D6FF00" stroke-width="2" fill="none"></path>
-              <path d="M 32 16 L 37 20 L 32 24 Z" fill="#D6FF00"></path>
-            </svg>
-            <h3>Govern</h3>
+          <div class="cap-band">
+            <dt class="cap-verb">
+              <!-- glyph: route through a notched gate -->
+              <svg width="34" height="34" viewBox="0 0 40 40" aria-hidden="true">
+                <path
+                  d="M 4 20 H 16"
+                  stroke="#6E6E6E"
+                  stroke-width="1.5"
+                  stroke-dasharray="4 3"
+                  fill="none"></path>
+                <path d="M 18 10 v 20 M 23 12 v 16" stroke="#bcbcbc" stroke-width="1.5"></path>
+                <path d="M 25 20 H 36" stroke="#E0E0E0" stroke-width="2" fill="none"></path>
+                <path d="M 32 16 L 37 20 L 32 24 Z" fill="#E0E0E0"></path>
+              </svg>
+              <span>Govern</span>
+            </dt>
+            <dd class="cap-rows">
+              <div class="cap-row">
+                <h3>Draw the security boundary</h3>
+                <p>
+                  One choke point for authentication, deny-by-default tool allowlists, per-principal
+                  visibility, and an audit event for every request — including the denials.
+                </p>
+              </div>
+              <div class="cap-row">
+                <h3>Broker credentials</h3>
+                <p>
+                  Clients hold one token with fold as audience; fold exchanges it per upstream (RFC
+                  8693) or injects service credentials. API keys never reach agents.
+                </p>
+              </div>
+              <div class="cap-row">
+                <h3>Govern vendor MCP servers</h3>
+                <p>
+                  Put third-party and SaaS MCP endpoints behind your own auth, policy, and audit —
+                  instead of scattering per-user API keys across every client.
+                </p>
+              </div>
+            </dd>
           </div>
-          <div class="cluster-cards">
-            <article class="problem">
-              <h4>Draw the security boundary</h4>
-              <p>
-                One choke point for authentication, deny-by-default tool allowlists, per-principal
-                visibility, and an audit event for every request — including the denials.
-              </p>
-            </article>
-            <article class="problem">
-              <h4>Broker credentials</h4>
-              <p>
-                Clients hold one token with fold as audience; fold exchanges it per upstream (RFC
-                8693) or injects service credentials. API keys never reach agents.
-              </p>
-            </article>
-            <article class="problem">
-              <h4>Govern vendor MCP servers</h4>
-              <p>
-                Put third-party and SaaS MCP endpoints behind your own auth, policy, and audit —
-                instead of scattering per-user API keys across every client.
-              </p>
-            </article>
-          </div>
-        </div>
 
-        <div class="cluster">
-          <div class="cluster-rail">
-            <!-- glyph: route with gauge ticks -->
-            <svg width="40" height="40" viewBox="0 0 40 40" aria-hidden="true">
-              <path d="M 4 20 H 36" stroke="#D6FF00" stroke-width="2" fill="none"></path>
-              <path d="M 12 14 v 5 M 20 12 v 7 M 28 14 v 5" stroke="#6E6E6E" stroke-width="1.5"
-              ></path>
-              <path d="M 12 26 v -3 M 20 28 v -5 M 28 26 v -3" stroke="#6E6E6E" stroke-width="1.5"
-              ></path>
-            </svg>
-            <h3>Operate</h3>
+          <div class="cap-band">
+            <dt class="cap-verb">
+              <!-- glyph: route with gauge ticks -->
+              <svg width="34" height="34" viewBox="0 0 40 40" aria-hidden="true">
+                <path d="M 4 20 H 36" stroke="#E0E0E0" stroke-width="2" fill="none"></path>
+                <path d="M 12 14 v 5 M 20 12 v 7 M 28 14 v 5" stroke="#6E6E6E" stroke-width="1.5"
+                ></path>
+                <path d="M 12 26 v -3 M 20 28 v -5 M 28 26 v -3" stroke="#6E6E6E" stroke-width="1.5"
+                ></path>
+              </svg>
+              <span>Operate</span>
+            </dt>
+            <dd class="cap-rows">
+              <div class="cap-row">
+                <h3>Protect fragile services</h3>
+                <p>
+                  List caching, global and per-upstream rate limits, and circuit breakers stand
+                  between agent traffic storms and your internal systems.
+                </p>
+              </div>
+              <div class="cap-row">
+                <h3>Expose tools outward, carefully</h3>
+                <p>
+                  Offer partners a curated, policy-scoped subset of internal tools on one hardened
+                  endpoint — a single static binary, self-hosted in your VPC.
+                </p>
+              </div>
+              <div class="cap-row">
+                <h3>Conformant, provably</h3>
+                <p>
+                  The official MCP conformance suite runs through fold on every merge — 40/40
+                  checks, including sampling, elicitation, and subscriptions bridged through the
+                  gateway.
+                </p>
+              </div>
+            </dd>
           </div>
-          <div class="cluster-cards">
-            <article class="problem">
-              <h4>Protect fragile services</h4>
-              <p>
-                List caching, global and per-upstream rate limits, and circuit breakers stand
-                between agent traffic storms and your internal systems.
-              </p>
-            </article>
-            <article class="problem">
-              <h4>Expose tools outward, carefully</h4>
-              <p>
-                Offer partners a curated, policy-scoped subset of internal tools on one hardened
-                endpoint — a single static binary, self-hosted in your VPC.
-              </p>
-            </article>
-            <article class="problem">
-              <h4>Conformant, provably</h4>
-              <p>
-                The official MCP conformance suite runs through fold on every merge — 40/40 checks,
-                including sampling, elicitation, and subscriptions bridged through the gateway.
-              </p>
-            </article>
-          </div>
-        </div>
+        </dl>
       </div>
     </section>
 
@@ -515,39 +523,6 @@ const jsonld = {
     });
   }
 
-  /* The hero answers to the pointer and to nothing else: one handler, throttled
-     to a frame, publishing the cursor twice — normalised (--mx/--my) for the
-     glow parallax, and in hero-local pixels (--cx/--cy) for the lit patch of
-     grid. Everything downstream is CSS, so there is no loop running when the
-     visitor is still. `is-tracking` gates the light on the same conditions, so
-     a coarse pointer or a reduced-motion visitor never gets one with nothing to
-     follow. */
-  {
-    const hero = document.querySelector<HTMLElement>('[data-glow]');
-    const fine = matchMedia('(pointer: fine)');
-    const calm = matchMedia('(prefers-reduced-motion: reduce)');
-    if (hero && fine.matches && !calm.matches) {
-      let raf = 0;
-      hero.classList.add('is-tracking');
-      hero.addEventListener('pointermove', (e: PointerEvent) => {
-        if (raf) return;
-        raf = requestAnimationFrame(() => {
-          const r = hero.getBoundingClientRect();
-          const x = e.clientX - r.left;
-          const y = e.clientY - r.top;
-          hero.style.setProperty('--mx', String(x / r.width - 0.5));
-          hero.style.setProperty('--my', String(y / r.height - 0.5));
-          hero.style.setProperty('--cx', `${x}px`);
-          hero.style.setProperty('--cy', `${y}px`);
-          raf = 0;
-        });
-      });
-      hero.addEventListener('pointerleave', () => {
-        hero.style.setProperty('--mx', '0');
-        hero.style.setProperty('--my', '0');
-      });
-    }
-  }
 </script>
 
 <style is:global>
@@ -556,122 +531,25 @@ const jsonld = {
     position: relative;
     overflow: hidden;
   }
-  .hero-field {
+  /* The pattern-paper ground: one dark ruled sheet behind the drawing, masked
+     so it dissolves before it reaches the copy on the left. Two CSS gradients,
+     no canvas, no frame loop, no pointer handler — it is a printed ground, and
+     printed grounds hold still. */
+  .hero-grid {
     position: absolute;
     inset: 0;
     pointer-events: none;
-    transform: translate3d(calc(var(--mx, 0) * 28px), calc(var(--my, 0) * 20px), 0);
-    transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
-  }
-  /* The pattern-paper ground: a dark ruled sheet, and the same rules again in
-     Live revealed only under the pointer. Both layers are plain CSS gradients,
-     so the compositor carries them and there is no canvas and no frame loop
-     behind the hero at all. Masked so the sheet dissolves before it reaches the
-     copy on the left. */
-  .hero-grid {
-    /* Bleeds the sheet past the section's edges, so the light stays a full disc
-       when the pointer is near a corner. It is also the offset --cx/--cy need,
-       since those arrive hero-local. */
-    --grid-bleed: 80px;
-    position: absolute;
-    inset: calc(-1 * var(--grid-bleed));
-    pointer-events: none;
-    mask-image: radial-gradient(112% 108% at 76% 28%, #000 24%, transparent 86%);
-    -webkit-mask-image: radial-gradient(112% 108% at 76% 28%, #000 24%, transparent 86%);
+    mask-image: radial-gradient(58% 104% at 76% 42%, #000 10%, transparent 74%);
+    -webkit-mask-image: radial-gradient(58% 104% at 76% 42%, #000 10%, transparent 74%);
   }
   .hero-rules {
     position: absolute;
     inset: 0;
-    opacity: 0.7;
+    opacity: 0.62;
     background-image:
       linear-gradient(to right, var(--color-trace) 1px, transparent 1px),
       linear-gradient(to bottom, var(--color-trace) 1px, transparent 1px);
     background-size: 64px 64px;
-  }
-  /* Revealed in a soft disc under the pointer: the sheet lights where you are
-     and goes dark again behind you. Sharing a parent and a background-size with
-     .hero-rules is what keeps the lit rules exactly over the dark ones. */
-  .hero-cursor {
-    position: absolute;
-    inset: 0;
-    opacity: 0;
-    transition: opacity 0.45s cubic-bezier(0.22, 1, 0.36, 1);
-    background-image:
-      radial-gradient(
-        170px 170px at calc(var(--cx, 50%) + var(--grid-bleed))
-          calc(var(--cy, 50%) + var(--grid-bleed)),
-        color-mix(in srgb, var(--color-accent) 18%, transparent),
-        transparent 70%
-      ),
-      linear-gradient(to right, var(--color-accent) 1px, transparent 1px),
-      linear-gradient(to bottom, var(--color-accent) 1px, transparent 1px);
-    background-size:
-      100% 100%,
-      64px 64px,
-      64px 64px;
-    mask-image: radial-gradient(
-      220px 220px at calc(var(--cx, 50%) + var(--grid-bleed))
-        calc(var(--cy, 50%) + var(--grid-bleed)),
-      #000,
-      transparent 72%
-    );
-    -webkit-mask-image: radial-gradient(
-      220px 220px at calc(var(--cx, 50%) + var(--grid-bleed))
-        calc(var(--cy, 50%) + var(--grid-bleed)),
-      #000,
-      transparent 72%
-    );
-  }
-  /* `is-tracking` is set by the script, so a coarse pointer or a reduced-motion
-     visitor never gets a light that has nothing to follow. */
-  .hero.is-tracking:hover .hero-cursor {
-    opacity: 0.8;
-  }
-  .glow {
-    position: absolute;
-    border-radius: 50%;
-    filter: blur(90px);
-  }
-  .glow-a {
-    width: 560px;
-    height: 420px;
-    right: -6%;
-    top: 4%;
-    background: radial-gradient(closest-side, rgba(214, 255, 0, 0.18), transparent 70%);
-  }
-  .glow-b {
-    width: 420px;
-    height: 360px;
-    left: 30%;
-    bottom: -22%;
-    background: radial-gradient(closest-side, rgba(188, 188, 188, 0.1), transparent 70%);
-  }
-  @media (prefers-reduced-motion: no-preference) {
-    .glow-a {
-      animation: drift-a 14s ease-in-out infinite alternate;
-    }
-    .glow-b {
-      animation: drift-b 18s ease-in-out infinite alternate;
-    }
-    @keyframes drift-a {
-      to {
-        transform: translate3d(-40px, 26px, 0);
-      }
-    }
-    @keyframes drift-b {
-      to {
-        transform: translate3d(48px, -20px, 0);
-      }
-    }
-  }
-  @media (prefers-reduced-motion: reduce) {
-    .hero-field {
-      transition: none;
-      transform: none;
-    }
-    .hero-cursor {
-      display: none;
-    }
   }
   .hero .wrap {
     position: relative;
@@ -684,15 +562,22 @@ const jsonld = {
     align-items: center;
   }
   .hero {
-    padding-block: calc(var(--section-padding) + 16px);
+    padding-block: var(--section-padding-lg);
   }
+  /* The release line: a wire label, so it is set in mono at meta size and sits
+     on its own rule rather than floating above the headline. */
   .kicker {
     font-family: var(--mono-font-family);
-    font-size: var(--body-sm);
+    font-size: 0.8125rem;
     letter-spacing: var(--tracking-meta);
     font-variant-numeric: tabular-nums slashed-zero;
-    color: var(--color-carrier);
+    color: var(--color-static);
+    padding-bottom: var(--spacing-md);
     margin-bottom: var(--spacing-lg);
+    border-bottom: 1px solid var(--color-trace);
+  }
+  .kicker a {
+    color: var(--color-carrier);
   }
   .kicker .sep {
     color: var(--color-fold-line);
@@ -773,58 +658,79 @@ const jsonld = {
     }
   }
 
-  /* ===== proof band ===== */
+  /* ===== proof band =====
+     Four readings off one instrument, divided by hairlines rather than boxed
+     into four cards. Nothing here is a container: the rules are the structure,
+     which is how a spec sheet is set and how this band earns its density. */
+  .proof {
+    padding-block: var(--section-padding-sm);
+    background: var(--color-rack);
+  }
   .proof .wrap {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
-    gap: var(--spacing-md);
-    padding: 0;
-    max-width: calc(var(--max-width) - 2.5rem);
+    grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+    gap: var(--spacing-lg) 0;
   }
-  .proof {
-    padding-block: 40px;
-  }
-  .stat {
-    background: var(--color-rack);
-    border: 1px solid var(--color-trace);
-    border-radius: var(--radius);
-    position: relative;
+  .proof-cell {
     display: block;
-    background: var(--color-bg);
-    padding: var(--spacing-md) var(--spacing-lg) var(--spacing-xl);
+    position: relative;
+    padding: 2px var(--spacing-lg);
     color: var(--color-fg);
+    border-left: 1px solid var(--color-trace);
   }
-  .stat::after {
-    content: '\2192';
-    position: absolute;
-    right: var(--spacing-lg);
-    bottom: var(--spacing-md);
-    color: var(--color-accent);
-    font-size: 1.1rem;
+  .proof-cell:first-child {
+    border-left: 0;
+    padding-left: 0;
   }
-  .stat:hover {
-    background: var(--color-rack);
+  .proof-cell:hover {
     text-decoration: none;
+  }
+  .proof-cell:hover b {
+    color: var(--color-accent);
   }
   /* The proof numerals. Mono, tabular and slashed-zero so "40/40" and
      "~0.2 ms" read as measurements rather than as marketing. */
-  .stat b {
+  .proof-cell b {
     font-family: var(--mono-font-family);
-    font-size: 1.625rem;
+    font-size: 1.5rem;
     font-weight: var(--weight-numeral);
     font-variant-numeric: tabular-nums slashed-zero;
     display: block;
-    margin-bottom: 8px;
+    margin-bottom: 10px;
     letter-spacing: -0.015em;
     line-height: 1.15;
+    transition: color 0.18s cubic-bezier(0.25, 1, 0.5, 1);
   }
   /* The caveat under each numeral is a caption, so it stays at meta size. */
-  .stat span {
+  .proof-cell span {
     color: var(--color-static);
     font-size: var(--body-sm);
     line-height: var(--line-height-meta);
     display: block;
-    max-width: 34ch;
+    max-width: 32ch;
+  }
+  /* Below the point where four columns fit, the vertical rules become a single
+     stacked list with the same hairline turned horizontal. */
+  @media (max-width: 900px) {
+    .proof .wrap {
+      grid-template-columns: 1fr 1fr;
+    }
+    .proof-cell:nth-child(odd) {
+      border-left: 0;
+      padding-left: 0;
+    }
+  }
+  @media (max-width: 520px) {
+    .proof .wrap {
+      grid-template-columns: 1fr;
+    }
+    .proof-cell {
+      border-left: 0;
+      padding: 0;
+    }
+    .proof-cell span {
+      max-width: none;
+    }
   }
 
   /* Section head: the title hangs in a narrow left column and the standfirst
@@ -995,57 +901,89 @@ const jsonld = {
   }
 
 
-  /* ===== problems: 3 cluster bands ===== */
-  .cluster {
+  /* ===== capability index ===== */
+  .capabilities {
+    margin: 0;
+    border-top: 1px solid var(--color-trace);
+  }
+  .cap-band {
     display: grid;
-    grid-template-columns: 200px repeat(3, minmax(0, 1fr));
+    grid-template-columns: minmax(0, 13rem) minmax(0, 1fr);
+    gap: var(--spacing-lg) var(--spacing-xl);
+    border-bottom: 1px solid var(--color-trace);
+    padding-block: var(--spacing-lg);
+  }
+  /* The verb hangs in the left column, level with its first row. It was pinned
+     sticky at first; at the tail of a band that left the label floating beside
+     rows it no longer introduced, which reads as a bug rather than as a guide. */
+  .cap-verb {
+    display: flex;
+    align-items: center;
     gap: var(--spacing-md);
+    align-self: start;
+    padding-top: var(--spacing-md);
   }
-  .cluster + .cluster {
-    margin-top: var(--spacing-md);
-  }
-  .cluster-rail {
-    background: var(--color-rack);
-    border: 1px solid var(--color-trace);
-    border-radius: var(--radius);
-    background: var(--color-rack);
-    padding: var(--spacing-lg);
-  }
-  .cluster-rail h3 {
+  .cap-verb span {
+    font-family: var(--heading-font-family);
     font-size: var(--heading-lg);
+    font-weight: var(--weight-heading);
     letter-spacing: var(--tracking-title);
-    margin-top: var(--spacing-md);
+    line-height: 1;
   }
-  .cluster-rail svg {
+  .cap-verb svg {
     display: block;
+    flex: none;
   }
-  .cluster-cards {
-    display: contents;
+  .cap-rows {
+    margin: 0;
+    display: grid;
+    gap: 0;
   }
-  .problem {
-    background: var(--color-rack);
-    border: 1px solid var(--color-trace);
-    border-radius: var(--radius);
-    padding: var(--spacing-lg);
+  .cap-row {
+    display: grid;
+    grid-template-columns: minmax(0, 15rem) minmax(0, 1fr);
+    gap: 6px var(--spacing-lg);
+    align-items: baseline;
+    padding-block: var(--spacing-md);
   }
-  .problem h4 {
-    margin-bottom: 8px;
+  .cap-row + .cap-row {
+    border-top: 1px solid var(--color-trace);
   }
-  .problem p {
+  .cap-row h3 {
+    font-size: var(--body-lg);
+    font-weight: var(--weight-heading);
+    letter-spacing: var(--tracking-card);
+    line-height: 1.35;
+    margin: 0;
+  }
+  .cap-row p {
     color: var(--color-static);
     font-size: var(--body);
     line-height: 1.6;
+    margin: 0;
+    max-width: 62ch;
+  }
+  @media (max-width: 900px) {
+    .cap-band {
+      grid-template-columns: 1fr;
+      gap: var(--spacing-md);
+    }
+    .cap-verb {
+      position: static;
+    }
+    .cap-row {
+      grid-template-columns: 1fr;
+    }
   }
 
-  /* ===== closing: the Route drench ===== */
-  .closing :focus-visible {
-    outline-color: var(--color-accent);
-  }
+  /* ===== closing =====
+     Carries the Rack ground so the last band reads as a landing rather than as
+     one more section: it was set to #121212, identical to the page, which made
+     the "band" a border and 80px of nothing. */
   .closing {
-    background: #121212;
+    background: var(--color-rack);
     border-top: 1px solid var(--color-trace);
-    
-    padding-block: 80px;
+    padding-block: var(--section-padding-lg);
   }
   /* The statement holds the left, the action sits at the end of the line.
      On the wide container a single left-aligned stack leaves half the band
@@ -1072,18 +1010,17 @@ const jsonld = {
     grid-row: 1 / span 2;
     justify-self: end;
   }
-  .closing .btn-primary {
-    background: var(--color-accent);
-    color: #121212;
-  }
-  .closing .btn-primary:hover {
-    background: #b4d600;
-  }
 
   /* ===== responsive (page-specific) ===== */
   @media (max-width: 1024px) {
     .hero .wrap {
       grid-template-columns: 1fr;
+    }
+    /* Once the diagram stacks under the copy there is no right-hand column for
+       the sheet to sit behind, and the mask's ellipse covers the full width —
+       the rules end up running through the headline. */
+    .hero-grid {
+      display: none;
     }
     .terminus::before {
       display: none;

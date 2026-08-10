@@ -38,16 +38,18 @@ conformance, honest benchmarks) and get an engineer running it in 60 seconds.
   status feed is open JSON, the benchmarks argue against their own numbers. The
   redesign amplifies this — proof surfaces become the visual centerpiece, not
   footnotes.
-- **Terminal-native, now with a drawing hand.** Monospace remains operational
-  content (real commands, real config, real status). New: the fold-line drawing
+- **Terminal-native, with a drawing hand.** Monospace remains operational
+  content (real commands, real config, real status). The fold-line drawing
   vocabulary — topology and pipeline diagrams drawn like tailor's pattern paper
   (dashed fold lines, notch marks, grain arrows) — gives the brand an ownable
-  visual signature beyond type.
-- **Committed, not loud.** One signature green (Live #00E599) carries every
-  action and proof signal across both origins; near-black instrument-panel
-  neutrals carry everything else. IBM Plex Sans + Geist Mono. Pills for
-  actions, rounded cards, a pointer-tracked glow in the hero — never
-  gradients-as-decoration, mascots, or superlatives.
+  visual signature beyond type. The drawn wordmark is the other half of it: the
+  identity is letters and line work, not a badge.
+- **Committed, not loud.** Near-black instrument-panel neutrals carry the whole
+  interface, actions included: the primary button is Signal white on ink. One
+  signature acid lime (Live #D6FF00) is held back for proof — status, the active
+  route, the focus ring. IBM Plex Sans + Geist Mono, a drawn wordmark, one 2px
+  radius on every surface. Never gradients-as-decoration, glow, pointer-tracked
+  chrome, mascots, or superlatives.
 
 - **One surface.** Marketing and docs share one token layer, one header, one
   footer, one CTA verb. A gateway that federates N servers into one endpoint
@@ -78,8 +80,8 @@ conformance, honest benchmarks) and get an engineer running it in 60 seconds.
    dashed fold-lines for routes, notch marks for policy points, Live green for
    the active path. This is the brand's signature; no stock illustration ever.
 3. **One system, two grounds.** Dark Backplane is canonical (marketing, docs
-   default); Paper-ground (docs light) uses the same hue family via Route Deep.
-   Tokens are shared; nothing is themed per-origin.
+   default); Paper-ground (docs light) mirrors the same ramp, with Live Ink
+   standing in for Live. Tokens are shared; nothing is themed per-origin.
 4. **Say it once.** One CTA verb per destination, one header, one footer, one
    voice. New copy uses periods and colons over em-dashes; captured copy is
    preserved as content.
@@ -88,9 +90,11 @@ conformance, honest benchmarks) and get an engineer running it in 60 seconds.
 
 ## Accessibility & Inclusion
 
-- Text ≥4.5:1 on its ground everywhere (Static lifted to ≈#a6aac2 on Backplane;
-  Route Deep, not Route, for text-on-Paper).
-- `:focus-visible` ring (2px Route) on every interactive element, both origins.
+- Text ≥4.5:1 on its ground everywhere (Static #BCBCBC is 9.9:1 on Backplane;
+  docs body links are Signal white plus an underline, so the affordance does not
+  depend on hue).
+- `:focus-visible` ring (2px Live) on every interactive element, both origins —
+  one of the few licensed uses of the accent, since focus is a live reading.
 - Diagrams carry meaningful `<title>`/`aria-label` descriptions of the topology,
   not "diagram".
 - Reduced-motion: any added motion ships with a `prefers-reduced-motion` fallback.

@@ -17,9 +17,17 @@ export default defineConfig({
     starlight({
       title: 'fold',
       description:
-        'The enterprise MCP gateway. Every team keeps building its own MCP servers — fold presents them as one governed virtual server. fold is the one; fold.run is the execution.',
+        'The enterprise MCP gateway. Every team keeps building its own MCP servers — fold presents them as one governed virtual server, on the official MCP Go SDK.',
       favicon: '/favicon.svg',
-      logo: { src: './src/assets/logo.svg', alt: '' },
+      // The drawn wordmark replaces the title outright, so docs and marketing
+      // present the identical lockup. Two files because it carries a baked
+      // stroke colour and has to survive the theme flip.
+      logo: {
+        light: './src/assets/wordmark-light.svg',
+        dark: './src/assets/wordmark-dark.svg',
+        alt: 'fold',
+        replacesTitle: true,
+      },
       customCss: ['./src/styles/fold.css'],
       // Code surfaces run on the brand palette, not Starlight's teal default.
       expressiveCode: { themes: [foldDark, foldLight] },

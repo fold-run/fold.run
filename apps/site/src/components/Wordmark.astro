@@ -1,0 +1,80 @@
+---
+/**
+ * The fold wordmark — drawn, not set.
+ *
+ * `fold` as a monoline geometric grotesk on a 19-unit ascender: constant 3-unit
+ * stroke, 12-unit x-height, round overshoot on the o and d bowls, sidebearings
+ * tuned by shape pair (round-to-straight 2.4, straight-to-round 2.6). Drawn
+ * rather than set in IBM Plex so the one element that has to be identical on
+ * every surface never waits on a webfont and never shifts.
+ *
+ * It carries `currentColor`, so a parent sets the colour.
+ */
+interface Props {
+  /** Cap height in px. The lockup scales from this. */
+  height?: number;
+  /** Adds the rule + descriptor used in footers and OG surfaces. */
+  descriptor?: string;
+  class?: string;
+}
+
+const { height = 20, descriptor, class: className } = Astro.props;
+---
+
+<span class:list={['wordmark', className]} style={`--wm-h:${height}px`}>
+  <svg
+    class="wordmark-glyphs"
+    viewBox="0 0 44.3 19.1"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="3"
+    aria-hidden="true"
+    focusable="false"
+  >
+    <path d="M4.2 19 V6.3 A4.8 4.8 0 0 1 9 1.5"></path>
+    <path d="M0 8.4 H8.6"></path>
+    <circle cx="18" cy="13" r="4.6"></circle>
+    <path d="M28 0 V19"></path>
+    <circle cx="38.2" cy="13" r="4.6"></circle>
+    <path d="M42.8 0 V19"></path>
+  </svg>
+  {
+    descriptor && (
+      <>
+        <span class="wordmark-rule" aria-hidden="true" />
+        <span class="wordmark-descriptor">{descriptor}</span>
+      </>
+    )
+  }
+</span>
+
+<style>
+  .wordmark {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.7em;
+    font-size: var(--wm-h);
+  }
+  .wordmark-glyphs {
+    display: block;
+    height: var(--wm-h);
+    width: auto;
+    /* The stroke is drawn on a 3-unit grid; without this the browser snaps the
+       stems to different subpixel columns and the l reads lighter than the d. */
+    shape-rendering: geometricPrecision;
+  }
+  .wordmark-rule {
+    width: 1px;
+    height: 1.05em;
+    background: var(--color-trace);
+  }
+  .wordmark-descriptor {
+    font-family: var(--mono-font-family);
+    font-size: 0.62em;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-static);
+    white-space: nowrap;
+  }
+</style>

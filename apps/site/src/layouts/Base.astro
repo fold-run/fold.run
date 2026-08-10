@@ -2,6 +2,8 @@
 // Shared chrome for fold.run: head metadata, design tokens, base styles, and
 // the canon header/footer from the stardust redesign (stardust/canon/*).
 // Page-specific section styles live in each page, not here.
+import Wordmark from '../components/Wordmark.astro';
+
 interface Props {
   title: string;
   description: string;
@@ -92,17 +94,36 @@ const { title, description, canonical, jsonld, current, template } = Astro.props
         --weight-heading: 600;
         --weight-numeral: 700;
 
-        /* colors — brand-native roles per DESIGN.md */
-        --color-bg: #121212; /* Backplane */
-        --color-fg: #FFFFFF; /* Signal — 18.7:1 */
-        --color-accent: #D6FF00; /* Live — 16.2:1; ink text on fills */
+        /* ===== colours — brand-native roles per DESIGN.md =====
+           Two families, and the split between them is the whole system.
 
-        --color-rack: #1A1A1A; /* Rack — panels */
-        --color-trace: #2B2B2B; /* Trace — hairlines (decorative borders) */
-        --color-fold-line: #6E6E6E; /* Trace-bright — meaningful fold-line graphics */
+           NEUTRALS carry the interface: grounds, panels, hairlines, text, and
+           every action. ACTION is Signal white on ink — the primary button is
+           the brightest neutral, not a colour.
+
+           LIVE (#D6FF00) is licensed to proof only: something that is running,
+           measured, current, or focused. Status dots, the active route in a
+           topology drawing, the focus ring, the brand mark's turned facet. It
+           is never a button, never a bullet, never a decorative arrow. A page
+           where Live appears in more than a couple of places has lost the
+           signal — that is the rule this redesign turns on. */
+        --color-bg: #121212; /* Backplane — page ground */
+        --color-fg: #FFFFFF; /* Signal — 18.7:1 */
+        --color-rack: #1A1A1A; /* Rack — panels, code */
+        --color-rack-hi: #212121; /* Rack, lifted — hover step */
+        --color-trace: #2B2B2B; /* Trace — hairlines */
+        --color-trace-hi: #3D3D3D; /* Trace, lifted — hover borders */
+        --color-fold-line: #6E6E6E; /* meaningful fold-line graphics */
         --color-static: #BCBCBC; /* Static — muted text (9.9:1) */
-        --color-carrier: #E0E0E0; /* neutral links, badges (14.2:1) */
-        --color-route-deep: #B4D600; /* accent hover depth */
+        --color-carrier: #E0E0E0; /* neutral links, labels (14.2:1) */
+
+        --color-accent: #D6FF00; /* Live — proof, status, focus. Never actions. */
+        --color-down: #FF4C79; /* status failures only */
+
+        /* Actions are neutral. Signal fill / Backplane ink is 18.7:1. */
+        --color-action: #FFFFFF;
+        --color-action-ink: #121212;
+        --color-action-hover: #D4D4D4;
 
         --spacing-xs: 4px;
         --spacing-sm: 8px;
@@ -111,11 +132,23 @@ const { title, description, canonical, jsonld, current, template } = Astro.props
         --spacing-xl: 48px;
         --spacing-2xl: 64px;
 
-        --section-padding: 72px; /* balanced tier; 48 tablet / 32 mobile below */
+        /* Vertical rhythm is a scale, not one number. A page whose every band
+           is the same height reads as a list; these three tiers are what give
+           the scroll its pacing. Fluid, so no breakpoint step-downs. */
+        --section-padding: clamp(3rem, 5.2vw, 5.5rem);
+        --section-padding-lg: clamp(4rem, 7.5vw, 7.5rem);
+        --section-padding-sm: clamp(2rem, 3vw, 2.75rem);
+
         --max-width: 72rem;
-        --radius: 2px; /* machined (user re-direct) */
+        --radius: 2px; /* machined — one radius, every surface, buttons included */
         --radius-sm: 0px;
         --radius-lg: 2px;
+
+        /* semantic stacking order */
+        --z-sticky: 50;
+        --z-dropdown: 60;
+        --z-nav-panel: 55;
+        --z-skip: 80;
       }
 
       /* ===== base ===== */
@@ -212,45 +245,59 @@ const { title, description, canonical, jsonld, current, template } = Astro.props
       }
       .will-reveal {
         opacity: 0;
-        transform: translateY(14px);
+        transform: translateY(10px);
         transition:
-          opacity 0.55s cubic-bezier(0.22, 1, 0.36, 1),
-          transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+          opacity 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+          transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
       }
       .will-reveal.revealed {
         opacity: 1;
         transform: none;
       }
+      /* Section rules are the page's structure, so they are drawn full-bleed
+         rather than inside the container: the hairline runs edge to edge and
+         the content sits within it, which is what makes the bands read as one
+         instrument rather than as stacked slides. */
       section + section {
         border-top: 1px solid var(--color-trace);
       }
 
-      /* buttons: sharp, label left, arrow right */
+      /* ===== buttons =====
+         One box for both variants — same height, same padding, same 2px
+         machined corner as every other surface. The arrow that used to trail
+         every button is gone: when a glyph sits after each of forty links it
+         has stopped pointing at anything. It survives on .arrow-link only,
+         where it marks the one inline "keep reading" affordance. */
       .btn {
         display: inline-flex;
         align-items: center;
-        gap: 12px;
-        min-height: 46px;
+        justify-content: center;
+        gap: 10px;
+        height: 44px;
+        padding: 0 22px;
+        border: 1px solid transparent;
+        border-radius: var(--radius);
         font: var(--weight-heading) var(--body) / 1 var(--body-font-family);
         letter-spacing: -0.004em;
-        border-radius: 9999px;
-        padding: 0 24px;
+        white-space: nowrap;
         transition:
           background-color 0.18s cubic-bezier(0.25, 1, 0.5, 1),
-          border-color 0.18s cubic-bezier(0.25, 1, 0.5, 1);
-      }
-      .btn::after {
-        content: '\2192';
-        font-weight: 400;
+          border-color 0.18s cubic-bezier(0.25, 1, 0.5, 1),
+          color 0.18s cubic-bezier(0.25, 1, 0.5, 1);
       }
       .arrow-link {
         font-weight: var(--weight-label);
+        color: var(--color-fg);
       }
       .arrow-link::after {
         content: '\2192';
-        color: var(--color-accent);
+        color: var(--color-static);
         margin-left: 8px;
         display: inline-block;
+        transition: transform 0.2s cubic-bezier(0.25, 1, 0.5, 1);
+      }
+      .arrow-link:hover::after {
+        transform: translateX(3px);
       }
       /* flush tile grids: hairline gutters */
       .tile-grid {
@@ -279,15 +326,21 @@ const { title, description, canonical, jsonld, current, template } = Astro.props
         position: absolute;
         right: var(--spacing-lg);
         bottom: var(--spacing-md);
-        color: var(--color-accent);
-        font-size: 1.25rem;
-        transition: transform 0.2s cubic-bezier(0.25, 1, 0.5, 1);
+        color: var(--color-static);
+        font-size: 1.125rem;
+        transition:
+          transform 0.2s cubic-bezier(0.25, 1, 0.5, 1),
+          color 0.2s cubic-bezier(0.25, 1, 0.5, 1);
       }
       a.tile:hover::after {
         transform: translateX(4px);
+        color: var(--color-fg);
       }
-      /* card surfaces: gradient hairline via masked border, brightening on hover */
-      .stat,
+      /* Card surfaces. A flat Rack panel on a 1px Trace hairline, lifting one
+         background step on hover. The masked gradient-border that used to run
+         here (and lit an accent glow along the top edge) is gone: an instrument
+         panel does not shimmer, and the effect was the loudest thing on pages
+         whose actual argument is the numbers inside the box. */
       .terminus,
       .problem,
       .cluster-rail,
@@ -295,89 +348,36 @@ const { title, description, canonical, jsonld, current, template } = Astro.props
       .post-row,
       .target,
       a.tile {
-        border: 1px solid transparent;
-        background:
-          linear-gradient(var(--color-rack), var(--color-rack)) padding-box,
-          linear-gradient(165deg, #3a3a3a, var(--color-trace) 45%) border-box;
-        transition: background 0.25s cubic-bezier(0.25, 1, 0.5, 1);
-      }
-      .stat:hover,
-      a.tile:hover {
-        background:
-          linear-gradient(#202020, #202020) padding-box,
-          linear-gradient(165deg, color-mix(in srgb, var(--color-accent) 45%, #3a3a3a), var(--color-trace) 60%)
-            border-box;
-      }
-      .stat::after {
-        transition: transform 0.2s cubic-bezier(0.25, 1, 0.5, 1);
-      }
-      .stat:hover::after {
-        transform: translateX(4px);
-      }
-      /* traveling light: a ring segment orbiting the primary pill */
-      @property --orbit {
-        syntax: '<angle>';
-        inherits: false;
-        initial-value: 0deg;
-      }
-      .btn-live {
-        position: relative;
-      }
-      .btn-live::before {
-        content: '';
-        position: absolute;
-        inset: -3px;
-        border-radius: 9999px;
-        padding: 1.5px;
-        background: conic-gradient(
-          from var(--orbit),
-          transparent 0deg,
-          transparent 300deg,
-          var(--color-accent) 330deg,
-          transparent 360deg
-        );
-        mask:
-          linear-gradient(#fff 0 0) content-box,
-          linear-gradient(#fff 0 0);
-        mask-composite: exclude;
-        pointer-events: none;
-      }
-      @media (prefers-reduced-motion: no-preference) {
-        .btn-live::before {
-          animation: orbit 3.2s linear infinite;
-        }
-        @keyframes orbit {
-          to {
-            --orbit: 360deg;
-          }
-        }
-      }
-      @media (prefers-reduced-motion: reduce) {
-        .btn-live::before {
-          display: none;
-        }
-      }
-      .btn-primary {
-        background: var(--color-accent);
-        color: var(--color-bg);
-      }
-      .btn-primary:hover {
-        background: var(--color-route-deep);
-        text-decoration: none;
-      }
-      /* A filled panel rather than an outline, so the pair reads as two solid
-         buttons of different weight — Live for the primary action, Rack for the
-         secondary — instead of a button beside a ghost. The hairline stays: on
-         Backplane the Rack fill alone does not describe an edge. */
-      .btn-secondary {
         background: var(--color-rack);
         border: 1px solid var(--color-trace);
-        color: var(--color-carrier);
-        padding: 11px 19px;
+        transition:
+          background-color 0.2s cubic-bezier(0.25, 1, 0.5, 1),
+          border-color 0.2s cubic-bezier(0.25, 1, 0.5, 1);
+      }
+      a.tile:hover,
+      .post-row:hover,
+      .target:hover {
+        background: var(--color-rack-hi);
+        border-color: var(--color-trace-hi);
+      }
+      /* The primary action is the brightest neutral on the page, not the
+         brand colour. Live is reserved for proof; a button is not proof. */
+      .btn-primary {
+        background: var(--color-action);
+        color: var(--color-action-ink);
+      }
+      .btn-primary:hover {
+        background: var(--color-action-hover);
+        text-decoration: none;
+      }
+      .btn-secondary {
+        background: transparent;
+        border-color: var(--color-trace-hi);
+        color: var(--color-fg);
       }
       .btn-secondary:hover {
-        background: #202020;
-        border-color: var(--color-carrier);
+        background: var(--color-rack);
+        border-color: var(--color-static);
         text-decoration: none;
       }
 
@@ -386,11 +386,11 @@ const { title, description, canonical, jsonld, current, template } = Astro.props
         position: absolute;
         left: -9999px;
         top: 0;
-        background: var(--color-accent);
-        color: var(--color-bg); /* Live fills carry ink text — 16.2:1 */
+        background: var(--color-action);
+        color: var(--color-action-ink);
         padding: 10px 16px;
         border-radius: 0 0 var(--radius) 0;
-        z-index: 10;
+        z-index: var(--z-skip);
       }
       .skip-link:focus {
         left: 0;
@@ -400,12 +400,11 @@ const { title, description, canonical, jsonld, current, template } = Astro.props
       header.site {
         position: sticky;
         top: 0;
-        z-index: 50;
+        z-index: var(--z-sticky);
         background: color-mix(in srgb, var(--color-bg) 88%, transparent);
         backdrop-filter: blur(12px);
         -webkit-backdrop-filter: blur(12px);
         border-bottom: 1px solid var(--color-trace);
-        padding-block: 0.75rem;
       }
       @supports not (backdrop-filter: blur(12px)) {
         header.site {
@@ -416,32 +415,40 @@ const { title, description, canonical, jsonld, current, template } = Astro.props
         display: flex;
         align-items: center;
         gap: var(--spacing-lg);
-        flex-wrap: wrap;
+        min-height: 60px;
       }
       .brandmark {
         display: inline-flex;
         align-items: center;
-        gap: 10px;
         color: var(--color-fg);
-        font-weight: var(--weight-numeral);
-        font-size: 1.1875rem;
-        letter-spacing: -0.022em;
+        flex: none;
       }
       .brandmark:hover {
         text-decoration: none;
+        color: var(--color-carrier);
       }
       header.site nav {
         display: flex;
         align-items: center;
-        gap: var(--spacing-sm);
+        gap: 2px;
         margin-left: auto;
-        flex-wrap: wrap;
         font-size: 0.9375rem;
       }
+      /* Nav is a supporting rank: Static until you point at it. Against one
+         solid action on the right, that is the entire hierarchy. */
       header.site nav a:not(.btn) {
-        padding: 12px 10px;
+        padding: 10px 12px;
         font-weight: var(--weight-label);
         letter-spacing: 0;
+        color: var(--color-static);
+        transition: color 0.15s cubic-bezier(0.25, 1, 0.5, 1);
+      }
+      header.site nav a:not(.btn):hover {
+        color: var(--color-fg);
+        text-decoration: none;
+      }
+      header.site .btn {
+        margin-left: var(--spacing-sm);
       }
       /* backdrop-filter makes the header the containing block for fixed
          descendants; lift it while the mobile panel is open so the panel
@@ -490,7 +497,12 @@ const { title, description, canonical, jsonld, current, template } = Astro.props
         align-items: center;
         gap: 4px;
       }
-      .nav-drop > button:hover {
+      .nav-drop > button {
+        color: var(--color-static);
+        transition: color 0.15s cubic-bezier(0.25, 1, 0.5, 1);
+      }
+      .nav-drop > button:hover,
+      .nav-drop > button[aria-expanded='true'] {
         color: var(--color-fg);
       }
       .nav-drop .chev {
@@ -511,9 +523,9 @@ const { title, description, canonical, jsonld, current, template } = Astro.props
         background: var(--color-rack);
         border: 1px solid var(--color-trace);
         border-radius: var(--radius-lg);
-        padding: 8px;
+        padding: 6px;
         display: grid;
-        z-index: 60;
+        z-index: var(--z-dropdown);
       }
       .drop-panel a {
         display: grid;
@@ -523,7 +535,7 @@ const { title, description, canonical, jsonld, current, template } = Astro.props
         color: var(--color-fg);
       }
       .drop-panel a:hover {
-        background: #202020;
+        background: var(--color-rack-hi);
         text-decoration: none;
       }
       .drop-panel a b {
@@ -548,14 +560,14 @@ const { title, description, canonical, jsonld, current, template } = Astro.props
           flex-wrap: nowrap;
           overflow-x: hidden;
           position: fixed;
-          inset: 57px 0 0 0;
+          inset: 60px 0 0 0;
           flex-direction: column;
           align-items: stretch;
           gap: 0;
           background: var(--color-bg);
           padding: var(--spacing-md) var(--spacing-md) var(--spacing-xl);
           overflow-y: auto;
-          z-index: 55;
+          z-index: var(--z-nav-panel);
         }
         header.site nav.open a:not(.btn),
         header.site nav.open .nav-drop > button {
@@ -581,9 +593,7 @@ const { title, description, canonical, jsonld, current, template } = Astro.props
         color: var(--color-fg);
       }
       header.site .btn {
-        min-width: auto;
-        min-height: 36px;
-        gap: 12px;
+        height: 34px;
         padding: 0 14px;
         font-size: var(--body-sm);
       }
@@ -591,7 +601,7 @@ const { title, description, canonical, jsonld, current, template } = Astro.props
       /* ===== footer ===== */
       footer.site {
         border-top: 1px solid var(--color-trace);
-        padding-block: var(--spacing-xl);
+        padding-block: var(--section-padding);
       }
       footer.site .wrap.foot-grid {
         display: grid;
@@ -600,14 +610,6 @@ const { title, description, canonical, jsonld, current, template } = Astro.props
         gap: var(--spacing-xl);
         padding-bottom: var(--spacing-xl);
       }
-      .foot-brand .brandmark-sm {
-        display: inline-flex;
-        align-items: center;
-        gap: 10px;
-        font-size: 1.0625rem;
-        font-weight: var(--weight-numeral);
-        letter-spacing: -0.02em;
-      }
       .foot-brand p {
         color: var(--color-static);
         font-size: var(--body-sm);
@@ -615,31 +617,35 @@ const { title, description, canonical, jsonld, current, template } = Astro.props
         max-width: 32ch;
         margin-top: var(--spacing-sm);
       }
+      /* One of the few places Live is licensed: this dot is a live reading off
+         the uptime worker, not decoration. */
       .status-badge {
         display: inline-flex;
         align-items: center;
-        gap: 8px;
+        gap: 9px;
         margin-top: var(--spacing-md);
-        padding: 7px 14px;
+        padding: 7px 12px;
         border: 1px solid var(--color-trace);
-        border-radius: 9999px;
-        font-size: var(--body-sm);
-        font-weight: var(--weight-label);
+        border-radius: var(--radius);
+        font-family: var(--mono-font-family);
+        font-size: 0.75rem;
+        letter-spacing: 0.04em;
         color: var(--color-static);
       }
       .status-badge:hover {
         color: var(--color-fg);
         text-decoration: none;
-        border-color: #3a3a3a;
+        border-color: var(--color-trace-hi);
       }
       .status-badge .dot {
-        width: 7px;
-        height: 7px;
+        width: 6px;
+        height: 6px;
         border-radius: 50%;
         background: var(--color-accent);
+        flex: none;
       }
       .status-badge.degraded .dot {
-        background: #ff4c79;
+        background: var(--color-down);
       }
       .status-badge[hidden] {
         display: none;
@@ -648,7 +654,7 @@ const { title, description, canonical, jsonld, current, template } = Astro.props
       .skeleton {
         position: relative;
         overflow: hidden;
-        background: #202020;
+        background: var(--color-rack-hi);
         border-radius: var(--radius-sm);
         min-height: 1.1em;
       }
@@ -806,22 +812,12 @@ const { title, description, canonical, jsonld, current, template } = Astro.props
         color: var(--color-carrier); /* keys / prompts */
       }
 
-      /* ===== shared responsive ===== */
-      @media (max-width: 768px) {
-        :root {
-          --section-padding: 48px;
-        }
-      }
-      @media (max-width: 640px) {
-        :root {
-          --section-padding: 32px;
-        }
-        header.site nav {
-          gap: var(--spacing-md);
-        }
-      }
+      /* ===== shared responsive =====
+         Section padding is a clamp() now, so there is nothing to step down. */
       @media (prefers-reduced-motion: reduce) {
-        .btn {
+        .btn,
+        a.tile,
+        .arrow-link::after {
           transition: none;
         }
       }
@@ -833,13 +829,7 @@ const { title, description, canonical, jsonld, current, template } = Astro.props
     <header class="site" data-section="header" data-intent="navigate" data-layout="contained" data-canon>
       <div class="wrap">
         <a class="brandmark" href="/" aria-label="fold home">
-          <!-- authored fold wordmark: fold-line letterform mark -->
-          <svg width="28" height="28" viewBox="0 0 28 28" aria-hidden="true">
-              <rect x="1" y="1" width="26" height="26" fill="#1a1a1a" stroke="#2b2b2b" stroke-width="1.5"></rect>
-              <path d="M 27 13 V 1 H 15 Z" fill="#D6FF00"></path>
-              <path d="M 15 1 L 27 13" stroke="#b4d600" stroke-width="1.2"></path>
-            </svg>
-          fold
+          <Wordmark height={20} />
         </a>
         <button class="nav-burger" aria-expanded="false" aria-controls="site-nav" aria-label="Open menu">
           <span></span><span></span>
@@ -857,11 +847,10 @@ const { title, description, canonical, jsonld, current, template } = Astro.props
             </div>
           </div>
           <a href="/#demo">Live demo</a>
-          <a href="https://docs.fold.run/use-cases/">Use cases</a>
           <a href="/blog/" aria-current={current === 'blog' ? 'page' : undefined}>Blog</a>
           <a href="/status/" aria-current={current === 'status' ? 'page' : undefined}>Status</a>
           <a href="https://github.com/fold-run/fold">GitHub</a>
-          <a class="btn btn-secondary" href="https://docs.fold.run/getting-started/">Get started</a>
+          <a class="btn btn-primary" href="https://docs.fold.run/getting-started/">Get started</a>
         </nav>
       </div>
     </header>
@@ -871,14 +860,7 @@ const { title, description, canonical, jsonld, current, template } = Astro.props
     <footer class="site" data-section="footer" data-intent="navigate" data-layout="contained" data-canon>
       <div class="wrap foot-grid">
         <div class="foot-brand">
-          <span class="brandmark-sm">
-            <svg width="24" height="24" viewBox="0 0 28 28" aria-hidden="true">
-              <rect x="1" y="1" width="26" height="26" fill="#1a1a1a" stroke="#2b2b2b" stroke-width="1.5"></rect>
-              <path d="M 27 13 V 1 H 15 Z" fill="#D6FF00"></path>
-              <path d="M 15 1 L 27 13" stroke="#b4d600" stroke-width="1.2"></path>
-            </svg>
-            <b>fold</b>
-          </span>
+          <Wordmark height={19} descriptor="MCP gateway" />
           <p>One governed endpoint between every MCP client and every MCP server.</p>
           <a class="status-badge" href="/status/" data-status-badge hidden>
             <span class="dot" aria-hidden="true"></span>
@@ -908,15 +890,8 @@ const { title, description, canonical, jsonld, current, template } = Astro.props
         </nav>
       </div>
       <div class="wrap foot-legal">
-        <span class="legal">
-          <svg width="20" height="20" viewBox="0 0 28 28" aria-hidden="true">
-              <rect x="1" y="1" width="26" height="26" fill="#1a1a1a" stroke="#2b2b2b" stroke-width="1.5"></rect>
-              <path d="M 27 13 V 1 H 15 Z" fill="#D6FF00"></path>
-              <path d="M 15 1 L 27 13" stroke="#b4d600" stroke-width="1.2"></path>
-            </svg>
-          © fold.run · the enterprise MCP gateway
-        </span>
-        <span class="tagline">fold is the one. fold.run is the execution.</span>
+        <span class="legal">© fold.run · Apache-2.0</span>
+        <span class="tagline">Built on the official MCP Go SDK, on both sides of the proxy.</span>
       </div>
     </footer>
       <script>
@@ -987,11 +962,15 @@ const { title, description, canonical, jsonld, current, template } = Astro.props
           });
         }
       }
-      // scroll reveal: sections rise in; default state stays fully visible without JS
+      // Scroll reveal: the contents of a band rise in; the default state stays
+      // fully visible without JS. Section heads are deliberately NOT reveal
+      // targets — with a -8% root margin a head could sit at opacity 0 while
+      // its own section filled the viewport, leaving an empty band above
+      // visible cards. The heading is the thing you read first; it never hides.
       {
         const calm = matchMedia('(prefers-reduced-motion: reduce)').matches;
         if (!calm && 'IntersectionObserver' in window) {
-          const targets = document.querySelectorAll('main section > .wrap > h2, main section > .wrap > .section-head, .tile-grid > *, .stat, .terminus, .problem, .path, .post-row, .target');
+          const targets = document.querySelectorAll('.tile-grid > *, .terminus, .cap-row, .path, .post-row, .target, .proof-cell');
           const io = new IntersectionObserver(
             (entries) => {
               for (const en of entries) {
@@ -1007,7 +986,7 @@ const { title, description, canonical, jsonld, current, template } = Astro.props
           for (const t of targets) {
             if (t.getBoundingClientRect().top < innerHeight) continue;
             t.classList.add('will-reveal');
-            t.style.transitionDelay = `${(i++ % 4) * 60}ms`;
+            t.style.transitionDelay = `${(i++ % 4) * 45}ms`;
             io.observe(t);
           }
         }

@@ -22,8 +22,11 @@ import Base from '../layouts/Base.astro';
           <path d="M 20 80 H 246" stroke="#D6FF00" stroke-width="2" fill="none"></path>
           <path d="M 236 74 L 248 80 L 236 86 Z" fill="#D6FF00"></path>
           <g>
-            <rect x="248" y="48" width="68" height="64" rx="10" fill="#1a1a1a" stroke="#2b2b2b" stroke-width="1.5"></rect>
-            <path d="M 316 66 V 58 A 10 10 0 0 0 306 48 H 298 Z" fill="#D6FF00"></path>
+            <!-- Matches the hero topology node: 2px machined corner, Live stroke
+                 because this is the gateway that answered. The 10px radius it
+                 carried was the only rounded corner left on either origin. -->
+            <rect x="248" y="48" width="68" height="64" rx="2" fill="#1a1a1a" stroke="#D6FF00" stroke-width="1.5"></rect>
+            <path d="M 316 66 V 50 A 2 2 0 0 0 314 48 H 298 Z" fill="#D6FF00"></path>
             <text x="282" y="86" text-anchor="middle" font-family="Geist Mono, monospace" font-size="15" fill="#FFFFFF">fold</text>
           </g>
           <path d="M 316 80 C 380 80, 400 80, 440 80" stroke="#6E6E6E" stroke-width="1.5" stroke-dasharray="5 6" fill="none"></path>
@@ -46,7 +49,7 @@ import Base from '../layouts/Base.astro';
   }
   .lost .code {
     font-family: var(--mono-font-family);
-    color: var(--color-accent);
+    color: var(--color-static);
     font-size: var(--body-sm);
     letter-spacing: var(--tracking-meta);
     font-variant-numeric: tabular-nums slashed-zero;

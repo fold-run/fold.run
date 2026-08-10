@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 44.3 19.1" role="img" aria-label="fold"><title>fold</title>
+  <g fill="none" stroke="#121212" stroke-width="3" shape-rendering="geometricPrecision">
+    <path d="M4.2 19V6.3A4.8 4.8 0 0 1 9 1.5"/>
+    <path d="M0 8.4H8.6"/>
+    <circle cx="18" cy="13" r="4.6"/>
+    <path d="M28 0V19"/>
+    <circle cx="38.2" cy="13" r="4.6"/>
+    <path d="M42.8 0V19"/>
+  </g>
+</svg>

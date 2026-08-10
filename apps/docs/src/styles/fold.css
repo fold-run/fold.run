@@ -1,7 +1,9 @@
 /* fold docs theme — unified brand token layer (stardust archetype:
  * stardust/prototypes/docs__getting-started-proposed.html; spec: DESIGN.md).
- * Dark is canonical: Backplane ground, Rack panels, Trace hairlines, Brass accent.
- * Machined 0–2px radii. No gradients; elevation by background-step, not shadow. */
+ * Dark is canonical: Backplane ground, Rack panels, Trace hairlines. Actions and
+ * links run on the neutral ramp; Live (--fold-live) is reserved for proof — the
+ * current-page rail, the focus ring, the brand mark. Machined 0–2px radii. No
+ * gradients; elevation by background-step, not shadow. */
 
 /* ===== fonts — self-hosted IBM Plex Sans (ITF free license) + Geist Mono (OFL) ===== */
 @font-face {
@@ -130,13 +132,21 @@
   --sl-color-gray-6: #1a1a1a; /* Rack — panels, nav, sidebar */
   --sl-color-black: #121212; /* Backplane — page ground */
 
-  /* Live accent family */
-  --sl-color-accent-low: #2a3300; /* dark Live surface tint */
-  --sl-color-accent: #d6ff00; /* Live */
-  --sl-color-accent-high: #e9ff80; /* Pulse — Live, softened */
-  --sl-color-text-accent: #d6ff00; /* links, current nav (16.2:1 on Backplane) */
-  --sl-color-bg-accent: #d6ff00; /* Live buttons… */
-  --sl-color-text-invert: #121212; /* …carry ink text (16.2:1) */
+  /* ===== accents =====
+   * Live is licensed to proof only, exactly as on the site: the current-page
+   * rail (where you are), the focus ring, the brand mark. Links and buttons
+   * take the neutral ramp instead — Signal on Backplane, underlined for the
+   * affordance the colour used to carry. A docs page is mostly links; when
+   * every one of them was Live the accent stopped meaning anything, and the
+   * body copy had to compete with a field of chartreuse. */
+  --sl-color-accent-low: #2b2b2b; /* neutral surface tint */
+  --sl-color-accent: #ffffff;
+  --sl-color-accent-high: #e0e0e0;
+  --sl-color-text-accent: #ffffff; /* links, current nav — 18.7:1 */
+  --sl-color-bg-accent: #ffffff; /* buttons… */
+  --sl-color-text-invert: #121212; /* …carry ink text (18.7:1) */
+
+  --fold-live: #d6ff00; /* proof, status, focus — never an action */
 
   /* hairlines are Trace, everywhere */
   --sl-color-hairline-light: #2b2b2b;
@@ -152,7 +162,7 @@
   --sl-search-corners: 2px;
 
   /* fold-local tokens (theme-flipped below) */
-  --fold-rail: #d6ff00; /* current-page rail: Live */
+  --fold-rail: var(--fold-live); /* current-page rail — a licensed Live use */
   --fold-rail-fill: #1a1a1a; /* current-page fill: Rack */
   --fold-inline-code-bg: #1a1a1a; /* Rack */
   --fold-inline-code-border: #2b2b2b; /* Trace */
@@ -174,13 +184,17 @@
   --sl-color-gray-7: #f6f6f6;
   --sl-color-black: #ffffff; /* Paper */
 
-  /* Live, darkened for light grounds */
-  --sl-color-accent-low: #f4ffbf; /* soft Live tint surface */
-  --sl-color-accent: #5a6b00; /* Live Ink — 5.94:1 on white */
-  --sl-color-accent-high: #3f4a00; /* 9.59:1 on white */
-  --sl-color-text-accent: #5a6b00; /* 5.94:1 on #ffffff — passes AA */
-  --sl-color-bg-accent: #5a6b00;
-  --sl-color-text-invert: #ffffff; /* 5.94:1 on Live Ink */
+  /* Same demotion, mirrored: neutral ink carries links and buttons. */
+  --sl-color-accent-low: #ededed;
+  --sl-color-accent: #121212;
+  --sl-color-accent-high: #000000;
+  --sl-color-text-accent: #121212; /* 18.7:1 on Paper */
+  --sl-color-bg-accent: #121212;
+  --sl-color-text-invert: #ffffff;
+
+  /* Live is 1.16:1 on Paper, so the proof signal takes Live Ink here —
+   * 5.94:1 on #ffffff, computed from relative luminance. */
+  --fold-live: #5a6b00;
 
   --sl-color-hairline-light: #e5e5e5;
   --sl-color-hairline: #e5e5e5;
@@ -191,7 +205,7 @@
   --sl-shadow-md: 0px 3px 2px hsla(0, 0%, 0%, 0.04), 0px 1px 1px hsla(0, 0%, 0%, 0.05);
   --sl-shadow-lg: 0px 9px 5px hsla(223, 13%, 10%, 0.06), 0px 4px 4px hsla(0, 0%, 0%, 0.1);
 
-  --fold-rail: #5a6b00;
+  --fold-rail: var(--fold-live);
   --fold-rail-fill: #ededed;
   --fold-inline-code-bg: #ededed;
   --fold-inline-code-border: #d4d4d4;
@@ -213,7 +227,6 @@
 
 .sl-markdown-content .card,
 .sl-markdown-content .sl-link-card,
-.sl-markdown-content a.sl-link-button,
 .sl-badge,
 .starlight-aside,
 .sl-markdown-content code:not(:is(pre, .expressive-code) code),
@@ -267,7 +280,7 @@ button[data-open-modal] {
   gap: 0.65rem;
   background: var(--fold-card-bg, var(--sl-color-black));
   border: 1px solid var(--sl-color-hairline, var(--sl-color-gray-5));
-  border-radius: 10px;
+  border-radius: 2px;
   padding: 1.25rem 1.5rem;
   margin-top: 0 !important;
 }
@@ -299,12 +312,59 @@ button[data-open-modal] {
 .sl-markdown-content .card .body > :first-child {
   margin-top: 0;
 }
-/* wordmark stays ink/signal, not accent */
-.site-title {
-  color: var(--sl-color-white);
-}
-/* mark next to the site title */
+/* ===== the lockup =====
+ * `replacesTitle` renders the drawn wordmark alone, so docs and marketing show
+ * the identical object. Sized to the site's 20px cap height. */
 .site-title img {
-  height: 1.6rem;
+  height: 20px;
   width: auto;
+}
+
+/* ===== links =====
+ * Body links no longer carry the accent colour, so they carry an underline
+ * instead — against #bcbcbc prose, Signal white plus a rule is a stronger
+ * affordance than the chartreuse it replaced, and it survives the theme flip
+ * without a second token. */
+.sl-markdown-content a:not(.sl-link-card, .sl-link-button, .card *) {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-color: var(--sl-color-gray-4);
+  text-decoration-thickness: 1px;
+  transition: text-decoration-color 0.15s ease-out;
+}
+.sl-markdown-content a:not(.sl-link-card, .sl-link-button, .card *):hover {
+  text-decoration-color: currentColor;
+}
+
+/* ===== focus =====
+ * The one interface-wide Live use: the ring follows the keyboard, and "where
+ * the focus is" is exactly the live-reading semantics the colour is kept for.
+ * Matches the site's :focus-visible treatment token for token. */
+:focus-visible {
+  outline: 2px solid var(--fold-live);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+/* ===== buttons =====
+ * Same box as the site: 2px machined corner, neutral fill, ink text. Scoped to
+ * `a.sl-link-button` rather than to the markdown container, because the splash
+ * hero renders its actions outside `.sl-markdown-content` — scoped there, the
+ * three most prominent buttons on the docs stayed 9999px pills while every
+ * other surface on both origins was machined. */
+a.sl-link-button {
+  border-radius: 2px;
+  font-weight: 600;
+}
+a.sl-link-button.primary {
+  border-color: transparent;
+}
+a.sl-link-button.secondary {
+  border-color: var(--sl-color-gray-4);
+}
+
+/* Card icons were drawing every glyph in the accent; on the neutral ramp that
+ * would make them Signal white and louder than the titles they sit beside. */
+.sl-markdown-content .card .title .icon svg {
+  color: var(--sl-color-gray-3);
 }
