@@ -17,6 +17,19 @@ interface Target {
   id: string;
   kind: 'http' | 'mcp-init';
   url: string;
+  /**
+   * The release this deployment is supposed to be serving, compared against
+   * `serverInfo.version` from the initialize round trip we already make.
+   *
+   * Availability checks cannot see this class of failure: a gateway two
+   * releases behind answers every probe perfectly. It happened — the demo
+   * served v1.4.1 for three days against a v1.5.0 pin, because bumping the
+   * pin and redeploying the container are separate acts and only the first
+   * one is in a commit.
+   *
+   * Must equal the tag in apps/demo/Dockerfile; CI fails if it drifts.
+   */
+  expectVersion?: string;
 }
 
 const TARGETS: Target[] = [
@@ -25,7 +38,7 @@ const TARGETS: Target[] = [
   // Real JSON-RPC round trips (initialize), not just a 200 — we monitor
   // the protocol, not the port. Checking the tasks upstream directly also
   // separates "gateway down" from "upstream down" when demo alerts fire.
-  { id: 'demo', kind: 'mcp-init', url: 'https://demo.fold.run/mcp' },
+  { id: 'demo', kind: 'mcp-init', url: 'https://demo.fold.run/mcp', expectVersion: 'v1.5.0' },
   { id: 'demo-tasks', kind: 'mcp-init', url: 'https://tasks.fold.run/mcp' },
 ];
 
@@ -42,11 +55,16 @@ interface TargetState {
   lastOkAt?: string;
   lastError?: string;
   latencyMs?: number;
+  /** Last `serverInfo.version` seen, for targets that report one. */
+  version?: string;
+  expectVersion?: string;
+  /** Running something other than `expectVersion`. Serving fine, wrong build. */
+  versionStale?: boolean;
 }
 
 async function checkTarget(
   target: Target,
-): Promise<{ ok: boolean; latencyMs: number; error?: string }> {
+): Promise<{ ok: boolean; latencyMs: number; error?: string; version?: string }> {
   const started = Date.now();
   try {
     const res =
@@ -77,6 +95,11 @@ async function checkTarget(
       if (!body.includes('"serverInfo"')) {
         return { ok: false, latencyMs, error: 'no initialize result in response' };
       }
+      // Scoped to serverInfo so the sibling `protocolVersion` can't be read as
+      // the build. The body is SSE or plain JSON depending on the server, so
+      // this matches the text rather than parsing a frame format twice.
+      const version = body.match(/"serverInfo"\s*:\s*\{[^}]*?"version"\s*:\s*"([^"]+)"/)?.[1];
+      return { ok: true, latencyMs, ...(version !== undefined && { version }) };
     }
     return { ok: true, latencyMs };
   } catch (error) {
@@ -136,8 +159,13 @@ export class UptimeMonitorDO implements DurableObject {
     if (path === '/status') {
       const targets = [...this.#targets.values()];
       const allUp = targets.length > 0 && targets.every((t) => t.status === 'up');
+      // `overall` and the HTTP code stay a pure availability signal: a target
+      // on the wrong build is serving every request correctly, and flipping
+      // the status page red for it would both lie and train people to ignore
+      // it. Drift rides alongside, in its own field.
+      const stale = targets.filter((t) => t.versionStale === true).map((t) => t.id);
       return Response.json(
-        { overall: allUp ? 'up' : 'degraded', targets },
+        { overall: allUp ? 'up' : 'degraded', stale, targets },
         { status: allUp ? 200 : 503 },
       );
     }
@@ -168,6 +196,11 @@ export class UptimeMonitorDO implements DurableObject {
       const consecutiveFailures = r.ok ? 0 : prev.consecutiveFailures + 1;
       const status: 'up' | 'down' =
         consecutiveFailures >= FAILURES_BEFORE_DOWN ? 'down' : r.ok ? 'up' : prev.status;
+      // A failed check tells us nothing new about the build, so hold the last
+      // version we saw rather than letting an outage read as a version change.
+      const version = r.version ?? prev.version;
+      const versionStale =
+        t.expectVersion !== undefined && version !== undefined && version !== t.expectVersion;
       const next: TargetState = {
         id: t.id,
         url: t.url,
@@ -179,6 +212,8 @@ export class UptimeMonitorDO implements DurableObject {
           ? { lastOkAt: new Date().toISOString() }
           : prev.lastOkAt !== undefined && { lastOkAt: prev.lastOkAt }),
         ...(r.error !== undefined && { lastError: r.error }),
+        ...(version !== undefined && { version }),
+        ...(t.expectVersion !== undefined && { expectVersion: t.expectVersion, versionStale }),
       };
       this.#targets.set(t.id, next);
       await this.#state.storage.put(`target:${t.id}`, next);
@@ -186,6 +221,13 @@ export class UptimeMonitorDO implements DurableObject {
 
       if (prev.status !== next.status && prev.lastCheckAt !== '') {
         await this.#alert(next, prev.status);
+      }
+      // Drift alerts are independent of up/down: the whole point is that this
+      // fires while the target is up and every availability signal is green.
+      const wasStale = prev.versionStale === true;
+      const isStale = next.versionStale === true;
+      if (wasStale !== isStale && prev.lastCheckAt !== '') {
+        await this.#alertDrift(next, isStale);
       }
     }
   }
@@ -211,6 +253,25 @@ export class UptimeMonitorDO implements DurableObject {
           text: `${emoji} fold-uptime: ${target.id} is ${target.status.toUpperCase()} (was ${from}) — ${target.url}${target.lastError ? ` · ${target.lastError}` : ''}`,
           target,
         }),
+        signal: AbortSignal.timeout(CHECK_TIMEOUT_MS),
+      });
+    } catch {
+      // alerting is best-effort by design
+    }
+  }
+
+  /** Best-effort webhook when a target starts or stops serving the wrong build. */
+  async #alertDrift(target: TargetState, stale: boolean): Promise<void> {
+    const webhook = this.#env.ALERT_WEBHOOK;
+    if (webhook === undefined || webhook === '') return;
+    const text = stale
+      ? `🟠 fold-uptime: ${target.id} is UP but serving ${target.version} — expected ${target.expectVersion}. The pin moved and the deploy did not.`
+      : `🟢 fold-uptime: ${target.id} is back on ${target.expectVersion}.`;
+    try {
+      await fetch(webhook, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ text, target }),
         signal: AbortSignal.timeout(CHECK_TIMEOUT_MS),
       });
     } catch {
