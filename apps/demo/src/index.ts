@@ -40,6 +40,14 @@ interface Env {
 
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
+    // Bare host is the "I pasted the URL in a browser" case: fold answers 404
+    // there, so send it to the console instead. Trailing slash is fold's own
+    // canonical path for it — redirecting to /console would only hop again.
+    const url = new URL(request.url);
+    if (url.pathname === '/') {
+      return Response.redirect(new URL('/console/', url).toString(), 302);
+    }
+
     try {
       return await getContainer(env.FOLD_DEMO as never, 'demo').fetch(request);
     } catch {
