@@ -9,9 +9,10 @@ colors:
   signal: "#FFFFFF"
   static: "#BCBCBC"
   live: "#D6FF00"
-  live-deep: "#b4d600"
-  pulse: "#E9FF80"
   carrier: "#E0E0E0"
+  action: "#FFFFFF"
+  action-hover: "#D4D4D4"
+  trace-bright: "#3D3D3D"
   down: "#ff4c79"
 typography:
   display:
@@ -63,32 +64,33 @@ typography:
     lineHeight: 1.7
     letterSpacing: "0"
 rounded:
-  sm: "6px"
-  md: "10px"
-  lg: "14px"
-  pill: "9999px"
+  sm: "0px"
+  md: "2px"
+  lg: "2px"
 spacing:
   xs: "8px"
   sm: "16px"
   md: "24px"
   lg: "40px"
-  section-desktop: "72px"
-  section-tablet: "48px"
-  section-mobile: "32px"
+  section: "clamp(3rem, 5.2vw, 5.5rem)"
+  section-lg: "clamp(4rem, 7.5vw, 7.5rem)"
+  section-sm: "clamp(2rem, 3vw, 2.75rem)"
   container: "72rem"
 components:
   button-primary:
-    backgroundColor: "{colors.live}"
+    backgroundColor: "{colors.action}"
     textColor: "{colors.backplane}"
-    rounded: "{rounded.pill}"
-    padding: "0 24px"
+    rounded: "{rounded.md}"
+    padding: "0 22px"
   button-secondary:
     backgroundColor: "transparent"
+    borderColor: "{colors.trace-bright}"
     textColor: "{colors.signal}"
-    rounded: "{rounded.pill}"
-    padding: "0 24px"
+    rounded: "{rounded.md}"
+    padding: "0 22px"
   card:
     backgroundColor: "{colors.rack}"
+    borderColor: "{colors.trace}"
     rounded: "{rounded.md}"
     padding: "24px"
   code-panel:
@@ -104,34 +106,51 @@ components:
 
 ## 1. Overview
 
-The final fold identity: near-black grounds (Backplane #121212, Rack panels
-#1a1a1a, Trace hairlines #2b2b2b), one signature acid lime (Live #D6FF00) reserved
-for actions, active routes, and live-proof signals, IBM Plex Sans + Geist Mono
-(both OFL, self-hosted). Surfaces are spaced rounded cards; CTAs are pills with
-ink text; the hero carries a pointer-tracked aurora glow. The fold-line diagram
-vocabulary (dashed routes, notch marks, the folded-corner mark) remains the
-brand's drawing hand. Unified across fold.run and docs.fold.run.
+Near-black grounds (Backplane #121212, Rack panels #1a1a1a, Trace hairlines
+#2b2b2b), IBM Plex Sans + Geist Mono (both OFL, self-hosted), and one drawn
+wordmark. Every corner is machined at 2px, buttons included. Surfaces are flat
+panels on hairlines; elevation is a background step, never a shadow and never a
+gradient border. The fold-line diagram vocabulary (dashed routes, notch marks,
+grain arrows) is the brand's drawing hand. Unified across fold.run and
+docs.fold.run.
+
+**The rule the system turns on: Live is a proof signal, not a colour scheme.**
+Acid lime #D6FF00 is licensed to things that are actually running, measured,
+current, or focused — status readouts, the active route in a topology drawing,
+the focus ring, the mark's turned facet. It is never an action, never a bullet,
+never a decorative arrow, never a syntax-highlight class. Actions run on the
+neutral ramp: a Signal-white fill with Backplane ink, which is the brightest
+element on any given page and needs no hue to win. When Live carried the buttons
+*and* the arrows *and* the card corners *and* every JSON key in the docs, it had
+stopped signalling anything; /status is the page where it is allowed to be
+everywhere, because there every mark of it is a live reading.
 
 ## 2. Colors
 
-### Primary
-- **Live** `#D6FF00` — the one saturated move: primary pills (ink text, 16.2:1),
-  active diagram routes, status-up, arrows, focus rings. **Live Deep** `#b4d600`
-  hover. **Pulse** `#E9FF80` soft accents in graphics only.
+### Neutral — carries the interface
+- **Backplane** `#121212` ground · **Rack** `#1a1a1a` cards/code · **Rack Hi**
+  `#212121` hover step · **Trace** `#2b2b2b` hairlines · **Trace Bright**
+  `#3D3D3D` hover borders · **Signal** `#FFFFFF` text (18.7:1) · **Static**
+  `#BCBCBC` muted (9.9:1) · **Carrier** `#E0E0E0` links/labels (14.2:1).
 
-### Neutral
-- **Backplane** `#121212` ground · **Rack** `#1a1a1a` cards/code · **Trace**
-  `#2b2b2b` hairlines · **Signal** `#FFFFFF` text (18.7:1) · **Static** `#BCBCBC`
-  muted (9.9:1) · **Carrier** `#E0E0E0` links/badges/kicker-meta (14.2:1).
+### Action — the brightest neutral, not a colour
+- **Action** `#FFFFFF` fill with Backplane ink (18.7:1); **Action Hover**
+  `#D4D4D4`. Secondary actions are transparent on a Trace Bright hairline.
 
-### Named Rules
-- Live doubles as the status-up color (lime = alive = the proof-forward brand);
-  **Down** `#ff4c79` is reserved for status failures only — the one hue outside
-  the four-color palette, and status semantics are its only license.
+### Live — proof only
+- **Live** `#D6FF00`. The complete licensed list: status-up readouts, the active
+  route and grain arrow in a topology drawing, `:focus-visible` rings, the brand
+  mark's turned facet, and the footer's live status dot. Anything not on that
+  list takes a neutral.
+- **Down** `#ff4c79` is reserved for status failures only — the one hue outside
+  the palette, and status semantics are its only license.
 - Live never carries text on a light ground (1.16:1 on Paper) and never carries
   light text on a dark one — it is a fill, and fills take ink.
-- Docs light theme: Paper ground with **Live Ink** `#5a6b00` as text-accent (5.9:1).
-- No gradients except the hero glow field; no new hues.
+- Docs light theme: Paper ground with **Live Ink** `#5a6b00` (5.9:1) standing in
+  for Live wherever the proof signal has to survive the theme flip.
+- No gradients anywhere; no new hues. Code syntax themes run on the neutral ramp
+  (keys at Signal, values at Static, structure receding) — a config key is not
+  proof, and docs are mostly config.
 
 ## 3. Typography
 
@@ -169,31 +188,50 @@ first baseline.
 
 ## 4. Elevation
 
-Hierarchy by background-step + 1px Trace borders; radius vocabulary 6/10/14px,
-pills for actions. The hero glow field (blurred Live + faint blue radials,
-pointer-tracked) is the one permitted luminous element.
+Hierarchy by background-step + 1px Trace borders. **One radius: 2px, on every
+surface including buttons.** A pill beside a machined panel is the single
+loudest inconsistency a system like this can carry, and it read as a hobby
+project. There is no luminous element: the hero's blurred Live/blue radials and
+its pointer-tracked lit grid were removed, leaving a static ruled sheet.
 
 ## 5. Components
 
-- **Buttons**: pill, 46px, Live fill + ink text (primary) or Trace outline +
-  Signal text (secondary); trailing arrow glyph.
-- **Cards**: Rack ground, 1px Trace border, 10px radius, 24px padding; grids
-  spaced (24px gap), interactive cards carry a Live corner arrow.
-- **Code panel**: Rack, 10px radius, Geist Mono, context tag + copy button.
+- **Wordmark**: drawn SVG, never set in a webfont. Monoline geometric grotesk on
+  a 19-unit ascender: 3-unit stroke, 12-unit x-height, round overshoot on the o
+  and d bowls, sidebearings tuned per shape pair (round-to-straight 2.4,
+  straight-to-round 2.6). Carries `currentColor`. It appears **alone** — there
+  is no pictorial mark beside it in any header on either origin. A square tile
+  next to bold body text is two unrelated objects, which is what the old lockup
+  was; the drawn letters are one. A folded-plane monogram (a plane creased on a
+  diagonal, the lower facet in Live) survives only where the wordmark cannot
+  fit: favicon, apple-touch-icon.
+- **Buttons**: 44px, 2px radius, no trailing arrow. Primary is an Action fill
+  with ink text; secondary is transparent on a Trace Bright hairline. Both
+  variants share one box.
+- **Cards**: Rack ground, 1px Trace border, 2px radius, 24px padding; hover
+  lifts one background step and brightens the border. No gradient hairlines.
+- **Code panel**: Rack, 2px radius, Geist Mono, context tag + copy button.
 - **Topology diagram**: fold-line vocabulary; active path in Live with grain
   arrow; nodes Rack with Trace strokes; aria-label required.
-- **Chrome**: one header (mark + Docs-first nav + pill CTA) and one footer
-  (brand column + Product/Deploy/Project + legal strip) on every page of both
-  origins. The mark: square tile, Live folded corner, Live-Deep crease.
+- **Proof band**: ruled columns divided by hairlines. Not cards.
+- **Capability index**: a verb rail beside hairline-separated rows. Not a grid.
+- **Chrome**: one header (wordmark + Docs-first nav in Static + one solid
+  neutral CTA) and one footer (brand column + Product/Deploy/Project + legal
+  strip) on every page of both origins.
 
 ## 6. Do's and Don'ts
 
 ### Do:
-- Reserve Live for action and proof; let the neutrals carry everything else.
+- Reserve Live for proof; let the neutrals carry every action and everything else.
 - Embed receipts (live demo, status, conformance, caveated numbers).
 - Draw topology in the fold-line vocabulary; author every diagram.
+- Vary band height across a page (`section`, `section-lg`, `section-sm`); equal
+  bands read as a list rather than as a composition.
 
 ### Don't:
-- No second saturated hue; no gradients outside the hero glow; no shadows on dark.
+- No second saturated hue; no gradients; no shadows on dark; no glow.
+- No pill radii, no radius other than 2px.
+- No trailing arrow on buttons; a glyph after every link points at nothing.
+- No grid of identical cards where a ruled table would carry the same content.
 - No mono for marketing prose; no fabricated stats, logos, or badges.
 - No per-origin theming; docs and marketing consume these tokens only.

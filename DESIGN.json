@@ -2,7 +2,8 @@
   "_provenance": {
     "writtenBy": "impeccable",
     "writtenAt": "2026-08-06T23:59:00Z",
-    "note": "final identity \u2014 clean rewrite; prior variants in git history"
+    "note": "final identity; 2026-08-10 revision demoted Live to a proof-only signal, moved actions onto the neutral ramp, unified every radius at 2px, and replaced the mark+text lockup with a drawn wordmark",
+    "revisedAt": "2026-08-10T00:00:00Z"
   },
   "schemaVersion": 2,
   "extensions": {
@@ -37,22 +38,22 @@
         {
           "name": "Carrier",
           "hex": "#E0E0E0",
-          "use": "links, badges, kicker meta"
+          "use": "links, labels, secondary button text"
+        },
+        {
+          "name": "Action",
+          "hex": "#FFFFFF",
+          "use": "primary action fill; carries Backplane ink text (18.7:1)"
+        },
+        {
+          "name": "Action Hover",
+          "hex": "#D4D4D4",
+          "use": "primary action hover"
         },
         {
           "name": "Live",
           "hex": "#D6FF00",
-          "use": "primary actions (ink text), active routes, status-up, arrows, focus"
-        },
-        {
-          "name": "Live Deep",
-          "hex": "#b4d600",
-          "use": "hover depth"
-        },
-        {
-          "name": "Pulse",
-          "hex": "#E9FF80",
-          "use": "soft accent in graphics only"
+          "use": "PROOF ONLY: status-up, the active route in a topology drawing, the focus ring, the brand mark's turned facet. Never an action, never a bullet, never a decorative arrow."
         },
         {
           "name": "Live Ink",
@@ -63,6 +64,11 @@
           "name": "Down",
           "hex": "#ff4c79",
           "use": "RESERVED: status failures"
+        },
+        {
+          "name": "Trace Bright",
+          "hex": "#3D3D3D",
+          "use": "hover borders, secondary button edge"
         }
       ]
     },
@@ -75,7 +81,12 @@
       "earnedMonoRule": "mono content must be runnable or live"
     },
     "motion": {
-      "heroGlow": "pointer-tracked aurora field; rAF-throttled CSS vars; idle drift; pointer:fine gated; static under prefers-reduced-motion",
+      "stance": "Motion is reserved for things that are actually happening. The pointer-tracked hero grid, the drifting blur fields, and the conic ring orbiting the primary button were removed in the 2026-08-10 revision: an instrument panel does not shimmer.",
+      "sanctioned": [
+        "topology diagram draws its active route once on load",
+        "content of a band rises 10px on first scroll into view (never section heads)",
+        "hover and focus state transitions"
+      ],
       "easing": "ease-out-quart",
       "reducedMotion": "every animation ships a fallback"
     },
@@ -85,7 +96,7 @@
     },
     "systemComponentRoles": {
       "header": {
-        "constraint": "mark + Docs-first nav + pill CTA; identical on both origins"
+        "constraint": "drawn wordmark + Docs-first nav (Static, Signal on hover) + one solid neutral CTA; identical on both origins"
       },
       "footer": {
         "constraint": "brand column + Product/Deploy/Project + legal strip; every page"
@@ -97,10 +108,16 @@
         "constraint": "authored SVG, fold-line vocabulary, aria-label; active path in Live"
       },
       "proof-band": {
-        "constraint": "every number links to its receipt or carries its caveat inline"
+        "constraint": "ruled columns divided by hairlines, not cards; every number links to its receipt or carries its caveat inline"
       },
       "status-readout": {
         "constraint": "Live/Down semantics; live hydration; timezone on timestamps"
+      },
+      "wordmark": {
+        "constraint": "drawn SVG, never set in a webfont; monoline geometric on a 19-unit ascender, 3-unit stroke, 12-unit x-height; carries currentColor; appears alone (no pictorial mark beside it) in every header on both origins"
+      },
+      "capability-index": {
+        "constraint": "verb rail + hairline-separated rows; never a grid of identical cards"
       }
     },
     "identityAssets": {

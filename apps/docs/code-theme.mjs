@@ -1,9 +1,13 @@
 // Syntax themes for Expressive Code, built from the fold palette (DESIGN.md §2).
 // Starlight ships a teal-accented default theme that introduces hues the brand
-// doesn't own — "no new hues" applies to code surfaces too. These two are a
-// neutral ramp with Live as the only saturated move: it marks the tokens that
-// carry meaning (keys, keywords, function names), values are Signal, structure
-// recedes to Trace-bright.
+// doesn't own — "no new hues" applies to code surfaces too.
+//
+// These two are the neutral ramp, and only the neutral ramp. Live used to mark
+// keys, keywords, and function names; on a docs site that is mostly JSON config
+// that put chartreuse on every property name of every block, which is the
+// single largest accent surface either origin had. Live is licensed to proof —
+// a config key is not proof. Emphasis now comes from the ramp itself: keys at
+// Signal, values at Static, structure and comments receding to Trace-bright.
 
 /** Dark — Rack surface, matching --ec-codeBg in src/styles/fold.css. */
 export const foldDark = {
@@ -38,20 +42,20 @@ export const foldDark = {
         'entity.name.function',
         'support.function',
       ],
-      settings: { foreground: '#D6FF00' },
-    },
-    {
-      scope: ['string', 'constant.numeric', 'constant.language', 'constant.other'],
       settings: { foreground: '#FFFFFF' },
     },
     {
-      scope: ['variable', 'entity.name', 'support.type', 'support.class', 'meta.definition'],
+      scope: ['string', 'constant.numeric', 'constant.language', 'constant.other'],
       settings: { foreground: '#BCBCBC' },
+    },
+    {
+      scope: ['variable', 'entity.name', 'support.type', 'support.class', 'meta.definition'],
+      settings: { foreground: '#E0E0E0' },
     },
   ],
 };
 
-/** Light — Paper ramp; Live drops to Live Ink, which is legible on light. */
+/** Light — the same ramp inverted onto Paper. */
 export const foldLight = {
   name: 'fold-light',
   type: 'light',
@@ -84,15 +88,15 @@ export const foldLight = {
         'entity.name.function',
         'support.function',
       ],
-      settings: { foreground: '#5A6B00' },
-    },
-    {
-      scope: ['string', 'constant.numeric', 'constant.language', 'constant.other'],
       settings: { foreground: '#121212' },
     },
     {
-      scope: ['variable', 'entity.name', 'support.type', 'support.class', 'meta.definition'],
+      scope: ['string', 'constant.numeric', 'constant.language', 'constant.other'],
       settings: { foreground: '#3D3D3D' },
+    },
+    {
+      scope: ['variable', 'entity.name', 'support.type', 'support.class', 'meta.definition'],
+      settings: { foreground: '#1F1F1F' },
     },
   ],
 };

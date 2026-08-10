@@ -2,18 +2,15 @@
 /**
  * Starlight's splash hero, on fold.run's pattern-paper ground.
  *
- * The same effect the marketing hero carries: a ruled sheet in the hairline
- * colour, and the same rules again in the accent revealed only through a soft
- * disc under the pointer, so the sheet lights where you are and goes dark
- * behind you. Both layers are CSS gradients sharing a parent and a
- * background-size, which is what keeps the lit rules exactly over the dark
- * ones — there is no canvas and no frame loop behind the hero.
+ * A ruled sheet in the hairline colour, masked so it dissolves before it
+ * reaches the copy. Static: the pointer-tracked lit grid that used to sit here
+ * (mirroring the site's) is gone on both origins. A ground that answers to the
+ * cursor is a demonstration of CSS, and the docs hero's job is to get someone
+ * to the first command.
  *
- * Unlike the site, this one has to survive a theme flip, so it is drawn in
- * tokens: --sl-color-hairline for the sheet, --sl-color-accent for the light.
- * In the light theme that accent is Live Ink, so the disc reads as ink caught
- * on the paper rather than as a glow — the correct move, since Live itself is
- * 1.16:1 on Paper and would simply vanish.
+ * Drawn in tokens rather than hexes, because unlike the site this one has to
+ * survive a theme flip: --sl-color-hairline is Trace on Backplane and a light
+ * rule on Paper.
  *
  * The wrapper only adds ground; <Default /> renders Starlight's hero markup
  * untouched, so its own styles and any hero frontmatter keep working.
@@ -21,11 +18,8 @@
 import Default from '@astrojs/starlight/components/Hero.astro';
 ---
 
-<div class="fold-hero" data-fold-hero>
-  <div class="fold-hero-grid" aria-hidden="true">
-    <div class="fold-hero-rules"></div>
-    <div class="fold-hero-cursor"></div>
-  </div>
+<div class="fold-hero">
+  <div class="fold-hero-grid" aria-hidden="true"></div>
   <div class="fold-hero-body"><Default><slot /></Default></div>
 </div>
 
@@ -52,100 +46,15 @@ import Default from '@astrojs/starlight/components/Hero.astro';
     position: relative;
   }
   .fold-hero-grid {
-    /* Bleeds the sheet past the hero's box so the light stays a full disc when
-       the pointer is near an edge. It is also the offset --cx/--cy need, since
-       those arrive hero-local. */
-    --grid-bleed: 80px;
-    position: absolute;
-    inset: calc(-1 * var(--grid-bleed));
-    pointer-events: none;
-    mask-image: radial-gradient(112% 108% at 76% 28%, #000 24%, transparent 86%);
-    -webkit-mask-image: radial-gradient(112% 108% at 76% 28%, #000 24%, transparent 86%);
-  }
-  .fold-hero-rules {
     position: absolute;
     inset: 0;
-    opacity: 0.7;
+    pointer-events: none;
+    opacity: 0.62;
     background-image:
       linear-gradient(to right, var(--sl-color-hairline) 1px, transparent 1px),
       linear-gradient(to bottom, var(--sl-color-hairline) 1px, transparent 1px);
     background-size: 64px 64px;
-  }
-  .fold-hero-cursor {
-    position: absolute;
-    inset: 0;
-    opacity: 0;
-    transition: opacity 0.45s cubic-bezier(0.22, 1, 0.36, 1);
-    background-image:
-      radial-gradient(
-        170px 170px at calc(var(--cx, 50%) + var(--grid-bleed))
-          calc(var(--cy, 50%) + var(--grid-bleed)),
-        color-mix(in srgb, var(--sl-color-accent) 12%, transparent),
-        transparent 70%
-      ),
-      linear-gradient(to right, var(--sl-color-accent) 1px, transparent 1px),
-      linear-gradient(to bottom, var(--sl-color-accent) 1px, transparent 1px);
-    background-size:
-      100% 100%,
-      64px 64px,
-      64px 64px;
-    mask-image: radial-gradient(
-      220px 220px at calc(var(--cx, 50%) + var(--grid-bleed))
-        calc(var(--cy, 50%) + var(--grid-bleed)),
-      #000,
-      transparent 72%
-    );
-    -webkit-mask-image: radial-gradient(
-      220px 220px at calc(var(--cx, 50%) + var(--grid-bleed))
-        calc(var(--cy, 50%) + var(--grid-bleed)),
-      #000,
-      transparent 72%
-    );
-  }
-  /* `is-tracking` is set by the script, so a coarse pointer or a reduced-motion
-     visitor never gets a light that has nothing to follow. */
-  .fold-hero.is-tracking:hover .fold-hero-cursor {
-    opacity: 0.5;
-  }
-  /* Ink on Paper carries much further than Live on Backplane — at the dark
-     theme's weight the light theme reads as a smudge. */
-  :root[data-theme='light'] .fold-hero.is-tracking:hover .fold-hero-cursor {
-    opacity: 0.4;
-  }
-  @media (prefers-reduced-motion: reduce) {
-    .fold-hero-cursor {
-      display: none;
-    }
+    mask-image: radial-gradient(58% 104% at 78% 42%, #000 10%, transparent 74%);
+    -webkit-mask-image: radial-gradient(58% 104% at 78% 42%, #000 10%, transparent 74%);
   }
 </style>
-
-<script>
-  /* One pointermove handler, throttled to a frame, publishing the cursor in
-     hero-local pixels. Everything downstream is CSS, so nothing runs while the
-     visitor is still. Mirrors the site's hero — see apps/site/src/pages/index.astro. */
-  const hero = document.querySelector<HTMLElement>('[data-fold-hero]');
-  const fine = matchMedia('(pointer: fine)');
-  const calm = matchMedia('(prefers-reduced-motion: reduce)');
-  if (hero && fine.matches && !calm.matches) {
-    let raf = 0;
-    // The latest pointer position, not the one that happened to open the frame.
-    // Every move overwrites these; the frame reads whatever is current when it
-    // runs. Closing over the event instead would paint the first move of each
-    // frame and silently drop the rest, so a pointer that stops mid-frame
-    // leaves the light behind where it was.
-    let px = 0;
-    let py = 0;
-    hero.classList.add('is-tracking');
-    hero.addEventListener('pointermove', (e: PointerEvent) => {
-      px = e.clientX;
-      py = e.clientY;
-      if (raf) return;
-      raf = requestAnimationFrame(() => {
-        const r = hero.getBoundingClientRect();
-        hero.style.setProperty('--cx', `${px - r.left}px`);
-        hero.style.setProperty('--cy', `${py - r.top}px`);
-        raf = 0;
-      });
-    });
-  }
-</script>
