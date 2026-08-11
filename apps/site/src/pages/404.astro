@@ -1,6 +1,7 @@
 ---
 // Unknown routes: the gateway metaphor, honestly applied.
 import Base from '../layouts/Base.astro';
+import { WORDMARK_PATH, wordmarkTransform } from '../lib/wordmark';
 ---
 
 <Base
@@ -26,8 +27,7 @@ import Base from '../layouts/Base.astro';
                  because this is the gateway that answered. The 10px radius it
                  carried was the only rounded corner left on either origin. -->
             <rect x="248" y="48" width="68" height="64" rx="2" fill="#1a1a1a" stroke="#D6FF00" stroke-width="1.5"></rect>
-            <path d="M 316 66 V 50 A 2 2 0 0 0 314 48 H 298 Z" fill="#D6FF00"></path>
-            <text x="282" y="86" text-anchor="middle" font-family="Geist Mono, monospace" font-size="15" fill="#FFFFFF">fold</text>
+            <path fill="#FFFFFF" d={WORDMARK_PATH} transform={wordmarkTransform(282, 80, 44)}></path>
           </g>
           <path d="M 316 80 C 380 80, 400 80, 440 80" stroke="#6E6E6E" stroke-width="1.5" stroke-dasharray="5 6" fill="none"></path>
           <text x="470" y="85" font-family="Geist Mono, monospace" font-size="14" fill="#BCBCBC">?</text>

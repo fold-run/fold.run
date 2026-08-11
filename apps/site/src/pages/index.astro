@@ -2,6 +2,7 @@
 // fold.run home — stardust redesign (stardust/migrated/index.html), transplanted
 // onto the shared Base layout. Markup and copy are the approved migrated design.
 import Base from '../layouts/Base.astro';
+import { WORDMARK_PATH, wordmarkTransform } from '../lib/wordmark';
 
 const description =
   'One governed endpoint between every MCP client and every MCP server. Federation, auth, policy, tenancy, budgets, and audit, built on the official MCP Go SDK.';
@@ -96,7 +97,11 @@ const jsonld = {
               <text class="fold-node-label" x="74" y="204" text-anchor="middle">client</text>
               <text class="fold-node-label" x="74" y="332" text-anchor="middle">client</text>
             </g>
-            <!-- fold gateway node with folded corner -->
+            <!-- The gateway node carries the wordmark, not a mono label: every
+                 other node in this drawing is a generic role (`client`) or a
+                 wire string (`git__*`), and this one is the product. The folded
+                 corner that used to sit here was a vestige of the retired
+                 square-tile mark, so it goes with it. -->
             <g>
               <rect
                 x="246"
@@ -107,10 +112,10 @@ const jsonld = {
                 fill="#1a1a1a"
                 stroke="#D6FF00"
                 stroke-width="1.5"></rect>
-              <path d="M 314 186 V 176 A 2 2 0 0 0 306 168 H 296 Z" fill="#D6FF00"></path>
-              <text class="fold-node-label" x="280" y="204" text-anchor="middle" font-weight="700"
-                >fold</text
-              >
+              <path
+                class="fold-node-mark"
+                d={WORDMARK_PATH}
+                transform={wordmarkTransform(280, 200, 44)}></path>
             </g>
             <!-- upstream nodes: captured demo prefixes -->
             <g>
@@ -660,6 +665,9 @@ const jsonld = {
   .fold-node {
     fill: var(--color-rack);
     stroke: var(--color-trace);
+  }
+  .fold-node-mark {
+    fill: var(--color-fg);
   }
   .fold-node-label {
     font-family: var(--mono-font-family);

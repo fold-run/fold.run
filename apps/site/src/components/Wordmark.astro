@@ -20,6 +20,8 @@
  *
  * Carries `currentColor`; a parent sets the colour.
  */
+import { WORDMARK_BOX, WORDMARK_PATH } from '../lib/wordmark';
+
 interface Props {
   /** Cap height in px. The lockup scales from this. */
   height?: number;
@@ -34,12 +36,12 @@ const { height = 20, descriptor, class: className } = Astro.props;
 <span class:list={['wordmark', className]} style={`--wm-h:${height}px`}>
   <svg
     class="wordmark-glyphs"
-    viewBox="0 0 3997 1467"
+    viewBox={`${WORDMARK_BOX.x} ${WORDMARK_BOX.y} ${WORDMARK_BOX.width} ${WORDMARK_BOX.height}`}
     fill="currentColor"
     aria-hidden="true"
     focusable="false"
   >
-    <path d="M105 1467V670H0V405H105V248L372 0H868V265H548V1467ZM615 670 618 405H868V670ZM1104 1467 839 1202V670L1104 405H1401V670H1286V1219H1401V1467ZM1471 1467V1219H1581V670H1471V405H1767L2032 670V1202L1767 1467ZM2419 1467 2171 1219V0H2613V1202H2811V1467ZM3555 1467V0H3997V1467ZM3069 1467 2830 1228V644L3069 405H3485V670H3272V1219H3485V1362L3380 1467Z"></path>
+    <path d={WORDMARK_PATH}></path>
   </svg>
   {
     descriptor && (
