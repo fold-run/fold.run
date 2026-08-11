@@ -13,9 +13,24 @@ interface Props {
   current?: 'blog' | 'status';
   /** Value for <body data-template> (landing | listing | article | unique). */
   template?: string;
+  /**
+   * Absolute-from-root path to this page's social card. Defaults to the site
+   * card, which says what fold is. A post wants one that says what the post is:
+   * every page sharing one image means a shared link tells you nothing about
+   * what was shared.
+   */
+  ogImage?: string;
 }
 
-const { title, description, canonical, jsonld, current, template } = Astro.props;
+const {
+  title,
+  description,
+  canonical,
+  jsonld,
+  current,
+  template,
+  ogImage = '/og.png',
+} = Astro.props;
 ---
 
 <!doctype html>
@@ -33,7 +48,7 @@ const { title, description, canonical, jsonld, current, template } = Astro.props
     <meta property="og:description" content={description} />
     <meta property="og:type" content="website" />
     <meta property="og:url" content={canonical} />
-    <meta property="og:image" content="https://fold.run/og.png" />
+    <meta property="og:image" content={`https://fold.run${ogImage}`} />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
     <meta name="twitter:card" content="summary_large_image" />
