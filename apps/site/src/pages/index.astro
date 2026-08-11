@@ -80,6 +80,25 @@ const jsonld = {
             <!-- active route: middle client -> fold -> git upstream -->
             <path class="fold-active draw" d="M 118 200 H 246 M 314 200 C 360 200, 380 200, 442 200"
             ></path>
+            <!-- Traffic. These sit before the gateway node in document order,
+                 so the node's opaque fill paints over them: a request slides
+                 behind the box rather than teleporting across it, and the time
+                 it spends hidden is the time the gateway spends on auth, policy
+                 and audit.
+
+                 The lit route carries a Signal packet; the four dashed routes
+                 carry Static ones, smaller and on longer cycles, so the
+                 federation reads as busy without competing with the one request
+                 the drawing is actually about. -->
+            <rect class="fold-packet" x="-6" y="-1.75" width="12" height="3.5" rx="1.75"></rect>
+            <rect class="fold-packet-dim in-a" x="-4.5" y="-1.25" width="9" height="2.5" rx="1.25"
+            ></rect>
+            <rect class="fold-packet-dim in-b" x="-4.5" y="-1.25" width="9" height="2.5" rx="1.25"
+            ></rect>
+            <rect class="fold-packet-dim out-a" x="-4.5" y="-1.25" width="9" height="2.5" rx="1.25"
+            ></rect>
+            <rect class="fold-packet-dim out-b" x="-4.5" y="-1.25" width="9" height="2.5" rx="1.25"
+            ></rect>
             <!-- grain arrow on the active route -->
             <path class="fold-arrow" d="M 432 194 L 444 200 L 432 206 Z"></path>
             <!-- dashed fold-lines: gateway out to upstreams -->
@@ -103,15 +122,12 @@ const jsonld = {
                  corner that used to sit here was a vestige of the retired
                  square-tile mark, so it goes with it. -->
             <g>
-              <rect
-                x="246"
-                y="168"
-                width="68"
-                height="64"
-                rx="2"
-                fill="#1a1a1a"
-                stroke="#D6FF00"
-                stroke-width="1.5"></rect>
+              <rect class="fold-gate" x="246" y="168" width="68" height="64" rx="2"></rect>
+              <!-- Fires on arrival: a ring stepping outward from the node's own
+                   edge, phased to the moment the request is behind the box and
+                   the gateway is doing the work. A ring rather than a blurred
+                   glow, because this system draws and does not light. -->
+              <rect class="fold-gate-halo" x="246" y="168" width="68" height="64" rx="2"></rect>
               <path
                 class="fold-node-mark"
                 d={WORDMARK_PATH}
@@ -688,6 +704,59 @@ const jsonld = {
   .fold-arrow {
     fill: var(--color-accent);
   }
+  /* ===== diagram motion =====
+     The drawing depicts a gateway, so the only motion it earns is traffic
+     moving through one. Everything here is stroke geometry on paths that are
+     already visible: nothing fades in, nothing is gated behind a class, and the
+     diagram is complete and readable with every animation removed.
+
+     The inactive routes stay still on purpose. They are dashed because no
+     traffic is on them; marching their dashes would say the opposite of what
+     the drawing means. */
+  .fold-gate {
+    fill: var(--color-rack);
+    stroke: var(--color-accent);
+    stroke-width: 1.5;
+  }
+  .fold-gate-halo {
+    fill: none;
+    stroke: var(--color-accent);
+    stroke-width: 1.5;
+    opacity: 0;
+    transform-box: fill-box;
+    transform-origin: center;
+  }
+  .fold-packet,
+  .fold-packet-dim {
+    offset-rotate: auto;
+    offset-distance: 0%;
+    opacity: 0;
+  }
+  /* Signal, not Live: the route is Live, and the request travelling it is not a
+     second accent. */
+  .fold-packet {
+    fill: var(--color-fg);
+    /* One continuous run, client to upstream, straight through the gateway.
+       Two subpaths made offset-distance skip the box, which teleported the
+       packet across the one part of the journey the drawing is about. */
+    offset-path: path('M 118 200 H 442');
+  }
+  .fold-packet-dim {
+    fill: var(--color-static);
+    opacity: 0;
+  }
+  .fold-packet-dim.in-a {
+    offset-path: path('M 118 80 C 200 80, 200 176, 246 184');
+  }
+  .fold-packet-dim.in-b {
+    offset-path: path('M 118 328 C 200 328, 200 224, 246 216');
+  }
+  .fold-packet-dim.out-a {
+    offset-path: path('M 314 184 C 370 176, 380 96, 442 88');
+  }
+  .fold-packet-dim.out-b {
+    offset-path: path('M 314 216 C 370 224, 380 304, 442 312');
+  }
   @media (prefers-reduced-motion: no-preference) {
     .fold-active.draw {
       stroke-dasharray: 720;
@@ -697,6 +766,126 @@ const jsonld = {
     @keyframes fold-draw {
       to {
         stroke-dashoffset: 0;
+      }
+    }
+    /* Starts once the route has finished drawing itself. */
+    .fold-packet {
+      animation: fold-packet 3.6s linear 2s infinite;
+    }
+    /* Linear on the open wire, deliberately: easing would imply a request
+       accelerates and coasts, and it does neither. The gateway is the only
+       place it slows, and that slowdown happens out of sight behind the node —
+       39.5% of the run is the box's left edge, 60.5% its right. */
+    @keyframes fold-packet {
+      0% {
+        offset-distance: 0%;
+        opacity: 0;
+      }
+      5% {
+        opacity: 1;
+      }
+      34% {
+        offset-distance: 39.5%;
+        opacity: 1;
+      }
+      56% {
+        offset-distance: 60.5%;
+        opacity: 1;
+      }
+      88% {
+        offset-distance: 100%;
+        opacity: 1;
+      }
+      93%,
+      100% {
+        offset-distance: 100%;
+        opacity: 0;
+      }
+    }
+    /* The node fires while the request is inside it. Same 3.6s cycle and the
+       same delay as the packet, so the ring and the disappearance are one
+       event: 34% is the box's left edge, 56% the right. */
+    .fold-gate {
+      animation: fold-gate 3.6s linear 2s infinite;
+    }
+    .fold-gate-halo {
+      animation: fold-gate-halo 3.6s linear 2s infinite;
+    }
+    @keyframes fold-gate {
+      0%,
+      32% {
+        stroke-width: 1.5;
+      }
+      38% {
+        stroke-width: 2.6;
+      }
+      62%,
+      100% {
+        stroke-width: 1.5;
+      }
+    }
+    @keyframes fold-gate-halo {
+      0%,
+      33% {
+        opacity: 0;
+        transform: scale(1);
+      }
+      37% {
+        opacity: 0.5;
+        transform: scale(1);
+      }
+      64% {
+        opacity: 0;
+        transform: scale(1.22);
+      }
+      100% {
+        opacity: 0;
+        transform: scale(1.22);
+      }
+    }
+    /* The dashed routes. Cycles are longer than the lit one and share no
+       common factor with it, so the diagram never falls into lockstep. Each
+       inbound is followed by an outbound a beat later, which is the shape of a
+       request being routed. */
+    .fold-packet-dim {
+      animation-name: fold-packet-dim;
+      animation-timing-function: linear;
+      animation-iteration-count: infinite;
+    }
+    .fold-packet-dim.in-a {
+      animation-duration: 5.2s;
+      animation-delay: 2.6s;
+    }
+    .fold-packet-dim.out-a {
+      animation-duration: 5.2s;
+      animation-delay: 4.4s;
+    }
+    .fold-packet-dim.in-b {
+      animation-duration: 6.8s;
+      animation-delay: 5.1s;
+    }
+    .fold-packet-dim.out-b {
+      animation-duration: 6.8s;
+      animation-delay: 7.3s;
+    }
+    /* Idle for the back half of each cycle: a quiet wire between requests is
+       what keeps five moving parts from reading as a screensaver. */
+    @keyframes fold-packet-dim {
+      0% {
+        offset-distance: 0%;
+        opacity: 0;
+      }
+      4% {
+        opacity: 0.85;
+      }
+      38% {
+        offset-distance: 100%;
+        opacity: 0.85;
+      }
+      44%,
+      100% {
+        offset-distance: 100%;
+        opacity: 0;
       }
     }
   }
