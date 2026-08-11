@@ -2,7 +2,7 @@
   "_provenance": {
     "writtenBy": "impeccable",
     "writtenAt": "2026-08-06T23:59:00Z",
-    "note": "final identity; 2026-08-10 revision demoted Live to a proof-only signal, moved actions onto the neutral ramp, unified every radius at 2px, and replaced the mark+text lockup with a drawn wordmark",
+    "note": "final identity; 2026-08-10 revision demoted Live to a proof-only signal, moved actions onto the neutral ramp, unified every radius at 2px, and replaced the mark+text lockup with a drawn wordmark; 2026-08-10 wordmark rebuilt from Black Ops One outlines with custom spacing, no pictorial mark, d-tile favicon",
     "revisedAt": "2026-08-10T00:00:00Z"
   },
   "schemaVersion": 2,
@@ -73,7 +73,7 @@
       ]
     },
     "typographyMeta": {
-      "families": "IBM Plex Sans + Geist Mono (OFL, self-hosted)",
+      "families": "IBM Plex Sans + Geist Mono (OFL, self-hosted); Black Ops One outlines for the wordmark only",
       "scale": {
         "kind": "modular",
         "ratio": 1.25
@@ -114,10 +114,15 @@
         "constraint": "Live/Down semantics; live hydration; timezone on timestamps"
       },
       "wordmark": {
-        "constraint": "drawn SVG, never set in a webfont; monoline geometric on a 19-unit ascender, 3-unit stroke, 12-unit x-height; carries currentColor; appears alone (no pictorial mark beside it) in every header on both origins"
+        "constraint": "outlined glyph paths derived from Black Ops One (SIL OFL 1.1); shipped as paths, never as a webfont; spacing is ours (track -70/em, kern fo -55, ol +10, ld -15); appears alone with no pictorial mark on either origin; carries currentColor",
+        "grid": "stems 640/2048em, chamfer 45deg with a 375-unit diagonal run, x-height 1062, ascender 1467",
+        "licence": "licenses/BlackOpsOne-OFL.txt"
       },
       "capability-index": {
         "constraint": "verb rail + hairline-separated rows; never a grid of identical cards"
+      },
+      "square-slot": {
+        "constraint": "favicon / apple-touch / avatar use the wordmark's own d on Backplane, not an invented mark"
       }
     },
     "identityAssets": {

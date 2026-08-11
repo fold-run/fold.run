@@ -155,7 +155,8 @@ everywhere, because there every mark of it is a live reading.
 ## 3. Typography
 
 IBM Plex Sans (400/500/600/700) for all prose and display; Geist Mono for
-everything operational (commands, config, status values, diagram annotations,
+everything operational; Black Ops One outlines for the wordmark only, and never
+as running text (commands, config, status values, diagram annotations,
 the kicker meta-line). Self-hosted woff2, font-display swap.
 
 **Ramp** — 14 · 16 · 18 · 20 · 24 · 30–38 · 40–56. Sizes that sit next to each
@@ -196,15 +197,26 @@ its pointer-tracked lit grid were removed, leaving a static ruled sheet.
 
 ## 5. Components
 
-- **Wordmark**: drawn SVG, never set in a webfont. Monoline geometric grotesk on
-  a 19-unit ascender: 3-unit stroke, 12-unit x-height, round overshoot on the o
-  and d bowls, sidebearings tuned per shape pair (round-to-straight 2.4,
-  straight-to-round 2.6). Carries `currentColor`. It appears **alone** — there
-  is no pictorial mark beside it in any header on either origin. A square tile
-  next to bold body text is two unrelated objects, which is what the old lockup
-  was; the drawn letters are one. A folded-plane monogram (a plane creased on a
-  diagonal, the lower facet in Live) survives only where the wordmark cannot
-  fit: favicon, apple-touch-icon.
+- **Wordmark**: outlined glyph paths derived from **Black Ops One** (SIL OFL
+  1.1, James Grieshaber and Eben Sorkin), a heavy chamfered stencil face. Its
+  45-degree corner cuts are the folded-plane idea carried in the letters, which
+  is the whole reason the identity needs no pictorial mark. Shipped as paths,
+  never as a webfont, so the one element that must be identical everywhere never
+  waits on a font load and never shifts, and no font binary is redistributed.
+  Provenance and licence: `licenses/BlackOpsOne-OFL.txt`.
+  - **Spacing is ours, not the font's**: tracked -70/em with per-pair kerning
+    (fo -55, ol +10, ld -15). The `fo` pair needs it because the f's flat
+    top-right terminal opens a hole beside the o that the metrics don't see.
+  - **The face's grid**, for anything drawn to sit beside it: stems 640/2048 em,
+    chamfers at exactly 45 degrees with a 375-unit diagonal run (265 per axis),
+    x-height 1062, ascender 1467.
+  - It appears **alone**. A module drawn on the same chamfer restates what the
+    letters already say — the aperture version sat eleven pixels from an actual
+    chamfered `o` and read as a stutter. Header 19px, footer 19px with the
+    descriptor rule.
+- **Square slot** (favicon, apple-touch, avatar): the wordmark's own **`d`**,
+  white on Backplane. A real letter from the mark rather than an invented shape,
+  and the only candidate that stayed legible at 16px on a light tab strip.
 - **Buttons**: 44px, 2px radius, no trailing arrow. Primary is an Action fill
   with ink text; secondary is transparent on a Trace Bright hairline. Both
   variants share one box.
