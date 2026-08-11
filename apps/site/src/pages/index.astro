@@ -91,14 +91,10 @@ const jsonld = {
                  federation reads as busy without competing with the one request
                  the drawing is actually about. -->
             <rect class="fold-packet" x="-6" y="-1.75" width="12" height="3.5" rx="1.75"></rect>
-            <rect class="fold-packet-dim in-a" x="-4.5" y="-1.25" width="9" height="2.5" rx="1.25"
-            ></rect>
-            <rect class="fold-packet-dim in-b" x="-4.5" y="-1.25" width="9" height="2.5" rx="1.25"
-            ></rect>
-            <rect class="fold-packet-dim out-a" x="-4.5" y="-1.25" width="9" height="2.5" rx="1.25"
-            ></rect>
-            <rect class="fold-packet-dim out-b" x="-4.5" y="-1.25" width="9" height="2.5" rx="1.25"
-            ></rect>
+            <circle class="fold-packet-dim in-a" r="3.4"></circle>
+            <circle class="fold-packet-dim in-b" r="3.4"></circle>
+            <circle class="fold-packet-dim out-a" r="3.4"></circle>
+            <circle class="fold-packet-dim out-b" r="3.4"></circle>
             <!-- grain arrow on the active route -->
             <path class="fold-arrow" d="M 432 194 L 444 200 L 432 206 Z"></path>
             <!-- dashed fold-lines: gateway out to upstreams -->
@@ -704,6 +700,51 @@ const jsonld = {
   .fold-arrow {
     fill: var(--color-accent);
   }
+  /* ===== hero entrance =====
+     One orchestrated arrival, once. This is the trade the diagram made when it
+     gave up its second packet and its stroke pulse: motion that happens and is
+     then over, rather than motion that never stops next to the headline.
+
+     It moves position only, never opacity. That is not a stylistic preference:
+     with fill-mode backwards, an element whose keyframe starts at opacity 0
+     renders at opacity 0 for as long as the timeline is frozen, and the
+     timeline is frozen on a hidden tab, in a headless renderer, and in anything
+     crawling the page without painting it. The first version of this faded in
+     and left the entire hero blank under exactly those conditions.
+
+     Translated by 10px, a frozen hero is merely 10px low: fully painted, fully
+     readable, indistinguishable in text extraction. Nothing here is gated
+     behind a class either, so reduced motion just gets the finished state. */
+  @media (prefers-reduced-motion: no-preference) {
+    .hero .kicker,
+    .hero h1,
+    .hero .lede,
+    .hero .cta-row,
+    .diagram-panel {
+      animation: hero-rise 0.62s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+    }
+    .hero .kicker {
+      animation-delay: 0.04s;
+    }
+    .hero h1 {
+      animation-delay: 0.12s;
+    }
+    .hero .lede {
+      animation-delay: 0.2s;
+    }
+    .hero .cta-row {
+      animation-delay: 0.28s;
+    }
+    .diagram-panel {
+      animation-delay: 0.16s;
+    }
+    @keyframes hero-rise {
+      from {
+        transform: translateY(10px);
+      }
+    }
+  }
+
   /* ===== diagram motion =====
      The drawing depicts a gateway, so the only motion it earns is traffic
      moving through one. Everything here is stroke geometry on paths that are
@@ -741,8 +782,13 @@ const jsonld = {
        packet across the one part of the journey the drawing is about. */
     offset-path: path('M 118 200 H 442');
   }
+  /* Dots, not dashes. As a 9x2.5 rounded rect in Static these were the same
+     shape, size and near enough the same value as the `5 5` dash pattern they
+     travelled on, so they read as a slightly brighter piece of the line rather
+     than as something moving along it. A round dot in Carrier cannot be
+     mistaken for a dash. */
   .fold-packet-dim {
-    fill: var(--color-static);
+    fill: var(--color-carrier);
     opacity: 0;
   }
   .fold-packet-dim.in-a {
@@ -761,16 +807,19 @@ const jsonld = {
     .fold-active.draw {
       stroke-dasharray: 720;
       stroke-dashoffset: 720;
-      animation: fold-draw 1.6s cubic-bezier(0.22, 1, 0.36, 1) 0.3s forwards;
+      animation: fold-draw 0.85s cubic-bezier(0.22, 1, 0.36, 1) 0.15s forwards;
     }
     @keyframes fold-draw {
       to {
         stroke-dashoffset: 0;
       }
     }
-    /* Starts once the route has finished drawing itself. */
+    /* Starts once the route has finished drawing itself. The whole cycle is
+       1.15s and the hold at the boundary is 9% of it, about 100ms: the proof
+       band claims ~0.2 ms of added p50 latency, and a request that visibly
+       sits inside the gateway argues against the product. */
     .fold-packet {
-      animation: fold-packet 3.6s linear 2s infinite;
+      animation: fold-packet 1.15s linear 0.9s infinite;
     }
     /* Linear on the open wire, deliberately: easing would imply a request
        accelerates and coasts, and it does neither. The gateway is the only
@@ -781,66 +830,60 @@ const jsonld = {
         offset-distance: 0%;
         opacity: 0;
       }
-      5% {
+      4% {
         opacity: 1;
       }
-      34% {
+      40% {
         offset-distance: 39.5%;
         opacity: 1;
       }
-      56% {
+      49% {
         offset-distance: 60.5%;
         opacity: 1;
       }
-      88% {
+      90% {
         offset-distance: 100%;
         opacity: 1;
       }
-      93%,
+      94%,
       100% {
         offset-distance: 100%;
         opacity: 0;
       }
     }
-    /* The node fires while the request is inside it. Same 3.6s cycle and the
-       same delay as the packet, so the ring and the disappearance are one
-       event: 34% is the box's left edge, 56% the right. */
-    .fold-gate {
-      animation: fold-gate 3.6s linear 2s infinite;
-    }
+    /* The node fires while the request is inside it: the stroke thickens and a
+       ring steps outward from the node's own edge. Same 1.15s cycle and delay
+       as the packet, so the ring and the disappearance behind the box are one
+       event rather than two things that happen near each other.
+
+       At 1.15s the whole pulse lasts about 440ms, so it is tuned brighter and
+       tighter than it was at 3.6s: a slow fade that read as a halo at the old
+       pace reads as nothing at this one.
+
+       One signal, not two. The node's stroke used to thicken on the same beat,
+       which meant its border breathed once a second forever and was the part
+       that read as shimmer rather than as an event. The ring fires and leaves;
+       the border holds still. */
     .fold-gate-halo {
-      animation: fold-gate-halo 3.6s linear 2s infinite;
-    }
-    @keyframes fold-gate {
-      0%,
-      32% {
-        stroke-width: 1.5;
-      }
-      38% {
-        stroke-width: 2.6;
-      }
-      62%,
-      100% {
-        stroke-width: 1.5;
-      }
+      animation: fold-gate-halo 1.15s linear 0.9s infinite;
     }
     @keyframes fold-gate-halo {
       0%,
-      33% {
-        opacity: 0;
-        transform: scale(1);
-      }
       37% {
-        opacity: 0.5;
+        opacity: 0;
         transform: scale(1);
       }
-      64% {
+      41% {
+        opacity: 0.7;
+        transform: scale(1);
+      }
+      74% {
         opacity: 0;
-        transform: scale(1.22);
+        transform: scale(1.26);
       }
       100% {
         opacity: 0;
-        transform: scale(1.22);
+        transform: scale(1.26);
       }
     }
     /* The dashed routes. Cycles are longer than the lit one and share no
@@ -853,20 +896,20 @@ const jsonld = {
       animation-iteration-count: infinite;
     }
     .fold-packet-dim.in-a {
-      animation-duration: 5.2s;
-      animation-delay: 2.6s;
+      animation-duration: 1.45s;
+      animation-delay: 1.0s;
     }
     .fold-packet-dim.out-a {
-      animation-duration: 5.2s;
-      animation-delay: 4.4s;
+      animation-duration: 1.45s;
+      animation-delay: 1.42s;
     }
     .fold-packet-dim.in-b {
-      animation-duration: 6.8s;
-      animation-delay: 5.1s;
+      animation-duration: 1.75s;
+      animation-delay: 1.24s;
     }
     .fold-packet-dim.out-b {
-      animation-duration: 6.8s;
-      animation-delay: 7.3s;
+      animation-duration: 1.75s;
+      animation-delay: 1.72s;
     }
     /* Idle for the back half of each cycle: a quiet wire between requests is
        what keeps five moving parts from reading as a screensaver. */
@@ -875,14 +918,14 @@ const jsonld = {
         offset-distance: 0%;
         opacity: 0;
       }
-      4% {
+      5% {
         opacity: 0.85;
       }
-      38% {
+      62% {
         offset-distance: 100%;
         opacity: 0.85;
       }
-      44%,
+      68%,
       100% {
         offset-distance: 100%;
         opacity: 0;

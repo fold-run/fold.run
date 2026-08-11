@@ -644,6 +644,24 @@ const { title, description, canonical, jsonld, current, template } = Astro.props
         background: var(--color-accent);
         flex: none;
       }
+      /* The dot is a live reading off the uptime worker, not an ornament, so a
+         slow breath on it is true: something is still checking. It only appears
+         once the fetch resolves, so the motion never runs against a stale or
+         unknown state. */
+      @media (prefers-reduced-motion: no-preference) {
+        .status-badge .dot {
+          animation: status-breath 2.6s ease-in-out infinite;
+        }
+        @keyframes status-breath {
+          0%,
+          100% {
+            opacity: 1;
+          }
+          50% {
+            opacity: 0.35;
+          }
+        }
+      }
       .status-badge.degraded .dot {
         background: var(--color-down);
       }
