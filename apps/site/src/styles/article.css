@@ -1,0 +1,306 @@
+/* Long-form article surfaces, shared by every post in src/pages/blog/.
+ *
+ * These lived in a page-scoped <style is:global> inside the first post, which
+ * meant the second post rendered with none of them: no measure, no paragraph
+ * rhythm, headings jammed against body copy, and the # anchors permanently
+ * visible instead of appearing on hover. Extracted rather than copied, for the
+ * same reason the wordmark path was: two copies drift.
+ *
+ * Import it from the page frontmatter: import '../../styles/article.css';
+ */
+/* ===== article ===== */
+.article-col {
+  max-width: 70ch;
+  margin-inline: auto;
+}
+
+.article-header {
+  padding-block: var(--spacing-xl) 0;
+}
+.crumb {
+  display: inline-block;
+  font-family: var(--mono-font-family);
+  font-size: var(--body-sm);
+  letter-spacing: var(--tracking-meta);
+  color: var(--color-static);
+  padding: 8px 0;
+  margin-bottom: var(--spacing-sm);
+}
+.crumb:hover {
+  color: var(--color-carrier);
+}
+.kicker {
+  font-family: var(--mono-font-family);
+  font-size: var(--body-sm);
+  letter-spacing: var(--tracking-meta);
+  font-variant-numeric: tabular-nums slashed-zero;
+  color: var(--color-carrier);
+  margin-bottom: var(--spacing-md);
+}
+.article-header h1 {
+  font-size: var(--heading-xl);
+  font-weight: var(--weight-heading);
+  line-height: var(--line-height-title);
+  letter-spacing: var(--tracking-title);
+}
+
+.article-body {
+  border-top: none;
+  padding-block: var(--spacing-lg) var(--section-padding);
+}
+.article-body .article-col {
+  font-size: var(--body-lg);
+  line-height: 1.7;
+}
+.article-col > * + * {
+  margin-top: 1.15em;
+}
+.article-col h2 {
+  font-size: clamp(1.5rem, 1.1vw + 1.15rem, 1.875rem);
+  letter-spacing: var(--tracking-card);
+  margin-top: 2.1em;
+  margin-bottom: 0.55em;
+}
+.article-col p {
+  max-width: none;
+}
+/* Standfirst: the body of this page is already Signal, so a lede in Carrier
+   would read as a step down rather than as the way in. Size and leading
+   carry it instead. */
+.article-col .lede {
+  font-size: 1.3125rem;
+  line-height: 1.55;
+  color: var(--color-fg);
+}
+.article-col a {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-color: var(--color-fold-line);
+}
+.article-col a:hover {
+  text-decoration-color: var(--color-carrier);
+}
+.article-col code {
+  font-family: var(--mono-font-family);
+  font-size: 0.85em;
+  letter-spacing: 0;
+  background: var(--color-rack);
+  border: 1px solid var(--color-trace);
+  border-radius: var(--radius-sm);
+  /* Tight side padding: at 0.4em the chip pushes following punctuation far
+     enough away that a comma after a token reads as a typo. */
+  padding: 0.12em 0.26em;
+  color: var(--color-carrier);
+  overflow-wrap: anywhere;
+}
+.article-col ul {
+  padding-left: 1.25rem;
+}
+.article-col li {
+  margin-top: 0.6em;
+}
+.article-col li::marker {
+  color: var(--color-fold-line);
+}
+.article-col .src {
+  font-size: var(--body-sm);
+  color: var(--color-static);
+  margin-top: 0.6em;
+}
+
+/* code panels inside the article: undo the inline-code chrome */
+.code-panel {
+  margin-top: var(--spacing-md);
+}
+.code-panel code {
+  background: none;
+  border: none;
+  padding: 0;
+  border-radius: 0;
+  color: inherit;
+  font-size: inherit;
+  overflow-wrap: normal;
+}
+
+/* mechanism diagram: fold-line vocabulary */
+.diagram-figure {
+  margin-top: var(--spacing-lg);
+}
+.diagram-figure svg {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+@media (max-width: 640px) {
+  .diagram-figure {
+    overflow-x: auto;
+  }
+  .diagram-figure svg {
+    min-width: 520px;
+  }
+}
+.fold-dash {
+  stroke: var(--color-fold-line);
+  stroke-width: 1.5;
+  stroke-dasharray: 5 5;
+  fill: none;
+}
+.fold-active {
+  stroke: var(--color-accent);
+  stroke-width: 2;
+  fill: none;
+}
+.fold-node {
+  fill: var(--color-rack);
+  stroke: var(--color-trace);
+}
+.fold-node-mark {
+  fill: var(--color-fg);
+}
+.fold-node-label {
+  font-family: var(--mono-font-family);
+  font-size: 16px;
+  fill: var(--color-fg);
+  letter-spacing: 0.02em;
+}
+.fold-anno {
+  font-family: var(--mono-font-family);
+  font-size: 13px;
+  fill: var(--color-static);
+  letter-spacing: 0.03em;
+}
+.fold-arrow {
+  fill: var(--color-accent);
+}
+@media (prefers-reduced-motion: no-preference) {
+  .fold-active.draw {
+    stroke-dasharray: 720;
+    stroke-dashoffset: 720;
+    animation: fold-draw 1.6s cubic-bezier(0.22, 1, 0.36, 1) 0.3s forwards;
+  }
+  @keyframes fold-draw {
+    to {
+      stroke-dashoffset: 0;
+    }
+  }
+}
+
+/* article footer rail */
+.route-rail {
+  border-bottom: 1px solid var(--color-trace);
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  padding-bottom: 8px;
+}
+.post-rail {
+  max-width: 70ch;
+  margin: var(--spacing-2xl) auto 0;
+}
+.route-rail .chip {
+  font-family: var(--mono-font-family);
+  font-size: var(--body-sm);
+  color: var(--color-carrier);
+  background: var(--color-rack);
+  border: 1px solid var(--color-trace);
+  border-radius: var(--radius-sm);
+  padding: 8px 14px;
+  text-decoration: none;
+}
+.route-rail a.chip:hover {
+  border-color: var(--color-carrier);
+  text-decoration: none;
+}
+
+/* ===== closing: compact Route drench (subordinated to the article h1) ===== */
+.closing :focus-visible {
+  outline-color: var(--color-accent);
+}
+.closing {
+  background: var(--color-rack);
+  border-top: 1px solid var(--color-trace);
+  padding-block: var(--section-padding);
+}
+.closing .wrap {
+  display: grid;
+  gap: var(--spacing-lg);
+  justify-items: start;
+}
+.closing h2 {
+  color: var(--color-fg);
+  font-size: clamp(1.5rem, 1.4vw + 1.1rem, 1.9rem);
+}
+.closing p {
+  color: var(--color-carrier);
+  font-size: var(--body-lg);
+  line-height: 1.6;
+  max-width: 54ch;
+}
+
+/* ===== responsive (page-specific) ===== */
+@media (max-width: 640px) {
+  .closing .btn {
+    width: 100%;
+    justify-content: center;
+  }
+}
+.back-link::before {
+  content: "\2190";
+  color: var(--color-accent);
+  margin-right: 8px;
+}
+.h-anchor {
+  opacity: 0;
+  margin-left: 10px;
+  color: var(--color-static);
+  font-weight: 400;
+  transition: opacity 0.15s;
+}
+h2:hover .h-anchor,
+.h-anchor:focus-visible {
+  opacity: 1;
+}
+.share-row {
+  display: flex;
+  gap: var(--spacing-md);
+  align-items: center;
+  margin-top: var(--spacing-xl);
+  padding-top: var(--spacing-lg);
+  border-top: 1px solid var(--color-trace);
+  font-size: var(--body-sm);
+}
+.share-row span {
+  color: var(--color-static);
+}
+.copy-link {
+  background: none;
+  border: 0;
+  color: var(--color-carrier);
+  font: inherit;
+  font-size: var(--body-sm);
+  cursor: pointer;
+  padding: 4px 0;
+}
+.copy-link:hover {
+  color: var(--color-fg);
+}
+
+/* Lists in long-form copy. The tasks post had none; the tenancy post leans on
+   them for the two orderings and the fan-out consequences. */
+.article-col ul {
+  max-width: 70ch;
+  color: var(--color-static);
+  padding-left: 1.15rem;
+  display: grid;
+  gap: var(--spacing-sm);
+  margin: var(--spacing-md) 0 var(--spacing-lg);
+}
+.article-col ul li {
+  line-height: 1.6;
+}
+.article-col ul strong,
+.article-col p strong {
+  color: var(--color-fg);
+  font-weight: var(--weight-heading);
+}

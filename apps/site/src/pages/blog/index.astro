@@ -39,12 +39,25 @@ const jsonld = {
       data-section="post-list"
       data-intent="discovery"
       data-layout="stack"
-      data-items="1"
+      data-items="2"
       data-fragment="post-row"
       data-fragment-role="source"
     >
       <div class="wrap">
         <ul class="posts">
+          <li class="post-row">
+            <p class="post-meta">2026-08-10 · engineering</p>
+            <h2>
+              <a href="/blog/tenancy-one-bucket/" class="arrow-link"
+                >One bucket, not ten: tenancy in an MCP gateway</a
+              >
+            </h2>
+            <p class="teaser">
+              A tenant groups principals and governs them as one. The line the design holds above
+              all is that it never authenticates them. Budgets charge narrowest-first, rate limits
+              check widest-first, and ambiguity is refused rather than resolved.
+            </p>
+          </li>
           <li class="post-row">
             <p class="post-meta">2026-08-04 · engineering</p>
             <h2>
