@@ -206,7 +206,7 @@ const jsonld = {
               not refuse.
             </li>
             <li>
-              A viewer's <a href="https://docs.fold.run/console/">console</a> shows <em>their</em>
+              A viewer's <a href="https://docs.fold.run/console/">console</a> shows <em>their</em>{' '}
               tenant's federation, not the operator's. That closes the one place a dashboard could otherwise
               show a customer the shape of a topology its own traffic is refused.
             </li>
@@ -265,7 +265,7 @@ const jsonld = {
           <p>
             With tenants configured, the dimension shows up in both observability surfaces: <code
               >tenant</code
-            > on every audit event its principals produce, denials included, and two new metrics,
+            > on every audit event its principals produce, denials included, and two new metrics,{' '}
             <code>fold_tenant_requests_total&#123;tenant,outcome&#125;</code> and <code
               >fold_tenant_upstream_calls_total&#123;tenant&#125;</code
             >. The second counts the unit a tenant budget is charged in, so an allowance can be
@@ -305,7 +305,7 @@ const jsonld = {
           </h2>
           <p>
             Tenants are reloadable, unlike <code>server.budget</code>, because customers sign up on
-            their own schedule and a reload has to be able to add one. The full field reference is at
+            their own schedule and a reload has to be able to add one. The full field reference is at{' '}
             <a href="https://docs.fold.run/tenancy/">docs.fold.run/tenancy</a>; budgets and metering
             are at <a href="https://docs.fold.run/consumption/">/consumption</a>; the source is on <a
               href="https://github.com/fold-run/fold">GitHub</a
