@@ -59,6 +59,7 @@ export default defineConfig({
         { label: 'Getting started', slug: 'getting-started' },
         { label: 'Run it locally', slug: 'run-it-locally' },
         { label: 'Try the live demo', slug: 'try-the-demo' },
+        { label: 'The console', slug: 'console' },
         { label: 'Use cases', slug: 'use-cases' },
         { label: 'Configuration', slug: 'configuration' },
         {
@@ -66,7 +67,6 @@ export default defineConfig({
           items: [
             { label: 'Deployment', slug: 'deployment' },
             { label: 'Operations', slug: 'operations' },
-            { label: 'The console', slug: 'console' },
             { label: 'Tenancy', slug: 'tenancy' },
             { label: 'Budgets & metering', slug: 'consumption' },
             { label: 'Local stdio servers', slug: 'stdio' },
