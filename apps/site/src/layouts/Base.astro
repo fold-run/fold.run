@@ -693,28 +693,37 @@ const { title, description, canonical, jsonld, current, template } = Astro.props
           grid-column: 1 / -1;
         }
       }
+      /* Columns are a flush-left stack: the link text starts on exactly the
+         same vertical as its heading. The links carry block padding only —
+         inline padding would inset the text from the heading above it while
+         leaving the boxes aligned, which is the kind of misalignment that
+         looks like a mistake rather than a margin. Hit area comes from the
+         block padding plus the full-width row, not from side padding. */
       .foot-col {
         display: flex;
         flex-direction: column;
-        gap: 2px;
-      }
-      .foot-col a {
-        align-self: flex-start;
+        align-items: flex-start;
+        gap: 0;
       }
       .foot-col h2 {
         font: var(--weight-heading) var(--body-sm) / 1.4 var(--body-font-family);
         color: var(--color-fg);
         letter-spacing: 0.02em;
-        margin-bottom: 8px;
+        margin-bottom: 10px;
       }
       .foot-col a {
         font-size: var(--body-sm);
         font-weight: var(--weight-label);
         color: var(--color-static);
-        padding-block: 5px;
+        /* Tighter leading inside the row, more padding around it, so the air
+           lands between links rather than inside each one. A single-line link
+           does not need body leading. */
+        line-height: 1.35;
+        padding: 9px 0;
+        transition: color 0.15s cubic-bezier(0.25, 1, 0.5, 1);
       }
       .foot-col a:hover {
-        color: var(--color-carrier);
+        color: var(--color-fg);
       }
       .foot-legal {
         display: flex;
@@ -729,28 +738,14 @@ const { title, description, canonical, jsonld, current, template } = Astro.props
         color: var(--color-static);
         font-size: var(--body-sm);
       }
-      footer.site .wrap {
-        display: flex;
-        gap: var(--spacing-lg);
-        align-items: center;
-        flex-wrap: wrap;
-      }
+      /* Left over from a single-row footer that no longer exists. They were not
+         inert: `footer.site nav a` (0,1,3) out-ranked `.foot-col a` (0,1,1) and
+         forced 8px of inline padding onto every column link, insetting the text
+         from its heading, and `footer.site nav`'s gap and flex-wrap overrode
+         the column's own. Deleted rather than patched around. */
       footer.site .legal {
         color: var(--color-static);
         font-size: var(--body-sm);
-        margin-right: auto;
-        display: inline-flex;
-        align-items: center;
-        gap: 10px;
-      }
-      footer.site nav {
-        display: flex;
-        gap: var(--spacing-sm);
-        flex-wrap: wrap;
-        font-size: var(--body-sm);
-      }
-      footer.site nav a {
-        padding: 12px 8px;
       }
 
       /* ===== code panels (signature chrome, shared across pages) ===== */
