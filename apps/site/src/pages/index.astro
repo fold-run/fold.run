@@ -813,6 +813,52 @@ const jsonld = {
     .fold-packet-2 {
       animation: fold-packet 1.15s linear 1.475s infinite;
     }
+    /* The node fires while the request is inside it: the stroke thickens and a
+       ring steps outward from the node's own edge. Same 1.15s cycle and delay
+       as the packet, so the ring and the disappearance behind the box are one
+       event rather than two things that happen near each other.
+
+       At 1.15s the whole pulse lasts about 300ms, so it is tuned brighter and
+       tighter than it was at 3.6s: a slow fade that read as a halo at the old
+       pace reads as nothing at this one. */
+    .fold-gate {
+      animation: fold-gate 1.15s linear 0.9s infinite;
+    }
+    .fold-gate-halo {
+      animation: fold-gate-halo 1.15s linear 0.9s infinite;
+    }
+    @keyframes fold-gate {
+      0%,
+      36% {
+        stroke-width: 1.5;
+      }
+      42% {
+        stroke-width: 3;
+      }
+      70%,
+      100% {
+        stroke-width: 1.5;
+      }
+    }
+    @keyframes fold-gate-halo {
+      0%,
+      37% {
+        opacity: 0;
+        transform: scale(1);
+      }
+      41% {
+        opacity: 0.7;
+        transform: scale(1);
+      }
+      74% {
+        opacity: 0;
+        transform: scale(1.26);
+      }
+      100% {
+        opacity: 0;
+        transform: scale(1.26);
+      }
+    }
     /* The dashed routes. Cycles are longer than the lit one and share no
        common factor with it, so the diagram never falls into lockstep. Each
        inbound is followed by an outbound a beat later, which is the shape of a
