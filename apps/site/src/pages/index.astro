@@ -176,17 +176,28 @@ const jsonld = {
         <div class="section-head">
           <h2>See it live.</h2>
           <p class="intro">
-            demo.fold.run federates three public MCP servers behind one endpoint — the unmodified
-            release binary, governed by its own config. Point any MCP client at it. Rate-limited,
-            unauthenticated, no warranty; live status on <a href="/status/">/status</a>. Copy-paste
-            walkthrough: <a href="https://docs.fold.run/try-the-demo/">try the demo</a>.
+            demo.fold.run federates three public MCP servers behind one endpoint: the unmodified
+            release binary, governed by its own config. Rate-limited, unauthenticated, no warranty;
+            live status on <a href="/status/">/status</a>. Copy-paste walkthrough: <a
+              href="https://docs.fold.run/try-the-demo/">try the demo</a
+            >.
           </p>
         </div>
+        <!-- Two live surfaces, and the order matters: the console is the one a
+             reader can open in this tab, right now, without wiring up a client.
+             It was documented and running on the demo for weeks while the
+             marketing site never once mentioned it. -->
         <div class="route-rail">
+          <a class="chip chip-link" href="https://demo.fold.run/console/">demo.fold.run/console</a>
           <span class="chip">demo.fold.run/mcp</span>
           <span class="muted" style="font-size: var(--body-sm)">three upstreams · one endpoint</span
           >
         </div>
+        <p class="console-note">
+          The console ships inside the binary and needs no client. Open it and you are reading the
+          running federation: live latency and breaker state per upstream, the policy in effect, the
+          rate limit. Its test console calls the same endpoint everything else does.
+        </p>
         <div class="termini">
           <article class="terminus">
             <h3>cfdocs__*</h3>
@@ -811,8 +822,44 @@ const jsonld = {
   .route-rail {
     margin-bottom: var(--spacing-md);
     display: flex;
-    justify-content: space-between;
     align-items: flex-end;
+    gap: var(--spacing-sm);
+    flex-wrap: wrap;
+  }
+  /* the count sits at the far end, the chips group at the near one */
+  .route-rail .muted {
+    margin-left: auto;
+  }
+  /* The console chip is the only clickable thing in the rail, so it carries
+     Signal text and a live dot against the mcp chip's Carrier. */
+  .route-rail .chip-link {
+    color: var(--color-fg);
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition:
+      border-color 0.18s cubic-bezier(0.25, 1, 0.5, 1),
+      background-color 0.18s cubic-bezier(0.25, 1, 0.5, 1);
+  }
+  .route-rail .chip-link::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--color-accent);
+    flex: none;
+  }
+  .route-rail .chip-link:hover {
+    background: var(--color-rack-hi);
+    border-color: var(--color-trace-hi);
+    text-decoration: none;
+  }
+  .console-note {
+    color: var(--color-static);
+    font-size: var(--body-sm);
+    line-height: var(--line-height-meta);
+    max-width: 78ch;
+    margin-bottom: var(--spacing-lg);
   }
   .route-rail .chip {
     font-family: var(--mono-font-family);
