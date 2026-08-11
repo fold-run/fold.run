@@ -35,7 +35,9 @@ import { BadgeCheck, Container, Network, ShieldCheck } from 'lucide-astro';
     OAuth 2.0 resource server, Enterprise-Managed Authorization (ID-JAG),
     RFC 8693 token exchange per upstream, deny-by-default allowlists with
     per-principal visibility, and an audit event for every request —
-    including the denials.
+    including the denials. Group principals into
+    [tenants](/tenancy/) for a shared allowance, a shared rate-limit
+    bucket, and a bounded view of the federation.
   </Card>
   <Card title="Provably conformant" icon={BadgeCheck}>
     The official MCP conformance suite runs through fold on every merge —

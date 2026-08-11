@@ -27,7 +27,7 @@ docker run --rm -p 8080:8080 \
 - Secrets referenced by the config's `secretRef` fields are ordinary environment variables (`-e NAME=...` or `--env-file`).
 - The image runs as nonroot on distroless static; `--read-only` works.
 
-Images are multi-arch (linux/amd64, linux/arm64), tagged `latest` and per release (e.g. `v1.1.0`).
+Images are multi-arch (linux/amd64, linux/arm64), tagged `latest` and per release (e.g. `v1.8.0`).
 
 ## docker compose
 

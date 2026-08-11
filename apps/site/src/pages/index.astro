@@ -49,7 +49,7 @@ const jsonld = {
           <!-- Separators are spaced by CSS, not by source whitespace: Astro
                collapses the newlines between inline elements and the marks
                end up fused to the words. -->
-          <p class="kicker"><a href="https://github.com/fold-run/fold/releases">v1.5.0</a><span
+          <p class="kicker"><a href="https://github.com/fold-run/fold/releases">v1.8.0</a><span
               class="sep"
               aria-hidden="true">·</span
             >Apache-2.0<span class="sep" aria-hidden="true">·</span><a
@@ -342,7 +342,7 @@ const jsonld = {
           </p>
         </div>
 
-        <!-- A capability index, not nine boxes. Each band is one verb; the rows
+        <!-- A capability index, not a grid of boxes. Each band is one verb; the rows
              under it are separated by the same hairline the sections use, so
              the whole section reads as one table an evaluator can scan down a
              column of. The card grid this replaced put twenty-seven borders on
@@ -388,6 +388,14 @@ const jsonld = {
                   every org, scoped per principal.
                 </p>
               </div>
+              <div class="cap-row">
+                <h3>Federate local servers</h3>
+                <p>
+                  Most MCP servers are local processes speaking stdio, not HTTP endpoints. The
+                  fold-stdio shim runs one and serves it over HTTP, so it joins the federation as an
+                  ordinary upstream with every policy and guard applied unchanged.
+                </p>
+              </div>
             </dd>
           </div>
 
@@ -429,6 +437,14 @@ const jsonld = {
                   instead of scattering per-user API keys across every client.
                 </p>
               </div>
+              <div class="cap-row">
+                <h3>Govern each customer separately</h3>
+                <p>
+                  A tenant is a named set of principals carrying its own allowance, its own
+                  rate-limit bucket, and its own view of the federation. Ten agents on one team
+                  share one bucket rather than holding ten between them.
+                </p>
+              </div>
             </dd>
           </div>
 
@@ -457,6 +473,14 @@ const jsonld = {
                 <p>
                   Offer partners a curated, policy-scoped subset of internal tools on one hardened
                   endpoint — a single static binary, self-hosted in your VPC.
+                </p>
+              </div>
+              <div class="cap-row">
+                <h3>Bound what a period can cost</h3>
+                <p>
+                  Rate limits smooth a burst and then forget it. Budgets accumulate across an hour,
+                  a day, or a month, charged in upstream invocations rather than client requests, so
+                  a busy month meets a ceiling instead of an invoice.
                 </p>
               </div>
               <div class="cap-row">

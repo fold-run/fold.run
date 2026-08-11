@@ -7,7 +7,7 @@ description: What enterprises put fold in front of — federation, security, cre
 
 import { CardGrid } from '@astrojs/starlight/components';
 import Card from '../../components/Card.astro';
-import { BadgeCheck, Gauge, Globe, KeyRound, Network, PackageCheck, Radar, Shield } from 'lucide-astro';
+import { BadgeCheck, Building2, Gauge, Globe, KeyRound, Network, PackageCheck, Radar, Shield, Terminal } from 'lucide-astro';
 
 fold is one gateway with one job — govern the path between MCP clients and MCP
 servers — and that single position covers a family of problems. Most
@@ -40,7 +40,22 @@ ride the same config.
     Agent traffic is bursty and retry-happy. List caching, global and
     per-upstream rate limits with Retry-After, and per-upstream circuit
     breakers stand between an agent storm and the twenty-year-old ERP that
-    must not fall over.
+    must not fall over. Where a rate limit smooths a burst and forgets it,
+    a [budget](/consumption/) accumulates across a calendar period, so a
+    busy month meets a ceiling.
+  </Card>
+  <Card title="Govern each customer separately" icon={Building2}>
+    A tenant is a named set of principals carrying its own allowance, its own
+    rate-limit bucket, and its own view of the federation — resolved from
+    claims the IdP already asserts. Ten agents on one team share one bucket
+    rather than holding ten between them, and every audit event they produce
+    carries the tenant's name. [Tenancy →](/tenancy/)
+  </Card>
+  <Card title="Federate local servers" icon={Terminal}>
+    Most MCP servers are local processes speaking stdio, not HTTP endpoints.
+    The `fold-stdio` shim runs one and serves it over streamable HTTP, so it
+    joins the federation as an ordinary `url` upstream with every credential
+    strategy, guard, and policy rule applied unchanged. [Stdio servers →](/stdio/)
   </Card>
   <Card title="Govern vendor MCP servers" icon={PackageCheck}>
     Third-party and SaaS MCP endpoints go behind your auth, your allowlists,
@@ -72,6 +87,8 @@ ride the same config.
 ## Start where it hurts
 
 Every use case above is the same binary and the same config file — an
-`upstreams` list plus optional `auth`, `policy`, and `audit` blocks. Begin
-with a single passthrough upstream in front of your most-used server, then
-[add governance](/configuration/) as the surface grows.
+`upstreams` list plus optional `auth`, `policy`, `audit`, and `tenants`
+blocks. Begin with a single passthrough upstream in front of your most-used
+server, then [add governance](/configuration/) as the surface grows. Nothing
+here is a separate product or a separate deployment: declare no tenants and
+no budgets, and the gateway behaves exactly as it did before either existed.
