@@ -91,8 +91,6 @@ const jsonld = {
                  federation reads as busy without competing with the one request
                  the drawing is actually about. -->
             <rect class="fold-packet" x="-6" y="-1.75" width="12" height="3.5" rx="1.75"></rect>
-            <rect class="fold-packet fold-packet-2" x="-6" y="-1.75" width="12" height="3.5" rx="1.75"
-            ></rect>
             <circle class="fold-packet-dim in-a" r="3.4"></circle>
             <circle class="fold-packet-dim in-b" r="3.4"></circle>
             <circle class="fold-packet-dim out-a" r="3.4"></circle>
@@ -702,6 +700,51 @@ const jsonld = {
   .fold-arrow {
     fill: var(--color-accent);
   }
+  /* ===== hero entrance =====
+     One orchestrated arrival, once. This is the trade the diagram made when it
+     gave up its second packet and its stroke pulse: motion that happens and is
+     then over, rather than motion that never stops next to the headline.
+
+     It moves position only, never opacity. That is not a stylistic preference:
+     with fill-mode backwards, an element whose keyframe starts at opacity 0
+     renders at opacity 0 for as long as the timeline is frozen, and the
+     timeline is frozen on a hidden tab, in a headless renderer, and in anything
+     crawling the page without painting it. The first version of this faded in
+     and left the entire hero blank under exactly those conditions.
+
+     Translated by 10px, a frozen hero is merely 10px low: fully painted, fully
+     readable, indistinguishable in text extraction. Nothing here is gated
+     behind a class either, so reduced motion just gets the finished state. */
+  @media (prefers-reduced-motion: no-preference) {
+    .hero .kicker,
+    .hero h1,
+    .hero .lede,
+    .hero .cta-row,
+    .diagram-panel {
+      animation: hero-rise 0.62s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+    }
+    .hero .kicker {
+      animation-delay: 0.04s;
+    }
+    .hero h1 {
+      animation-delay: 0.12s;
+    }
+    .hero .lede {
+      animation-delay: 0.2s;
+    }
+    .hero .cta-row {
+      animation-delay: 0.28s;
+    }
+    .diagram-panel {
+      animation-delay: 0.16s;
+    }
+    @keyframes hero-rise {
+      from {
+        transform: translateY(10px);
+      }
+    }
+  }
+
   /* ===== diagram motion =====
      The drawing depicts a gateway, so the only motion it earns is traffic
      moving through one. Everything here is stroke geometry on paths that are
@@ -808,37 +851,21 @@ const jsonld = {
         opacity: 0;
       }
     }
-    /* A second request half a cycle behind the first, so the lit wire is never
-       empty. One packet at this speed reads as a blink; two read as a stream. */
-    .fold-packet-2 {
-      animation: fold-packet 1.15s linear 1.475s infinite;
-    }
     /* The node fires while the request is inside it: the stroke thickens and a
        ring steps outward from the node's own edge. Same 1.15s cycle and delay
        as the packet, so the ring and the disappearance behind the box are one
        event rather than two things that happen near each other.
 
-       At 1.15s the whole pulse lasts about 300ms, so it is tuned brighter and
+       At 1.15s the whole pulse lasts about 440ms, so it is tuned brighter and
        tighter than it was at 3.6s: a slow fade that read as a halo at the old
-       pace reads as nothing at this one. */
-    .fold-gate {
-      animation: fold-gate 1.15s linear 0.9s infinite;
-    }
+       pace reads as nothing at this one.
+
+       One signal, not two. The node's stroke used to thicken on the same beat,
+       which meant its border breathed once a second forever and was the part
+       that read as shimmer rather than as an event. The ring fires and leaves;
+       the border holds still. */
     .fold-gate-halo {
       animation: fold-gate-halo 1.15s linear 0.9s infinite;
-    }
-    @keyframes fold-gate {
-      0%,
-      36% {
-        stroke-width: 1.5;
-      }
-      42% {
-        stroke-width: 3;
-      }
-      70%,
-      100% {
-        stroke-width: 1.5;
-      }
     }
     @keyframes fold-gate-halo {
       0%,

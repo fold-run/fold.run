@@ -83,6 +83,12 @@ const jsonld = {
     return `${Math.round(m / 60)} h ago`;
   }
 
+  /* The list is rebuilt wholesale on every refresh, so nothing in the DOM knows
+     what changed. Keeping the last readout per target is what turns a re-render
+     into an event: only the rows whose numbers actually moved get marked, and a
+     quiet minute stays quiet instead of flashing every row once a minute. */
+  const previous = new Map<string, string>();
+
   function render(overallState: string, targets: Target[]): void {
     const up = overallState === 'up';
     overall.className = `overall ${up ? 'ok' : 'bad'}`;
@@ -94,13 +100,14 @@ const jsonld = {
       const isUp = t.status === 'up';
       const li = document.createElement('li');
       li.className = 'target';
+      const reading = isUp ? `${t.latencyMs ?? '—'} ms` : (t.lastError ?? 'failing');
+      const moved = previous.has(t.id) && previous.get(t.id) !== reading;
+      previous.set(t.id, reading);
       li.innerHTML = `
         <span class="name">${t.url.replace('https://', '')}</span>
-        <span class="readout"><span class="${isUp ? 'up-dot' : 'down-dot'}" aria-hidden="true"></span><span
+        <span class="readout${moved ? ' moved' : ''}"><span class="${isUp ? 'up-dot' : 'down-dot'}" aria-hidden="true"></span><span
             class="state${isUp ? '' : ' down'}">${isUp ? 'up' : 'down'}</span><span class="sep" aria-hidden="true">·</span><span
-            class="${isUp ? 'latency' : 'checked'}">${
-              isUp ? `${t.latencyMs ?? '—'} ms` : (t.lastError ?? 'failing')
-            }</span><span class="sep" aria-hidden="true">·</span><span class="checked">checked ${ago(t.lastCheckAt)}</span></span>`;
+            class="${isUp ? 'latency' : 'checked'}">${reading}</span><span class="sep" aria-hidden="true">·</span><span class="checked">checked ${ago(t.lastCheckAt)}</span></span>`;
       list.appendChild(li);
     }
     const time = new Date().toLocaleTimeString(undefined, { timeZoneName: 'short' });
@@ -173,6 +180,24 @@ const jsonld = {
   }
   .overall.bad {
     color: var(--color-down);
+  }
+
+  /* A readout that moved since the last poll lifts to Signal and settles back.
+     The page already refreshed a minute ago and looked identical; this is the
+     difference between a page that re-renders and a page that is being read
+     off something. Only changed rows animate. */
+  @media (prefers-reduced-motion: no-preference) {
+    .readout.moved {
+      animation: readout-moved 1.1s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    @keyframes readout-moved {
+      0% {
+        color: var(--color-fg);
+      }
+      100% {
+        color: inherit;
+      }
+    }
   }
 
   /* status dots: the reserved colors, used only for live semantics */
