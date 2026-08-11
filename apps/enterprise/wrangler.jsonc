@@ -6,10 +6,10 @@
  * `auth.mode` is gateway-wide, so demo.fold.run stays unauthenticated and
  * copy-pasteable while this one requires a token and governs the caller.
  *
- * Config is embedded in src/index.ts (FOLD_CONFIG env). The Auth0 M2M secrets
+ * Config is embedded in src/index.ts (FOLD_CONFIG env). The client-credentials secrets
  * behind /demo-token are Worker secrets, set with `wrangler secret put`:
- *   AUTH0_M2M_CLIENT_ID_ACME    AUTH0_M2M_CLIENT_SECRET_ACME
- *   AUTH0_M2M_CLIENT_ID_GLOBEX  AUTH0_M2M_CLIENT_SECRET_GLOBEX
+ *   OAUTH_WORK_CLIENT_ID_ACME    OAUTH_WORK_CLIENT_SECRET_ACME
+ *   OAUTH_WORK_CLIENT_ID_GLOBEX  OAUTH_WORK_CLIENT_SECRET_GLOBEX
  */
 {
   "$schema": "node_modules/wrangler/config-schema.json",
