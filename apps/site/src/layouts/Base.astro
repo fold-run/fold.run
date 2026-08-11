@@ -807,6 +807,62 @@ const { title, description, canonical, jsonld, current, template } = Astro.props
         color: var(--color-carrier); /* keys / prompts */
       }
 
+
+      /* ===== closing band =====
+         The same object on every page that has one: home, blog index, and each
+         post. It lived in three places and two of them had drifted to a
+         stacked, smaller variant, so the site made a different closing argument
+         depending on which page you finished on. One definition here, in the
+         chrome every page already loads.
+
+         The statement holds the left and the action sits at the end of the
+         line: on the wide container a single left-aligned stack leaves half the
+         band empty, and this makes the width part of the composition. */
+      .closing {
+        background: var(--color-rack);
+        border-top: 1px solid var(--color-trace);
+        padding-block: var(--section-padding-lg);
+      }
+      .closing .wrap {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        gap: var(--spacing-lg) var(--spacing-2xl);
+        align-items: center;
+      }
+      .closing h2 {
+        color: var(--color-fg);
+        font-size: clamp(2rem, 2.2vw + 1.2rem, 2.75rem);
+        max-width: 18ch;
+      }
+      .closing p {
+        color: var(--color-carrier);
+        font-size: var(--body-lg);
+        line-height: 1.6;
+        max-width: 52ch;
+      }
+      .closing .btn {
+        grid-column: 2;
+        grid-row: 1 / span 2;
+        justify-self: end;
+      }
+      @media (max-width: 840px) {
+        .closing .wrap {
+          grid-template-columns: 1fr;
+          justify-items: start;
+        }
+        .closing .btn {
+          grid-column: 1;
+          grid-row: auto;
+          justify-self: start;
+        }
+      }
+      @media (max-width: 640px) {
+        .closing .btn {
+          width: 100%;
+          justify-content: center;
+        }
+      }
+
       /* ===== shared responsive =====
          Section padding is a clamp() now, so there is nothing to step down. */
       @media (prefers-reduced-motion: reduce) {

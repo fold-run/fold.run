@@ -1244,41 +1244,6 @@ const jsonld = {
     }
   }
 
-  /* ===== closing =====
-     Carries the Rack ground so the last band reads as a landing rather than as
-     one more section: it was set to #121212, identical to the page, which made
-     the "band" a border and 80px of nothing. */
-  .closing {
-    background: var(--color-rack);
-    border-top: 1px solid var(--color-trace);
-    padding-block: var(--section-padding-lg);
-  }
-  /* The statement holds the left, the action sits at the end of the line.
-     On the wide container a single left-aligned stack leaves half the band
-     empty; this makes the width part of the composition. */
-  .closing .wrap {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) auto;
-    gap: var(--spacing-lg) var(--spacing-2xl);
-    align-items: center;
-  }
-  .closing h2 {
-    color: var(--color-fg);
-    font-size: clamp(2rem, 2.2vw + 1.2rem, 2.75rem);
-    max-width: 18ch;
-  }
-  .closing p {
-    color: var(--color-carrier);
-    font-size: var(--body-lg);
-    line-height: 1.6;
-    max-width: 52ch;
-  }
-  .closing .btn {
-    grid-column: 2;
-    grid-row: 1 / span 2;
-    justify-self: end;
-  }
-
   /* ===== responsive (page-specific) ===== */
   @media (max-width: 1024px) {
     .hero .wrap {
