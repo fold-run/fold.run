@@ -3,6 +3,7 @@
 // can click. Publish = site deploy. Markup from the approved stardust
 // redesign (stardust/migrated/blog/federating-mcp-tasks/index.html).
 import Base from '../../layouts/Base.astro';
+import { WORDMARK_PATH, wordmarkTransform } from '../../lib/wordmark';
 
 const title = 'Federating MCP tasks: affinity routing over opaque ids';
 const description =
@@ -147,7 +148,8 @@ tasks/get  &#123; "job-42" &#125;     ──▶ ...which upstream owns this?</co
               <!-- client node -->
               <rect class="fold-node" x="30" y="110" width="88" height="36" rx="2"></rect>
               <text class="fold-node-label" x="74" y="132" text-anchor="middle">client</text>
-              <!-- fold gateway node with folded corner -->
+              <!-- the gateway node carries the wordmark; the folded corner it
+                   used to wear was the retired square-tile mark's dog-ear -->
               <rect
                 x="246"
                 y="96"
@@ -157,10 +159,10 @@ tasks/get  &#123; "job-42" &#125;     ──▶ ...which upstream owns this?</co
                 fill="#1a1a1a"
                 stroke="#D6FF00"
                 stroke-width="1.5"></rect>
-              <path d="M 314 114 V 104 A 2 2 0 0 0 306 96 H 296 Z" fill="#D6FF00"></path>
-              <text class="fold-node-label" x="280" y="132" text-anchor="middle" font-weight="700"
-                >fold</text
-              >
+              <path
+                class="fold-node-mark"
+                d={WORDMARK_PATH}
+                transform={wordmarkTransform(280, 128, 44)}></path>
               <!-- upstream nodes -->
               <rect class="fold-node" x="434" y="38" width="112" height="36" rx="2"></rect>
               <rect class="fold-node" x="434" y="110" width="112" height="36" rx="2"></rect>
@@ -431,6 +433,9 @@ owner := g.locateTaskOwner(ctx, rt, taskID)</code></pre>
   .fold-node {
     fill: var(--color-rack);
     stroke: var(--color-trace);
+  }
+  .fold-node-mark {
+    fill: var(--color-fg);
   }
   .fold-node-label {
     font-family: var(--mono-font-family);
