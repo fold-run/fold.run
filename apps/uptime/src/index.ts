@@ -38,7 +38,7 @@ const TARGETS: Target[] = [
   // Real JSON-RPC round trips (initialize), not just a 200 — we monitor
   // the protocol, not the port. Checking the tasks upstream directly also
   // separates "gateway down" from "upstream down" when demo alerts fire.
-  { id: 'demo', kind: 'mcp-init', url: 'https://demo.fold.run/mcp', expectVersion: 'v1.8.0' },
+  { id: 'demo', kind: 'mcp-init', url: 'https://demo.fold.run/mcp', expectVersion: 'v1.10.1' },
   { id: 'demo-tasks', kind: 'mcp-init', url: 'https://tasks.fold.run/mcp' },
 ];
 

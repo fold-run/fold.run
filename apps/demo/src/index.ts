@@ -21,6 +21,10 @@ const FOLD_CONFIG = {
     rateLimit: { requestsPerMinute: 300 },
     // The console doubles as the demo's front door: /console shows the
     // federation live, and its test console is a plain governed MCP client.
+    // Since v1.9 the page and the API it reads are configured separately, and
+    // the page requires the API — a console-only config is refused at startup,
+    // not degraded, so these two move together.
+    introspection: { enabled: true },
     console: { enabled: true },
   },
 };

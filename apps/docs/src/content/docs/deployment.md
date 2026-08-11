@@ -27,7 +27,7 @@ docker run --rm -p 8080:8080 \
 - Secrets referenced by the config's `secretRef` fields are ordinary environment variables (`-e NAME=...` or `--env-file`).
 - The image runs as nonroot on distroless static; `--read-only` works.
 
-Images are multi-arch (linux/amd64, linux/arm64), tagged `latest` and per release (e.g. `v1.8.0`).
+Images are multi-arch (linux/amd64, linux/arm64), tagged `latest` and per release (e.g. `v1.10.1`).
 
 ## docker compose
 
@@ -90,7 +90,7 @@ The same rule applies to any external health checker (load balancer target check
 - **Liveness**: plain TCP connect, deliberately *not* `/health` — liveness should detect a wedged process, not restart pods because upstreams are down, and shouldn't generate upstream traffic every few seconds.
 - **Startup**: `httpGet /health` with a ~2-minute budget for first upstream connects and JWKS fetches.
 
-Upgrading from v1.4 or earlier: the path was `/healthz`, which still answers as a deprecated alias (identical response, `Deprecation: true`, one log line on first use), so nothing breaks on upgrade. Move probes, load-balancer target checks, and uptime monitors to `/health` — the alias goes away in the next major.
+Upgrading to v1.9 or later from v1.4 or earlier: the path was `/healthz`, kept as a deprecated alias through v1.8 and **removed in v1.9** — a probe left on it now `404`s, which for a readiness probe means pods that never become ready. Move probes, load-balancer target checks, and uptime monitors to `/health` before you take the upgrade. (`fold-discovery` keeps its `/healthz` alias for now: there the path doesn't 404 when removed but falls through to the document handler, so a stale probe would quietly start scraping the upstreams document and reporting `200`.)
 
 Shutdown: on SIGTERM the gateway drains for up to 10 s, then exits; long-lived SSE streams are cut at that bound. The chart sets `terminationGracePeriodSeconds: 30` to stay clear of it.
 
