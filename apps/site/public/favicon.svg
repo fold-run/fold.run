@@ -1,5 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" role="img" aria-label="fold"><title>fold</title>
-  <rect width="32" height="32" fill="#121212"/>
-  <path d="M4 4H28L7 25H4Z" fill="#FFFFFF"/>
-  <path d="M9 28L28 9V28Z" fill="#D6FF00"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1807 1807" role="img" aria-label="fold"><title>fold</title>
+  <rect width="1807" height="1807" fill="#121212"/>
+  <path fill="#FFFFFF" d="M1045.0 1637.0V170.0H1487.0V1637.0ZM559.0 1637.0 320.0 1398.0V814.0L559.0 575.0H975.0V840.0H762.0V1389.0H975.0V1532.0L870.0 1637.0Z"/>
 </svg>

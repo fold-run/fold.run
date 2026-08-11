@@ -58,8 +58,8 @@ const jsonld = {
           <h1>The enterprise MCP gateway.</h1>
           <p class="lede">
             One governed endpoint between every MCP (Model Context Protocol) client and every MCP
-            server. Federation, auth, policy, caching, and audit — built on the official MCP Go SDK
-            on both sides of the proxy.
+            server. Federation, auth, policy, tenancy, budgets, and audit, built on the official MCP
+            Go SDK on both sides of the proxy.
           </p>
           <div class="cta-row">
             <a class="btn btn-primary" href="https://docs.fold.run/getting-started/">Get started</a>
@@ -424,6 +424,14 @@ const jsonld = {
                 </p>
               </div>
               <div class="cap-row">
+                <h3>Govern each customer separately</h3>
+                <p>
+                  A tenant is a named set of principals carrying its own allowance, its own
+                  rate-limit bucket, and its own view of the federation. Ten agents on one team
+                  share one bucket rather than holding ten between them.
+                </p>
+              </div>
+              <div class="cap-row">
                 <h3>Broker credentials</h3>
                 <p>
                   Clients hold one token with fold as audience; fold exchanges it per upstream (RFC
@@ -435,14 +443,6 @@ const jsonld = {
                 <p>
                   Put third-party and SaaS MCP endpoints behind your own auth, policy, and audit —
                   instead of scattering per-user API keys across every client.
-                </p>
-              </div>
-              <div class="cap-row">
-                <h3>Govern each customer separately</h3>
-                <p>
-                  A tenant is a named set of principals carrying its own allowance, its own
-                  rate-limit bucket, and its own view of the federation. Ten agents on one team
-                  share one bucket rather than holding ten between them.
                 </p>
               </div>
             </dd>
