@@ -64,11 +64,32 @@ customer and compare. This is the artifact the whole exercise is for: one
 gateway, two logins, visibly different federations — different upstreams,
 different limits, different tool lists.
 
+| org | email | password |
+|---|---|---|
+| `org_acme` | `casey@acme.example` | `Fold-Demo-Acme-26!` |
+| `org_globex` | `jordan@globex.example` | `Fold-Demo-Globex-26!` |
+
+SPA client id (wired in `src/index.ts`): **`spa_fold_enterprise`**.
+
+Agent clients (Worker secrets): `agent_fold_acme` / `agent_fold_globex`.
+
+Re-provision on oauth.work with:
+
+```bash
+DATABASE_URL=… node --experimental-strip-types \
+  apps/worker/scripts/provision-fold-enterprise.ts
+```
+
 ## 2. Findings from reviewing the provider's OAuth flows
 
-**None of these block the demo.** The flows fold depends on — authorization
+**Addressed on oauth.work** (demo no longer blocked by these): RFC 9207 `iss` on
+auth redirects + discovery flag; RFC 8707 resource syntax + per-client
+`allowed_resources` allowlist on client_credentials; `/revoke` requires client
+authentication and matching `client_id`; auth-code TTL shortened to 60s.
+
+**None of these blocked the demo.** The flows fold depends on — authorization
 code with PKCE, client credentials, RFC 8707 audience binding, JWKS
-verification — are correct as written.
+verification — were already correct as written for the happy path.
 
 What is already right, and worth not regressing: PKCE is mandatory and S256-only;
 `response_type=code` is the only one accepted (no implicit, no ROPC); redirect
