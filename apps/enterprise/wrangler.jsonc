@@ -1,0 +1,39 @@
+/**
+ * enterprise.fold.run — the governed fold gateway.
+ *
+ * Same shape as apps/demo (a singleton Cloudflare Container running the real
+ * fold binary, pinned in the Dockerfile), and deliberately a separate worker:
+ * `auth.mode` is gateway-wide, so demo.fold.run stays unauthenticated and
+ * copy-pasteable while this one requires a token and governs the caller.
+ *
+ * Config is embedded in src/index.ts (FOLD_CONFIG env). The client-credentials secrets
+ * behind /demo-token are Worker secrets, set with `wrangler secret put`:
+ *   OAUTH_WORK_CLIENT_ID_ACME    OAUTH_WORK_CLIENT_SECRET_ACME
+ *   OAUTH_WORK_CLIENT_ID_GLOBEX  OAUTH_WORK_CLIENT_SECRET_GLOBEX
+ */
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "fold-enterprise",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-07-01",
+  "observability": { "enabled": true },
+  "workers_dev": true,
+  "containers": [
+    {
+      "class_name": "FoldEnterprise",
+      "image": "./Dockerfile",
+      "instance_type": "basic",
+      "max_instances": 1
+    }
+  ],
+  "durable_objects": {
+    "bindings": [{ "name": "FOLD_ENTERPRISE", "class_name": "FoldEnterprise" }]
+  },
+  "migrations": [
+    {
+      "tag": "v1",
+      "new_sqlite_classes": ["FoldEnterprise"]
+    }
+  ],
+  "routes": [{ "pattern": "enterprise.fold.run", "custom_domain": true }]
+}

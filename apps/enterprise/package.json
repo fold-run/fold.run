@@ -1,0 +1,22 @@
+{
+  "name": "@fold-run/enterprise",
+  "version": "0.0.1",
+  "private": true,
+  "description": "enterprise.fold.run — the governed fold gateway: the real Go binary in a Cloudflare Container, federating the same three servers behind auth, tenants, budgets, and policy.",
+  "type": "module",
+  "scripts": {
+    "build": "tsc --noEmit",
+    "typecheck": "tsc --noEmit",
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy"
+  },
+  "dependencies": {
+    "@cloudflare/containers": "^0.3.7"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "catalog:",
+    "typescript": "catalog:",
+    "wrangler": "catalog:"
+  },
+  "license": "Apache-2.0"
+}
