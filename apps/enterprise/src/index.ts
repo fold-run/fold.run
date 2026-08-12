@@ -12,7 +12,7 @@
  * The container runs the unmodified fold release; this Worker routes, and
  * vends demo tokens (see /demo-token below).
  */
-import { Container, getContainer } from "@cloudflare/containers";
+import { Container, getContainer } from '@cloudflare/containers';
 
 // The identity provider is oauth.work, which mints EdDSA-signed JWT access
 // tokens and honours RFC 8707 — the `resource` parameter is bound at
@@ -24,28 +24,28 @@ import { Container, getContainer } from "@cloudflare/containers";
 // <slug>.oauth.work and as the platform on the apex; both carry the `org_id`
 // claim the tenants below select on, and a single issuer means one console
 // sign-in serves every demo org rather than one per tenant.
-const ISSUER = "https://oauth.work";
+const ISSUER = 'https://oauth.work';
 
 // TODO(oauth.work): a public SPA client registered with
 // https://enterprise.fold.run/console/ as its redirect URI.
-const CONSOLE_CLIENT_ID = "spa_fold_enterprise";
+const CONSOLE_CLIENT_ID = 'spa_fold_enterprise';
 
 // The canonical resource URI, which is also the audience every token must
 // carry (RFC 8707). fold matches it exactly and publishes it as RFC 9728
 // metadata, which is how the console discovers where to sign in.
-const RESOURCE = "https://enterprise.fold.run";
+const RESOURCE = 'https://enterprise.fold.run';
 
 // The federation is the demo's, so the two gateways tell one story about one
 // set of upstreams. What differs is everything governance decides.
 const FOLD_CONFIG = {
   upstreams: [
-    { id: "cf-docs", url: "https://docs.mcp.cloudflare.com/mcp", namespace: "cfdocs" },
-    { id: "gitmcp", url: "https://gitmcp.io/docs", namespace: "git" },
-    { id: "demo-tasks", url: "https://tasks.fold.run/mcp", namespace: "jobs" },
+    { id: 'cf-docs', url: 'https://docs.mcp.cloudflare.com/mcp', namespace: 'cfdocs' },
+    { id: 'gitmcp', url: 'https://gitmcp.io/docs', namespace: 'git' },
+    { id: 'demo-tasks', url: 'https://tasks.fold.run/mcp', namespace: 'jobs' },
   ],
 
   auth: {
-    mode: "required",
+    mode: 'required',
     resource: RESOURCE,
     issuers: [
       {
@@ -53,7 +53,7 @@ const FOLD_CONFIG = {
         jwksUri: `${ISSUER}/.well-known/jwks.json`,
         // oauth.work carries a signed-in user's memberships as `roles`; fold's
         // group matching reads whatever claim is named here.
-        groupsClaim: "roles",
+        groupsClaim: 'roles',
       },
     ],
   },
@@ -70,17 +70,17 @@ const FOLD_CONFIG = {
   // lookup rather than a scan.
   tenants: [
     {
-      id: "acme",
-      subjects: { claims: { org_id: "org_acme" } },
-      budget: { period: "day", upstreamCalls: 5000 },
+      id: 'acme',
+      subjects: { claims: { org_id: 'org_acme' } },
+      budget: { period: 'day', upstreamCalls: 5000 },
       rateLimit: { requestsPerMinute: 120 },
     },
     {
-      id: "globex",
-      subjects: { claims: { org_id: "org_globex" } },
-      budget: { period: "day", upstreamCalls: 1000 },
+      id: 'globex',
+      subjects: { claims: { org_id: 'org_globex' } },
+      budget: { period: 'day', upstreamCalls: 1000 },
       rateLimit: { requestsPerMinute: 60 },
-      upstreams: ["cf-docs", "demo-tasks"],
+      upstreams: ['cf-docs', 'demo-tasks'],
     },
   ],
 
@@ -90,72 +90,72 @@ const FOLD_CONFIG = {
   // surface than the person it runs for, which is the whole argument for
   // putting policy at the gateway rather than in each client.
   policy: {
-    defaultDecision: "deny",
+    defaultDecision: 'deny',
     rules: [
       {
-        id: "acme-people",
-        subjects: { claims: { org_id: "org_acme", actor_type: "user" } },
+        id: 'acme-people',
+        subjects: { claims: { org_id: 'org_acme', actor_type: 'user' } },
         allow: [
-          { server: "cf-docs" },
-          { server: "demo-tasks" },
+          { server: 'cf-docs' },
+          { server: 'demo-tasks' },
           // Everything gitmcp offers except fetch_generic_url_content, which
           // fetches arbitrary URLs on the caller's behalf — the capability an
           // enterprise most wants decided at the gateway. Withheld from the
           // list *and* refused on call: invisibility plus denial is the pair.
           {
-            server: "gitmcp",
-            methods: ["tools/call"],
+            server: 'gitmcp',
+            methods: ['tools/call'],
             names: [
-              "match_common_libs_owner_repo_mapping",
-              "fetch_generic_documentation",
-              "search_generic_documentation",
-              "search_generic_code",
+              'match_common_libs_owner_repo_mapping',
+              'fetch_generic_documentation',
+              'search_generic_documentation',
+              'search_generic_code',
             ],
           },
-          { server: "gitmcp", methods: ["prompts/get", "resources/read"] },
+          { server: 'gitmcp', methods: ['prompts/get', 'resources/read'] },
         ],
       },
       {
-        id: "acme-agents",
-        subjects: { claims: { org_id: "org_acme", actor_type: "agent" } },
+        id: 'acme-agents',
+        subjects: { claims: { org_id: 'org_acme', actor_type: 'agent' } },
         allow: [
-          { server: "cf-docs", methods: ["tools/call"], names: ["search_*"] },
-          { server: "demo-tasks" },
-          { server: "gitmcp", methods: ["tools/call"], names: ["search_*"] },
+          { server: 'cf-docs', methods: ['tools/call'], names: ['search_*'] },
+          { server: 'demo-tasks' },
+          { server: 'gitmcp', methods: ['tools/call'], names: ['search_*'] },
         ],
       },
       {
-        id: "globex-people",
-        subjects: { claims: { org_id: "org_globex", actor_type: "user" } },
+        id: 'globex-people',
+        subjects: { claims: { org_id: 'org_globex', actor_type: 'user' } },
         allow: [
           {
-            server: "cf-docs",
-            methods: ["tools/call"],
-            names: ["search_cloudflare_documentation"],
+            server: 'cf-docs',
+            methods: ['tools/call'],
+            names: ['search_cloudflare_documentation'],
           },
-          { server: "demo-tasks" },
+          { server: 'demo-tasks' },
         ],
       },
       {
-        id: "globex-agents",
-        subjects: { claims: { org_id: "org_globex", actor_type: "agent" } },
-        allow: [{ server: "demo-tasks" }],
+        id: 'globex-agents',
+        subjects: { claims: { org_id: 'org_globex', actor_type: 'agent' } },
+        allow: [{ server: 'demo-tasks' }],
       },
     ],
   },
 
   // stdout lands in the container log, which is where a visitor comparing two
   // logins can be shown the `tenant` field doing its work.
-  audit: { sinks: [{ type: "stdout" }] },
+  audit: { sinks: [{ type: 'stdout' }] },
 
   server: {
-    allowedHosts: ["enterprise.fold.run", "fold-enterprise.bauman.workers.dev"],
+    allowedHosts: ['enterprise.fold.run', 'fold-enterprise.bauman.workers.dev'],
     // Three ceilings that answer different questions: the gateway's own floor,
     // each person's bucket, and (above, per tenant) one bucket for a team.
     rateLimit: { requestsPerMinute: 300, perPrincipalPerMinute: 60 },
     // A singleton container, so per-instance enforcement *is* fleet-wide and
     // the startup warning about shared state is expected here.
-    budget: { period: "day", upstreamCalls: 20000 },
+    budget: { period: 'day', upstreamCalls: 20000 },
     // No `groups` allowlist: a viewer already sees only their own tenant's
     // federation, which is the narrowing that matters, and gating on role
     // names would lock the demo to whatever oauth.work memberships happen to
@@ -175,7 +175,7 @@ export class FoldEnterprise extends Container {
   defaultPort = 8080;
   // The uptime monitor keeps this warm the same way it does the demo; the
   // timeout is the backstop if monitoring stops.
-  sleepAfter = "1h";
+  sleepAfter = '1h';
   enableInternet = true; // fold dials the public upstreams and the issuer's JWKS
   envVars = { FOLD_CONFIG: JSON.stringify(FOLD_CONFIG) };
 }
@@ -192,7 +192,7 @@ interface Env {
   OAUTH_WORK_CLIENT_SECRET_GLOBEX?: string;
 }
 
-type DemoTenant = "acme" | "globex";
+type DemoTenant = 'acme' | 'globex';
 
 /**
  * Minted tokens are cached until shortly before they expire. This is not an
@@ -204,14 +204,14 @@ const tokenCache = new Map<DemoTenant, { token: string; expiresAt: number }>();
 
 async function mintDemoToken(tenant: DemoTenant, env: Env): Promise<Response> {
   const clientId =
-    tenant === "acme" ? env.OAUTH_WORK_CLIENT_ID_ACME : env.OAUTH_WORK_CLIENT_ID_GLOBEX;
+    tenant === 'acme' ? env.OAUTH_WORK_CLIENT_ID_ACME : env.OAUTH_WORK_CLIENT_ID_GLOBEX;
   const clientSecret =
-    tenant === "acme" ? env.OAUTH_WORK_CLIENT_SECRET_ACME : env.OAUTH_WORK_CLIENT_SECRET_GLOBEX;
+    tenant === 'acme' ? env.OAUTH_WORK_CLIENT_SECRET_ACME : env.OAUTH_WORK_CLIENT_SECRET_GLOBEX;
 
   if (!clientId || !clientSecret) {
     // Deployable before the clients exist, and honest about why it cannot answer.
     return Response.json(
-      { error: "demo token vending is not configured yet", tenant },
+      { error: 'demo token vending is not configured yet', tenant },
       { status: 503 },
     );
   }
@@ -225,10 +225,10 @@ async function mintDemoToken(tenant: DemoTenant, env: Env): Promise<Response> {
   // the token endpoint reads RFC 8707 resource indicators off the form and
   // reflects them into `aud`, which is the claim fold matches on.
   const res = await fetch(`${ISSUER}/token`, {
-    method: "POST",
-    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
     body: new URLSearchParams({
-      grant_type: "client_credentials",
+      grant_type: 'client_credentials',
       client_id: clientId,
       client_secret: clientSecret,
       resource: RESOURCE,
@@ -236,7 +236,7 @@ async function mintDemoToken(tenant: DemoTenant, env: Env): Promise<Response> {
   });
 
   if (!res.ok) {
-    return Response.json({ error: "could not mint a demo token", tenant }, { status: 502 });
+    return Response.json({ error: 'could not mint a demo token', tenant }, { status: 502 });
   }
 
   const body = (await res.json()) as { access_token: string; expires_in: number };
@@ -253,8 +253,8 @@ export default {
 
     // Bare host is the "I pasted the URL in a browser" case: fold answers 404
     // there, so send it to the console, which is this gateway's front door.
-    if (url.pathname === "/") {
-      return Response.redirect(new URL("/console/", url).toString(), 302);
+    if (url.pathname === '/') {
+      return Response.redirect(new URL('/console/', url).toString(), 302);
     }
 
     // The copy-paste path. A visitor curling this gateway needs a token, and
@@ -262,19 +262,19 @@ export default {
     // demo. The tokens are audience-pinned to this gateway and bounded by the
     // tenant budgets above, so what a holder can do is exactly what the
     // walkthrough shows.
-    if (url.pathname === "/demo-token") {
-      const tenant = url.searchParams.get("tenant");
-      if (tenant !== "acme" && tenant !== "globex") {
+    if (url.pathname === '/demo-token') {
+      const tenant = url.searchParams.get('tenant');
+      if (tenant !== 'acme' && tenant !== 'globex') {
         return Response.json({ error: 'tenant must be "acme" or "globex"' }, { status: 400 });
       }
       return mintDemoToken(tenant, env);
     }
 
     try {
-      return await getContainer(env.FOLD_ENTERPRISE as never, "enterprise").fetch(request);
+      return await getContainer(env.FOLD_ENTERPRISE as never, 'enterprise').fetch(request);
     } catch {
       // Container cold-start hiccup: a clean 503 beats an opaque 1101.
-      return new Response("enterprise gateway is starting, retry in a few seconds\n", {
+      return new Response('enterprise gateway is starting, retry in a few seconds\n', {
         status: 503,
       });
     }
