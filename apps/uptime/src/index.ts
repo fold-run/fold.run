@@ -1,8 +1,9 @@
 /**
  * fold-uptime — cron monitor for the public fold.run properties.
  *
- * Every 5 minutes: HTTP checks on the site and docs, plus an MCP initialize
- * round trip against the demo gateway. State lives in one
+ * Every 5 minutes: HTTP checks on the site and docs, an MCP initialize round
+ * trip against the open gateways, and — for a gateway that requires a token —
+ * an assertion that it refuses one that has none. State lives in one
  * Durable Object; /status serves the latest snapshot; an optional
  * ALERT_WEBHOOK secret receives a POST on every state transition (down
  * after 2 consecutive failures, and recovery).
@@ -15,8 +16,22 @@ export interface Env {
 
 interface Target {
   id: string;
-  kind: 'http' | 'mcp-init';
+  /**
+   * `mcp-guarded` is for a gateway with `auth.mode: "required"`, where the
+   * `mcp-init` probe would read a correct 401 as an outage. It asserts the
+   * refusal instead: a 401 carrying a `WWW-Authenticate` challenge is the
+   * pass condition, and anything else — including a 200 — is a failure.
+   * A gateway that started answering initialize unauthenticated has lost its
+   * auth config, which no availability check would otherwise notice.
+   */
+  kind: 'http' | 'mcp-init' | 'mcp-guarded';
   url: string;
+  /**
+   * `mcp-guarded` only: an unauthenticated endpoint carrying `version`.
+   * The refusal above proves the door is locked but says nothing about the
+   * build behind it, and `/health` is open by design on every fold gateway.
+   */
+  versionUrl?: string;
   /**
    * The release this deployment is supposed to be serving, compared against
    * `serverInfo.version` from the initialize round trip we already make.
@@ -27,7 +42,8 @@ interface Target {
    * pin and redeploying the container are separate acts and only the first
    * one is in a commit.
    *
-   * Must equal the tag in apps/demo/Dockerfile; CI fails if it drifts.
+   * Must equal the tag pinned in the container apps' Dockerfiles — every
+   * gateway runs one release — and CI fails if any of them drift apart.
    */
   expectVersion?: string;
 }
@@ -40,6 +56,15 @@ const TARGETS: Target[] = [
   // separates "gateway down" from "upstream down" when demo alerts fire.
   { id: 'demo', kind: 'mcp-init', url: 'https://demo.fold.run/mcp', expectVersion: 'v1.12.0' },
   { id: 'demo-tasks', kind: 'mcp-init', url: 'https://tasks.fold.run/mcp' },
+  // The governed gateway. Its correct answer to an anonymous initialize is a
+  // 401, so it needs the guarded check rather than the one the demo uses.
+  {
+    id: 'enterprise',
+    kind: 'mcp-guarded',
+    url: 'https://enterprise.fold.run/mcp',
+    versionUrl: 'https://enterprise.fold.run/health',
+    expectVersion: 'v1.12.0',
+  },
 ];
 
 const FAILURES_BEFORE_DOWN = 2;
@@ -62,11 +87,64 @@ interface TargetState {
   versionStale?: boolean;
 }
 
+/**
+ * A gateway that requires a token: assert the refusal, then read the build
+ * from the open health endpoint. Two requests rather than one, which also
+ * keeps its container as warm as the demo's single ping keeps that one.
+ */
+async function checkGuarded(
+  target: Target,
+  started: number,
+): Promise<{ ok: boolean; latencyMs: number; error?: string; version?: string }> {
+  const res = await fetch(target.url, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json', accept: 'application/json, text/event-stream' },
+    body: JSON.stringify({
+      jsonrpc: '2.0',
+      id: 1,
+      method: 'initialize',
+      params: {
+        protocolVersion: '2026-07-28',
+        capabilities: {},
+        clientInfo: { name: 'fold-uptime', version: '1' },
+      },
+    }),
+    signal: AbortSignal.timeout(CHECK_TIMEOUT_MS),
+  });
+  const latencyMs = Date.now() - started;
+  if (res.status !== 401) {
+    // A 200 here is the alarming case, not a relief: the gateway is serving
+    // MCP to anyone. Name it as such rather than reporting a bare status.
+    const detail =
+      res.status === 200 ? 'answered initialize UNAUTHENTICATED' : `HTTP ${res.status}`;
+    return { ok: false, latencyMs, error: `expected 401, ${detail}` };
+  }
+  if (!res.headers.get('www-authenticate')) {
+    return { ok: false, latencyMs, error: '401 without a WWW-Authenticate challenge' };
+  }
+  if (!target.versionUrl) return { ok: true, latencyMs };
+  try {
+    const health = await fetch(target.versionUrl, {
+      signal: AbortSignal.timeout(CHECK_TIMEOUT_MS),
+    });
+    if (!health.ok) return { ok: false, latencyMs, error: `health HTTP ${health.status}` };
+    const version = (await health.json<{ version?: string }>()).version;
+    return { ok: true, latencyMs, ...(version !== undefined && { version }) };
+  } catch (error) {
+    return {
+      ok: false,
+      latencyMs,
+      error: `health: ${error instanceof Error ? error.message : String(error)}`,
+    };
+  }
+}
+
 async function checkTarget(
   target: Target,
 ): Promise<{ ok: boolean; latencyMs: number; error?: string; version?: string }> {
   const started = Date.now();
   try {
+    if (target.kind === 'mcp-guarded') return await checkGuarded(target, started);
     const res =
       target.kind === 'mcp-init'
         ? await fetch(target.url, {
