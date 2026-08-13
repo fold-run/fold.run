@@ -1,8 +1,17 @@
-# enterprise.fold.run — what has to exist before this deploys
+# enterprise.fold.run — what it depends on in the identity provider
 
-`apps/enterprise` is committed and validated but not deployed: its config names
-things that do not exist yet in the identity provider. This is that list, plus
-what a review of the provider's OAuth flows turned up while writing it.
+**Status: live.** `enterprise.fold.run` is deployed, and everything in section 1
+is provisioned on oauth.work — `spa_fold_enterprise` resolves at
+`https://oauth.work/authorize`, and `/demo-token` mints working tokens for both
+tenants. Section 1 is now the record of what exists and how to recreate it, not
+a to-do list; re-run the provisioning script to rebuild it.
+
+Verified end to end on 2026-08-13 against production on both sides: a
+client-credentials token from oauth.work carries `iss=https://oauth.work`,
+`aud=https://enterprise.fold.run`, `org_id`, and `actor_type=agent`, and the
+gateway resolves the tenant from `org_id` and enforces the subset — a globex
+agent calling a gitmcp tool is refused with `-32042` before the upstream is
+contacted, while the same call as acme reaches gitmcp and is answered by it.
 
 The gateway config lives in `src/index.ts`; every literal below appears there,
 so the two must agree exactly.
@@ -44,7 +53,8 @@ without making a visitor register an account.
 - **`client_type: "agent"`**, not `"service"` — the gateway's policy rules match
   `actor_type: "agent"`, and `routes/token.ts` derives that from `client_type`.
   A client registered as `service` gets a token that verifies correctly and
-  then matches no rule, which is a confusing failure. See finding 5.
+  then matches no policy rule — the request is denied by `defaultDecision`,
+  which looks like a gateway fault rather than a registration mistake.
 - `org_id` set to the matching org: the minted token carries it, and that is
   what resolves the fold tenant.
 
@@ -82,10 +92,19 @@ DATABASE_URL=… node --experimental-strip-types \
 
 ## 2. Findings from reviewing the provider's OAuth flows
 
-**Addressed on oauth.work** (demo no longer blocked by these): RFC 9207 `iss` on
-auth redirects + discovery flag; RFC 8707 resource syntax + per-client
-`allowed_resources` allowlist on client_credentials; `/revoke` requires client
-authentication and matching `client_id`; auth-code TTL shortened to 60s.
+Each finding is kept as written at review time — present tense, describing the
+code as it was. **Re-verified against production on 2026-08-13:** five of the
+six are fixed, so read the state in the heading and the table before the prose.
+Only finding 4 remains, and it is a decision rather than a defect.
+
+| | Finding | State |
+|---|---|---|
+| 1 | `iss` on the authorization response (RFC 9207) | fixed — discovery advertises `authorization_response_iss_parameter_supported: true` |
+| 2 | `resource` unvalidated on client_credentials | fixed — per-client `allowed_resources` |
+| 3 | `resource` syntax unchecked at `/authorize` | fixed — shared `parseResourceIndicators` |
+| 4 | repeated `resource` dropped at `/authorize` | **open** — `authorize.ts` still flattens to one value |
+| 5 | `/revoke` unauthenticated | fixed — answers 401 without client auth |
+| 6 | auth-code TTL 10 minutes | fixed — `TTL.authCode` is 60s |
 
 **None of these blocked the demo.** The flows fold depends on — authorization
 code with PKCE, client credentials, RFC 8707 audience binding, JWKS
@@ -100,7 +119,7 @@ family revocation on reuse; PAR is single-use through a Postgres arbiter rather
 than a racy KV get-then-delete; DPoP is opt-in with `Bearer` as the default;
 and no endpoint accepts an access token in a query string.
 
-### Finding 1 — the authorization response carries no `iss` (RFC 9207)
+### Finding 1 — the authorization response carries no `iss` (RFC 9207) — FIXED
 
 **Severity: medium. Spec: OAuth 2.1 mix-up defense.**
 
@@ -117,7 +136,7 @@ construction* a client of many authorization servers.
 **Fix:** add `iss` to both the success and error redirects, and set the metadata
 flag.
 
-### Finding 2 — `resource` is unvalidated on the client-credentials grant
+### Finding 2 — `resource` is unvalidated on the client-credentials grant — FIXED
 
 **Severity: medium-high in a multi-tenant deployment. Spec: RFC 8707 §2.**
 
@@ -138,7 +157,7 @@ RFC 8707 §2.2 specifies `invalid_target` for exactly this case.
 rejecting anything else with `invalid_target`. A useful interim step is finding
 3, which is a few lines.
 
-### Finding 3 — `resource` syntax is not checked at `/authorize`
+### Finding 3 — `resource` syntax is not checked at `/authorize` — FIXED
 
 **Severity: low. Spec: RFC 8707 §2.**
 
@@ -149,7 +168,7 @@ unchecked.
 **Fix:** one shared validator used by both `/authorize` and `/token`, which is
 also the natural home for finding 2's entitlement check.
 
-### Finding 4 — repeated `resource` parameters are dropped at `/authorize`
+### Finding 4 — repeated `resource` parameters are dropped at `/authorize` — OPEN
 
 **Severity: low. Spec: RFC 8707 §2 (the parameter may repeat).**
 
@@ -158,7 +177,7 @@ also the natural home for finding 2's entitlement check.
 of the same flow disagree. The code comments the limitation, so this is a
 "decide and record" item rather than a bug found by surprise.
 
-### Finding 5 — `/revoke` does not authenticate the caller
+### Finding 5 — `/revoke` does not authenticate the caller — FIXED
 
 **Severity: low-medium. Spec: RFC 7009 §2.1.**
 
@@ -174,7 +193,7 @@ Worth noting the neighbouring endpoint is *stricter* than the spec:
 **Fix:** authenticate the client and verify the token's `client_id` matches
 before revoking.
 
-### Finding 6 — authorization codes live 10 minutes
+### Finding 6 — authorization codes live 10 minutes — FIXED
 
 **Severity: low.**
 
@@ -188,24 +207,60 @@ the exposure is small, but 60s costs nothing.
 user — but `index.ts:48` refuses to start the request when it is set on an
 https issuer. Fail-closed, no change needed.
 
-## 3. Verifying it once the pieces exist
+## 3. Verifying it
+
+`/demo-token` mints a **client-credentials** token, so everything below runs as
+an *agent*. That matters for what you should expect back: policy narrows the
+agent surface below the tenant's upstream subset, which is the whole argument
+for putting policy at the gateway. Signing into the console as a demo user
+shows the wider, human surface.
+
+| | tenant subset | what an **agent** token sees | what a signed-in **user** sees |
+|---|---|---|---|
+| `acme` | all three | `cfdocs`, `git`, `jobs` | all three |
+| `globex` | `cf-docs`, `demo-tasks` | `jobs` only (`globex-agents` allows `demo-tasks`) | `cfdocs` (one tool) + `jobs` |
 
 ```bash
 # 1. A token, and it should be a JWT (three dot-separated segments), not opaque
-curl -s "https://enterprise.fold.run/demo-token?tenant=globex" | jq -r .access_token
+TOKEN=$(curl -s "https://enterprise.fold.run/demo-token?tenant=globex" | jq -r .access_token)
 
 # 2. aud must equal https://enterprise.fold.run, and org_id must be org_globex
 #    (decode the payload; both are what fold matches on)
+echo "$TOKEN" | cut -d. -f2 | base64 -d 2>/dev/null | jq '{iss,aud,org_id,sub,actor_type}'
+```
 
-# 3. globex sees two upstreams and a short tool list; acme sees three and more
-curl -s -X POST https://enterprise.fold.run/mcp \
-  -H "Authorization: Bearer $TOKEN" -H 'Content-Type: application/json' \
-  -H 'Accept: application/json, text/event-stream' \
-  -d '{"jsonrpc":"2.0","id":1,"method":"tools/list"}'
+MCP over streamable HTTP is a **session** protocol: `tools/list` before
+`initialize` returns `method "tools/list" is invalid during session
+initialization`. Handshake first, and carry the `Mcp-Session-Id` the initialize
+response returns as a header.
 
-# 4. a globex agent calling a gitmcp tool is refused before policy runs
-#    (-32042, and gitmcp is never contacted)
+```bash
+BASE=https://enterprise.fold.run
+H=(-H "Authorization: Bearer $TOKEN" -H 'Content-Type: application/json'
+   -H 'Accept: application/json, text/event-stream')
+
+# 3a. initialize — the session id comes back as a *response header*
+SID=$(curl -s -D - -o /dev/null "${H[@]}" -X POST "$BASE/mcp" \
+  -d '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2025-06-18","capabilities":{},"clientInfo":{"name":"setup","version":"1"}}}' \
+  | tr -d '\r' | awk -F': ' 'tolower($1)=="mcp-session-id"{print $2}')
+
+# 3b. the initialized notification closes the handshake
+curl -s -o /dev/null "${H[@]}" -H "Mcp-Session-Id: $SID" -X POST "$BASE/mcp" \
+  -d '{"jsonrpc":"2.0","method":"notifications/initialized"}'
+
+# 3c. now the tool list — one entry for a globex agent, four for acme
+curl -s "${H[@]}" -H "Mcp-Session-Id: $SID" -X POST "$BASE/mcp" \
+  -d '{"jsonrpc":"2.0","id":2,"method":"tools/list"}'
+
+# 4. a globex agent calling a gitmcp tool is refused before the upstream is
+#    contacted: -32042, "upstream \"gitmcp\" is outside tenant \"globex\"'s subset".
+#    Run the same call with an acme token as the control — it reaches gitmcp,
+#    which answers on its own terms. That contrast is the demonstration: not
+#    "both fail", but "one is refused by policy, the other gets through".
+curl -s "${H[@]}" -H "Mcp-Session-Id: $SID" -X POST "$BASE/mcp" \
+  -d '{"jsonrpc":"2.0","id":3,"method":"tools/call","params":{"name":"git__search_generic_code","arguments":{"owner":"cloudflare","repo":"workers-sdk"}}}'
 ```
 
 Then sign into `https://enterprise.fold.run/console/` as each demo user and
-compare the federation view — that comparison is the deliverable.
+compare the federation view — that comparison is the deliverable, and it shows
+the user surface the agent checks above deliberately do not.
