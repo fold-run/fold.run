@@ -38,10 +38,26 @@ const RESOURCE = 'https://enterprise.fold.run';
 // The federation is the demo's, so the two gateways tell one story about one
 // set of upstreams. What differs is everything governance decides.
 const FOLD_CONFIG = {
+  // `pinDefinitions` matters more here than anywhere: two of these three
+  // servers are operated by other people, and a tool's description and schema
+  // are the instruction set a model acts on. fold records each definition's
+  // digest and reports a change through audit and a metric — arithmetic, not
+  // judgement. It never asks whether a description is malicious, only whether
+  // it is the one that was there when the federation was approved.
   upstreams: [
-    { id: 'cf-docs', url: 'https://docs.mcp.cloudflare.com/mcp', namespace: 'cfdocs' },
-    { id: 'gitmcp', url: 'https://gitmcp.io/docs', namespace: 'git' },
-    { id: 'demo-tasks', url: 'https://tasks.fold.run/mcp', namespace: 'jobs' },
+    {
+      id: 'cf-docs',
+      url: 'https://docs.mcp.cloudflare.com/mcp',
+      namespace: 'cfdocs',
+      pinDefinitions: 'warn',
+    },
+    { id: 'gitmcp', url: 'https://gitmcp.io/docs', namespace: 'git', pinDefinitions: 'warn' },
+    {
+      id: 'demo-tasks',
+      url: 'https://tasks.fold.run/mcp',
+      namespace: 'jobs',
+      pinDefinitions: 'warn',
+    },
   ],
 
   auth: {
@@ -91,6 +107,16 @@ const FOLD_CONFIG = {
   // putting policy at the gateway rather than in each client.
   policy: {
     defaultDecision: 'deny',
+    // The same posture pointed the other way. A bridged session lets an
+    // upstream reach back through the gateway to the caller's client —
+    // sampling borrows the caller's model, elicitation puts a prompt in front
+    // of the caller's human — and both spend something of theirs. fold
+    // defaults this to `allow` for compatibility with deployments that
+    // predate the check, which is exactly why a gateway arguing for
+    // deny-by-default should not leave it there. No rule grants it, so
+    // nothing may ask, and an upstream that may not ask is never told the
+    // caller can answer.
+    serverInitiatedDecision: 'deny',
     rules: [
       {
         id: 'acme-people',
