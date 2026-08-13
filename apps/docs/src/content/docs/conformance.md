@@ -18,6 +18,12 @@ directions: sampling (`sampling/createMessage`), elicitation, logging,
 progress notifications, and resource subscriptions bridged from upstream
 servers back to the originating client.
 
+**The receipt is one click away**, because a conformance claim you have to take
+on faith isn't one: the
+[`conformance` job from the v1.12.0 release run](https://github.com/fold-run/fold/actions/runs/31745179711/job/94597912793),
+and
+[every green run on `main`](https://github.com/fold-run/fold/actions/workflows/ci.yml?query=branch%3Amain+is%3Asuccess).
+
 - The `conformance` job in [CI](https://github.com/fold-run/fold/blob/main/.github/workflows/ci.yml)
   runs on every push and pull request, pinned to a conformance-suite commit in
   [`scripts/conformance.sh`](https://github.com/fold-run/fold/blob/main/scripts/conformance.sh)
