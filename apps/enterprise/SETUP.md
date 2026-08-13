@@ -6,12 +6,21 @@ is provisioned on oauth.work — `spa_fold_enterprise` resolves at
 tenants. Section 1 is now the record of what exists and how to recreate it, not
 a to-do list; re-run the provisioning script to rebuild it.
 
-Verified end to end on 2026-08-13 against production on both sides: a
-client-credentials token from oauth.work carries `iss=https://oauth.work`,
-`aud=https://enterprise.fold.run`, `org_id`, and `actor_type=agent`, and the
-gateway resolves the tenant from `org_id` and enforces the subset — a globex
-agent calling a gitmcp tool is refused with `-32042` before the upstream is
-contacted, while the same call as acme reaches gitmcp and is answered by it.
+Verified end to end on 2026-08-13 against production on both sides, on both
+paths a customer can take.
+
+*Machine* — a client-credentials token from oauth.work carries
+`iss=https://oauth.work`, `aud=https://enterprise.fold.run`, `org_id`, and
+`actor_type=agent`; the gateway resolves the tenant from `org_id` and enforces
+the subset. A globex agent calling a gitmcp tool is refused with `-32042`
+before the upstream is contacted, while the same call as acme reaches gitmcp
+and is answered by it — the contrast, not a shared failure, is the proof.
+
+*Browser* — signing in at `https://enterprise.fold.run/console/` completes the
+authorization-code flow: `/authorize` on the apex, the sign-in and consent
+screens on the same origin, the consent decision as a native form POST so the
+authorization server can answer with a 302, and PKCE token exchange back at
+the console.
 
 The gateway config lives in `src/index.ts`; every literal below appears there,
 so the two must agree exactly.
@@ -93,16 +102,16 @@ DATABASE_URL=… node --experimental-strip-types \
 ## 2. Findings from reviewing the provider's OAuth flows
 
 Each finding is kept as written at review time — present tense, describing the
-code as it was. **Re-verified against production on 2026-08-13:** five of the
-six are fixed, so read the state in the heading and the table before the prose.
-Only finding 4 remains, and it is a decision rather than a defect.
+code as it was. **All six are now fixed and deployed** (re-verified against
+production on 2026-08-13), so read the state in the heading and the table
+before the prose.
 
 | | Finding | State |
 |---|---|---|
 | 1 | `iss` on the authorization response (RFC 9207) | fixed — discovery advertises `authorization_response_iss_parameter_supported: true` |
 | 2 | `resource` unvalidated on client_credentials | fixed — per-client `allowed_resources` |
 | 3 | `resource` syntax unchecked at `/authorize` | fixed — shared `parseResourceIndicators` |
-| 4 | repeated `resource` dropped at `/authorize` | **open** — `authorize.ts` still flattens to one value |
+| 4 | repeated `resource` dropped at `/authorize` | fixed — every value is bound, at `/authorize` and through PAR |
 | 5 | `/revoke` unauthenticated | fixed — answers 401 without client auth |
 | 6 | auth-code TTL 10 minutes | fixed — `TTL.authCode` is 60s |
 
@@ -168,7 +177,7 @@ unchecked.
 **Fix:** one shared validator used by both `/authorize` and `/token`, which is
 also the natural home for finding 2's entitlement check.
 
-### Finding 4 — repeated `resource` parameters are dropped at `/authorize` — OPEN
+### Finding 4 — repeated `resource` parameters are dropped at `/authorize` — FIXED
 
 **Severity: low. Spec: RFC 8707 §2 (the parameter may repeat).**
 
@@ -176,6 +185,16 @@ also the natural home for finding 2's entitlement check.
 `/authorize` reads a flattened query map and keeps one value, so the two ends
 of the same flow disagree. The code comments the limitation, so this is a
 "decide and record" item rather than a bug found by surprise.
+
+**Fixed.** `/par` also dropped the extras — it stored parameters with
+`form.get` into a flat map, so a pushed request lost the repetition before
+`/authorize` ever saw it. Both now collect every value.
+
+The severity held. The extra value was *dropped, not honoured*: `aud` never
+carried it, and `/token`'s subset check still refused it afterwards. What the
+client lost was the answer — it asked for two resources, silently got one, and
+found out at the token request. It now gets `invalid_target` at the point it
+asked, per RFC 8707 §2.2.
 
 ### Finding 5 — `/revoke` does not authenticate the caller — FIXED
 
