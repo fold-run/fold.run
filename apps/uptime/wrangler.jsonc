@@ -4,6 +4,14 @@
   "main": "src/index.ts",
   "compatibility_date": "2026-07-01",
   "workers_dev": true,
+
+  // Its own hostname, like every other property here. It had none, which was
+  // invisible in a way worth recording: the zone carries a wildcard CNAME, so
+  // an unrouted subdomain does not fail to resolve — it resolves, reaches
+  // Cloudflare, finds no Worker and no origin, and answers 522. "Never
+  // configured" and "down" are the same symptom, and the thing that was down
+  // was the monitor.
+  "routes": [{ "pattern": "uptime.fold.run", "custom_domain": true }],
   "observability": {
     "enabled": true
   },

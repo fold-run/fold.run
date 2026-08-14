@@ -999,7 +999,7 @@ const {
             if (Date.now() - at < 300000) apply(data);
           }
           if (badge.hidden) {
-            fetch('https://fold-uptime.bauman.workers.dev/status')
+            fetch('https://uptime.fold.run/status')
               .then((r) => r.json())
               .then((data) => {
                 sessionStorage.setItem(KEY, JSON.stringify({ at: Date.now(), data }));
