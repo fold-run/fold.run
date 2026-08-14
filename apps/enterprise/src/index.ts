@@ -175,7 +175,7 @@ const FOLD_CONFIG = {
   audit: { sinks: [{ type: 'stdout' }] },
 
   server: {
-    allowedHosts: ['enterprise.fold.run', 'fold-enterprise.bauman.workers.dev'],
+    allowedHosts: ['enterprise.fold.run'],
     // Three ceilings that answer different questions: the gateway's own floor,
     // each person's bucket, and (above, per tenant) one bucket for a team.
     rateLimit: { requestsPerMinute: 300, perPrincipalPerMinute: 60 },

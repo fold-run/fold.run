@@ -17,7 +17,13 @@
   "main": "src/index.ts",
   "compatibility_date": "2026-07-01",
   "observability": { "enabled": true },
-  "workers_dev": true,
+  // No workers.dev hostname. Every Worker here answers on its own domain, and
+  // a second address it also answers on is a second thing to get right: it
+  // bypasses whatever is bound to the real hostname, and it turns up in a page
+  // or a config as the URL somebody happened to copy — which is how the status
+  // page ended up naming a personal account's subdomain in public. Deploying
+  // with this false removes the route.
+  "workers_dev": false,
   "containers": [
     {
       "class_name": "FoldEnterprise",

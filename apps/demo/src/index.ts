@@ -17,7 +17,7 @@ const FOLD_CONFIG = {
     { id: 'demo-tasks', url: 'https://tasks.fold.run/mcp', namespace: 'jobs' },
   ],
   server: {
-    allowedHosts: ['demo.fold.run', 'fold-demo.bauman.workers.dev'],
+    allowedHosts: ['demo.fold.run'],
     rateLimit: { requestsPerMinute: 300 },
     // The console doubles as the demo's front door: /console shows the
     // federation live, and its test console is a plain governed MCP client.
