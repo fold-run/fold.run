@@ -2,8 +2,9 @@
  * fold-demo-tasks — the jobs__* upstream behind demo.fold.run.
  *
  * A singleton Cloudflare Container runs the Go MCP task server built from
- * ./main.go (see Dockerfile). Same worker name as the retired TS version,
- * so the workers.dev URL the demo gateway dials is unchanged.
+ * ./main.go (see Dockerfile). The worker name is the retired TS version's,
+ * kept because renaming a Worker is a new Durable Object namespace rather
+ * than a rename. The demo gateway dials it at tasks.fold.run.
  */
 {
   "$schema": "node_modules/wrangler/config-schema.json",
@@ -11,7 +12,13 @@
   "main": "src/index.ts",
   "compatibility_date": "2026-07-01",
   "observability": { "enabled": true },
-  "workers_dev": true,
+  // No workers.dev hostname. Every Worker here answers on its own domain, and
+  // a second address it also answers on is a second thing to get right: it
+  // bypasses whatever is bound to the real hostname, and it turns up in a page
+  // or a config as the URL somebody happened to copy — which is how the status
+  // page ended up naming a personal account's subdomain in public. Deploying
+  // with this false removes the route.
+  "workers_dev": false,
   "containers": [
     {
       "class_name": "TasksBoard",

@@ -5,9 +5,9 @@
 // redesign (stardust/migrated/status/index.html); rows are JS-rendered.
 import Base from '../layouts/Base.astro';
 
-// The monitor's own hostname, not the workers.dev one it also answers on: a
-// public page should not name a personal account's subdomain, and that
-// hostname is not ours to keep.
+// The monitor's own hostname. It used to be the free one every Worker gets,
+// which meant a public page naming a personal account's subdomain — and that
+// address is gone now: every Worker here is deployed with workers_dev false.
 const STATUS_URL = 'https://uptime.fold.run/status';
 
 const description =
