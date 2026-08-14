@@ -54,7 +54,7 @@ const TARGETS: Target[] = [
   // Real JSON-RPC round trips (initialize), not just a 200 — we monitor
   // the protocol, not the port. Checking the tasks upstream directly also
   // separates "gateway down" from "upstream down" when demo alerts fire.
-  { id: 'demo', kind: 'mcp-init', url: 'https://demo.fold.run/mcp', expectVersion: 'v1.12.0' },
+  { id: 'demo', kind: 'mcp-init', url: 'https://demo.fold.run/mcp', expectVersion: 'v1.13.0' },
   { id: 'demo-tasks', kind: 'mcp-init', url: 'https://tasks.fold.run/mcp' },
   // The governed gateway. Its correct answer to an anonymous initialize is a
   // 401, so it needs the guarded check rather than the one the demo uses.
@@ -63,7 +63,7 @@ const TARGETS: Target[] = [
     kind: 'mcp-guarded',
     url: 'https://enterprise.fold.run/mcp',
     versionUrl: 'https://enterprise.fold.run/health',
-    expectVersion: 'v1.12.0',
+    expectVersion: 'v1.13.0',
   },
 ];
 
