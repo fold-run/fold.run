@@ -20,7 +20,7 @@ servers back to the originating client.
 
 **The receipt is one click away**, because a conformance claim you have to take
 on faith isn't one: the
-[`conformance` job from the v1.12.0 release run](https://github.com/fold-run/fold/actions/runs/31745179711/job/94597912793),
+[`conformance` job from the v1.13.0 release run](https://github.com/fold-run/fold/actions/runs/31833840044/job/94875553255),
 and
 [every green run on `main`](https://github.com/fold-run/fold/actions/workflows/ci.yml?query=branch%3Amain+is%3Asuccess).
 
