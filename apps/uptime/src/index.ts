@@ -33,6 +33,28 @@ interface Target {
    */
   versionUrl?: string;
   /**
+   * The status code that means healthy, when it is not a 2xx.
+   *
+   * The console proxies the control plane so both share one origin, and an
+   * anonymous `/v1/me` is *supposed* to be a 401. A 404 there is the failure
+   * worth catching: a Worker that fetches another Worker by hostname is
+   * answered by itself, the request never leaves, and the 404 it returns is
+   * indistinguishable from the other service saying no. Availability checks
+   * read that as fine, because the origin is up — it is the binding behind it
+   * that is gone.
+   */
+  expectStatus?: number;
+  /**
+   * Publish this target on fold.run/status. Default true.
+   *
+   * The product estate is monitored before it is announced: alerting is the
+   * point, and the status page is a separate, editorial decision about what
+   * customers are told exists. `overall` is computed from published targets
+   * only, so the page never shows "degraded" with every visible row green —
+   * a private failure still fires ALERT_WEBHOOK, which is what it is for.
+   */
+  public?: boolean;
+  /**
    * The release this deployment is supposed to be serving, compared against
    * `serverInfo.version` from the initialize round trip we already make.
    *
@@ -64,6 +86,36 @@ const TARGETS: Target[] = [
     url: 'https://enterprise.fold.run/mcp',
     versionUrl: 'https://enterprise.fold.run/health',
     expectVersion: 'v1.13.0',
+  },
+
+  // fold cloud — the half of the estate that has customers, and until now the
+  // half with no alerting. Unpublished for the moment: monitoring it is not
+  // the same decision as listing it on a public page.
+  //
+  // No `expectVersion` on the two Go services: their /health answers 200 with
+  // an empty body, so there is no build to read. Catching a stale control
+  // plane needs something that reports one, which is a change over there.
+  { id: 'cloud-api', kind: 'http', url: 'https://api.fold.run/health', public: false },
+  { id: 'cloud-broker', kind: 'http', url: 'https://broker.fold.run/health', public: false },
+  // The router's apex metadata (RFC 9728) — what a gateway's 401 challenge
+  // points a client at, so a client that cannot read this cannot find its way
+  // in at all, however healthy the gateway behind it is.
+  {
+    id: 'cloud-mcp',
+    kind: 'http',
+    url: 'https://mcp.fold.run/.well-known/oauth-protected-resource',
+    public: false,
+  },
+  { id: 'cloud-console', kind: 'http', url: 'https://console.fold.run/', public: false },
+  // The console's other half. Serving its assets proves nothing about the
+  // proxy that makes it one origin with the API, and that proxy is a service
+  // binding — see `expectStatus`.
+  {
+    id: 'cloud-console-api',
+    kind: 'http',
+    url: 'https://console.fold.run/v1/me',
+    expectStatus: 401,
+    public: false,
   },
 ];
 
@@ -167,6 +219,15 @@ async function checkTarget(
           })
         : await fetch(target.url, { signal: AbortSignal.timeout(CHECK_TIMEOUT_MS) });
     const latencyMs = Date.now() - started;
+    if (target.expectStatus !== undefined) {
+      return res.status === target.expectStatus
+        ? { ok: true, latencyMs }
+        : {
+            ok: false,
+            latencyMs,
+            error: `expected ${target.expectStatus}, got HTTP ${res.status}`,
+          };
+    }
     if (!res.ok) return { ok: false, latencyMs, error: `HTTP ${res.status}` };
     if (target.kind === 'mcp-init') {
       const body = await res.text();
@@ -235,7 +296,11 @@ export class UptimeMonitorDO implements DurableObject {
       return Response.json({ ran: true, at: new Date().toISOString() });
     }
     if (path === '/status') {
-      const targets = [...this.#targets.values()];
+      // Published targets only. Everything is checked and everything alerts;
+      // this endpoint is what fold.run/status renders, and an unannounced
+      // property showing up there would announce it.
+      const publish = new Set(TARGETS.filter((t) => t.public !== false).map((t) => t.id));
+      const targets = [...this.#targets.values()].filter((t) => publish.has(t.id));
       const allUp = targets.length > 0 && targets.every((t) => t.status === 'up');
       // `overall` and the HTTP code stay a pure availability signal: a target
       // on the wrong build is serving every request correctly, and flipping
