@@ -67,6 +67,8 @@ const jsonld = {
   interface Target {
     id: string;
     url: string;
+    /** Set when the URL is a probe path rather than a name worth showing. */
+    label?: string;
     status: 'up' | 'down';
     lastCheckAt: string;
     latencyMs?: number;
@@ -107,7 +109,7 @@ const jsonld = {
       const moved = previous.has(t.id) && previous.get(t.id) !== reading;
       previous.set(t.id, reading);
       li.innerHTML = `
-        <span class="name">${t.url.replace('https://', '')}</span>
+        <span class="name">${t.label ?? t.url.replace('https://', '')}</span>
         <span class="readout${moved ? ' moved' : ''}"><span class="${isUp ? 'up-dot' : 'down-dot'}" aria-hidden="true"></span><span
             class="state${isUp ? '' : ' down'}">${isUp ? 'up' : 'down'}</span><span class="sep" aria-hidden="true">·</span><span
             class="${isUp ? 'latency' : 'checked'}">${reading}</span><span class="sep" aria-hidden="true">·</span><span class="checked">checked ${ago(t.lastCheckAt)}</span></span>`;
