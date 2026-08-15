@@ -45,6 +45,15 @@ interface Target {
    */
   expectStatus?: number;
   /**
+   * What the status page calls this, when the URL is not the answer.
+   *
+   * The page names a row by its URL, which reads well for `fold.run` and badly
+   * for a probe: `mcp.fold.run/.well-known/oauth-protected-resource` is a
+   * mouthful, and `console.fold.run/v1/me` looks like something leaked. The
+   * URL stays the thing that is checked; this is the thing that is read.
+   */
+  label?: string;
+  /**
    * Publish this target on fold.run/status. Default true.
    *
    * The product estate is monitored before it is announced: alerting is the
@@ -88,34 +97,48 @@ const TARGETS: Target[] = [
     expectVersion: 'v1.13.0',
   },
 
-  // fold cloud — the half of the estate that has customers, and until now the
-  // half with no alerting. Unpublished for the moment: monitoring it is not
-  // the same decision as listing it on a public page.
+  // fold cloud — the half of the estate that has customers. Published: with no
+  // ALERT_WEBHOOK set, the status page is the only channel these have, and a
+  // check nobody can see is not monitoring. `public: false` stays available
+  // for the next property that is watched before it is announced.
   //
-  // No `expectVersion` on the two Go services: their /health answers 200 with
-  // an empty body, so there is no build to read. Catching a stale control
-  // plane needs something that reports one, which is a change over there.
-  { id: 'cloud-api', kind: 'http', url: 'https://api.fold.run/health', public: false },
-  { id: 'cloud-broker', kind: 'http', url: 'https://broker.fold.run/health', public: false },
+  // No `expectVersion` on the two Go services yet. Their /health has just
+  // learned to report the commit it was built from, but these deploy from
+  // main rather than from a tag, so there is nothing here to compare it to —
+  // the value is worth surfacing before it is worth asserting.
+  { id: 'cloud-api', kind: 'http', label: 'api.fold.run', url: 'https://api.fold.run/health' },
+  {
+    id: 'cloud-broker',
+    kind: 'http',
+    label: 'broker.fold.run',
+    url: 'https://broker.fold.run/health',
+  },
   // The router's apex metadata (RFC 9728) — what a gateway's 401 challenge
   // points a client at, so a client that cannot read this cannot find its way
   // in at all, however healthy the gateway behind it is.
   {
     id: 'cloud-mcp',
     kind: 'http',
+    label: 'mcp.fold.run',
     url: 'https://mcp.fold.run/.well-known/oauth-protected-resource',
-    public: false,
   },
-  { id: 'cloud-console', kind: 'http', url: 'https://console.fold.run/', public: false },
-  // The console's other half. Serving its assets proves nothing about the
-  // proxy that makes it one origin with the API, and that proxy is a service
-  // binding — see `expectStatus`.
+  {
+    id: 'cloud-console',
+    kind: 'http',
+    label: 'console.fold.run',
+    url: 'https://console.fold.run/',
+  },
+  // The console's other half, and a row of its own because it fails on its
+  // own: serving assets proves nothing about the proxy that makes the console
+  // and the API one origin, and that proxy is a service binding — see
+  // `expectStatus`. A customer whose console loads but cannot sign in is
+  // looking at exactly this row.
   {
     id: 'cloud-console-api',
     kind: 'http',
+    label: 'console.fold.run · API',
     url: 'https://console.fold.run/v1/me',
     expectStatus: 401,
-    public: false,
   },
 ];
 
@@ -126,6 +149,8 @@ const HISTORY_LIMIT = 288; // 24h of 5-minute checks per target
 interface TargetState {
   id: string;
   url: string;
+  /** What the status page shows instead of the URL, when one is set. */
+  label?: string;
   status: 'up' | 'down';
   consecutiveFailures: number;
   lastCheckAt: string;
@@ -332,6 +357,7 @@ export class UptimeMonitorDO implements DurableObject {
       const prev: TargetState = this.#targets.get(t.id) ?? {
         id: t.id,
         url: t.url,
+        ...(t.label !== undefined && { label: t.label }),
         status: 'up',
         consecutiveFailures: 0,
         lastCheckAt: '',
@@ -347,6 +373,7 @@ export class UptimeMonitorDO implements DurableObject {
       const next: TargetState = {
         id: t.id,
         url: t.url,
+        ...(t.label !== undefined && { label: t.label }),
         status,
         consecutiveFailures,
         lastCheckAt: new Date().toISOString(),
