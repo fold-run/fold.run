@@ -145,6 +145,18 @@ const TARGETS: Target[] = [
 const FAILURES_BEFORE_DOWN = 2;
 const CHECK_TIMEOUT_MS = 10_000;
 const HISTORY_LIMIT = 288; // 24h of 5-minute checks per target
+/**
+ * The floor between check cycles, whoever asked for one.
+ *
+ * /run is unauthenticated, which is right — forcing a check after a deploy
+ * should not need a credential, and the endpoint reveals nothing /status does
+ * not. But each call fans out to every target, so without a floor it is a
+ * small amplifier aimed at fold's own properties by anyone who finds it.
+ *
+ * Well under the 5-minute cron, so the schedule never trips it, and short
+ * enough that a human forcing a check still gets one.
+ */
+const MIN_RUN_INTERVAL_MS = 30_000;
 
 interface TargetState {
   id: string;
@@ -304,6 +316,9 @@ export class UptimeMonitorDO implements DurableObject {
   readonly #state: DurableObjectState;
   readonly #env: Env;
   #targets = new Map<string, TargetState>();
+  /** Held in memory only: an evicted DO forgets and allows a run, which is the
+   *  direction a monitor should fail in. */
+  #lastRunAt = 0;
 
   constructor(state: DurableObjectState, env: Env) {
     this.#state = state;
@@ -317,6 +332,20 @@ export class UptimeMonitorDO implements DurableObject {
   async fetch(request: Request): Promise<Response> {
     const path = new URL(request.url).pathname;
     if (path === '/run') {
+      const now = Date.now();
+      if (now - this.#lastRunAt < MIN_RUN_INTERVAL_MS) {
+        // Deliberately not an error: the caller asked for fresh state and the
+        // state is fresh. Saying so beats running the fan-out again.
+        return Response.json(
+          {
+            ran: false,
+            reason: 'checked moments ago',
+            at: new Date(this.#lastRunAt).toISOString(),
+          },
+          { status: 429 },
+        );
+      }
+      this.#lastRunAt = now;
       await this.#runChecks();
       return Response.json({ ran: true, at: new Date().toISOString() });
     }
