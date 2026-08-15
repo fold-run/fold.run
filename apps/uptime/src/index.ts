@@ -385,7 +385,23 @@ export class UptimeMonitorDO implements DurableObject {
   /** Best-effort webhook on up↔down transitions; silence must never break checks. */
   async #alert(target: TargetState, from: 'up' | 'down'): Promise<void> {
     const webhook = this.#env.ALERT_WEBHOOK;
-    if (webhook === undefined || webhook === '') return;
+    if (webhook === undefined || webhook === '') {
+      // A published target still shows the transition on the status page, so
+      // no webhook is a thin channel rather than no channel. An unpublished
+      // one has nowhere else to appear: it is filtered out of /status by
+      // design, so this transition just happened to nobody. Say so, loudly,
+      // because the failure is silence and silence is what it looks like when
+      // everything is fine.
+      const published = TARGETS.find((t) => t.id === target.id)?.public !== false;
+      if (!published) {
+        console.warn(
+          `fold-uptime: ${target.id} went ${target.status} and nothing was told — ` +
+            'it is unpublished and ALERT_WEBHOOK is not set. ' +
+            'Set the secret, or make the target public.',
+        );
+      }
+      return;
+    }
     const emoji = target.status === 'down' ? '🔴' : '🟢';
     try {
       await fetch(webhook, {
