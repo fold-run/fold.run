@@ -533,13 +533,7 @@ const jsonld = {
          and the receipts for the hosted service are not written yet: it has
          carried a handful of calls for a handful of teams. So this says
          private beta, names what it is, and asks — rather than offering a
-         signup that would imply a product anybody can buy today.
-
-         The address is a personal one on purpose, for now: cloud@fold.run is
-         configured in Cloudflare Email Routing but the apex MX still points at
-         Google, so mail to it would bounce back to whoever wrote in. A working
-         address beats the right-looking one. Swap it the moment the routing
-         cutover lands. It sits
+         signup that would imply a product anybody can buy today. It sits
          before the closing band deliberately: run it yourself is still the
          call to action, and this is the alternative for teams who would
          rather not. -->
@@ -564,6 +558,12 @@ const jsonld = {
           traffic. Self-hosting is not the lesser path and never will be — it is the same binary,
           and the configuration below is the whole of it.
         </p>
+        {/* A personal address on purpose, for now. The role address is
+            configured but does not receive yet, and a request that bounces is
+            worse than a plain-looking link. Swap it once it does. This is a
+            JSX-style comment rather than an HTML one deliberately: the others
+            in this file explain markup and are worth shipping, and an
+            operational note about a temporary state is not. */}
         <a
           class="btn btn-secondary"
           href="mailto:blake.bauman@gmail.com?subject=fold%20cloud%20access&body=Team%3A%0AWhat%20you%27d%20connect%3A%0AHow%20many%20people%3A%0A"
