@@ -10,7 +10,7 @@ interface Props {
   canonical: string;
   jsonld?: Record<string, unknown>;
   /** Highlights the matching nav/footer link with aria-current="page". */
-  current?: 'blog' | 'status';
+  current?: 'blog';
   /** Value for <body data-template> (landing | listing | article | unique). */
   template?: string;
   /**
@@ -632,89 +632,6 @@ const {
         max-width: 32ch;
         margin-top: var(--spacing-sm);
       }
-      /* One of the few places Live is licensed: this dot is a live reading off
-         the uptime worker, not decoration. */
-      .status-badge {
-        display: inline-flex;
-        align-items: center;
-        gap: 9px;
-        margin-top: var(--spacing-md);
-        padding: 7px 12px;
-        border: 1px solid var(--color-trace);
-        border-radius: var(--radius);
-        font-family: var(--mono-font-family);
-        font-size: 0.75rem;
-        letter-spacing: 0.04em;
-        color: var(--color-static);
-      }
-      .status-badge:hover {
-        color: var(--color-fg);
-        text-decoration: none;
-        border-color: var(--color-trace-hi);
-      }
-      .status-badge .dot {
-        width: 6px;
-        height: 6px;
-        border-radius: 50%;
-        background: var(--color-accent);
-        flex: none;
-      }
-      /* The dot is a live reading off the uptime worker, not an ornament, so a
-         slow breath on it is true: something is still checking. It only appears
-         once the fetch resolves, so the motion never runs against a stale or
-         unknown state. */
-      @media (prefers-reduced-motion: no-preference) {
-        .status-badge .dot {
-          animation: status-breath 2.6s ease-in-out infinite;
-        }
-        @keyframes status-breath {
-          0%,
-          100% {
-            opacity: 1;
-          }
-          50% {
-            opacity: 0.35;
-          }
-        }
-      }
-      .status-badge.degraded .dot {
-        background: var(--color-down);
-      }
-      .status-badge[hidden] {
-        display: none;
-      }
-      /* skeleton shimmer (status rows pre-hydration) */
-      .skeleton {
-        position: relative;
-        overflow: hidden;
-        background: var(--color-rack-hi);
-        border-radius: var(--radius-sm);
-        min-height: 1.1em;
-      }
-      .skeleton::after {
-        content: '';
-        position: absolute;
-        inset: 0;
-        transform: translateX(-100%);
-        background-image: linear-gradient(
-          90deg,
-          rgba(58, 58, 58, 0) 0,
-          rgba(58, 58, 58, 0.35) 20%,
-          rgba(58, 58, 58, 0.75) 60%,
-          rgba(58, 58, 58, 0)
-        );
-        animation: shimmer 2s infinite;
-      }
-      @keyframes shimmer {
-        100% {
-          transform: translateX(100%);
-        }
-      }
-      @media (prefers-reduced-motion: reduce) {
-        .skeleton::after {
-          animation: none;
-        }
-      }
       /* Four columns need 220 + 3×140 + 3×48 of gutter; below ~900px that no
          longer fits the viewport and the last column pushed the page sideways. */
       @media (max-width: 900px) {
@@ -930,9 +847,7 @@ const {
               <a href="https://docs.fold.run/benchmarks/"><b>Benchmarks</b><span>Honest numbers, caveats attached</span></a>
             </div>
           </div>
-          <a href="/#demo">Live demo</a>
           <a href="/blog/" aria-current={current === 'blog' ? 'page' : undefined}>Blog</a>
-          <a href="/status/" aria-current={current === 'status' ? 'page' : undefined}>Status</a>
           <a href="https://github.com/fold-run/fold">GitHub</a>
           <a class="btn btn-primary" href="https://docs.fold.run/getting-started/">Get started</a>
         </nav>
@@ -946,15 +861,9 @@ const {
         <div class="foot-brand">
           <Wordmark height={19} descriptor="MCP gateway" />
           <p>One governed endpoint between every MCP client and every MCP server.</p>
-          <a class="status-badge" href="/status/" data-status-badge hidden>
-            <span class="dot" aria-hidden="true"></span>
-            <span data-status-text>All systems operational</span>
-          </a>
         </div>
         <nav aria-label="Product" class="foot-col">
           <h2>Product</h2>
-          <a href="/#demo">Live demo</a>
-          <a href="https://demo.fold.run/console/">Live console</a>
           <a href="https://docs.fold.run/use-cases/">Use cases</a>
           <a href="https://docs.fold.run/benchmarks/">Benchmarks</a>
           <a href="https://docs.fold.run/conformance/">Conformance</a>
@@ -970,7 +879,6 @@ const {
           <h2>Project</h2>
           <a href="https://github.com/fold-run/fold">GitHub</a>
           <a href="/blog/" aria-current={current === 'blog' ? 'page' : undefined}>Blog</a>
-          <a href="/status/" aria-current={current === 'status' ? 'page' : undefined}>Status</a>
           <a href="https://github.com/fold-run/fold/blob/main/LICENSE">Apache-2.0 license</a>
         </nav>
       </div>
@@ -980,35 +888,6 @@ const {
       </div>
     </footer>
       <script>
-      // footer status badge: live uptime feed, session-cached 5 minutes
-      {
-        const badge = document.querySelector('[data-status-badge]');
-        if (badge) {
-          const KEY = 'fold-status';
-          const apply = (d) => {
-            const down = d.targets?.some((t) => t.status === 'down');
-            badge.querySelector('[data-status-text]').textContent = down
-              ? 'Partial outage'
-              : 'All systems operational';
-            badge.classList.toggle('degraded', Boolean(down));
-            badge.hidden = false;
-          };
-          const cached = sessionStorage.getItem(KEY);
-          if (cached) {
-            const { at, data } = JSON.parse(cached);
-            if (Date.now() - at < 300000) apply(data);
-          }
-          if (badge.hidden) {
-            fetch('https://uptime.fold.run/status')
-              .then((r) => r.json())
-              .then((data) => {
-                sessionStorage.setItem(KEY, JSON.stringify({ at: Date.now(), data }));
-                apply(data);
-              })
-              .catch(() => {});
-          }
-        }
-      }
       // nav: docs dropdown + mobile menu (progressive enhancement)
       {
         const drop = document.querySelector('.nav-drop > button');
