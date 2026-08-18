@@ -538,41 +538,6 @@ const jsonld = {
          call to action, and this is the alternative for teams who would
          rather not. -->
     <section
-      class="cloud"
-      id="cloud"
-      data-section="cloud"
-      data-intent="offer the hosted path, honestly"
-      data-layout="contained"
-      data-module="cta-band"
-    >
-      <div class="wrap">
-        <p class="kicker">fold cloud<span class="sep" aria-hidden="true">·</span>private beta</p>
-        <h2>Or let us run it.</h2>
-        <p>
-          The same gateway, hosted: one endpoint for your team, your own MCP servers behind it, and
-          every request made as the person who made it rather than as a shared key. Import
-          the <code>.mcp.json</code> your agents already read and it federates what was in it.
-        </p>
-        <p class="cloud-note">
-          It is open to a small number of teams while we learn what breaks under somebody else's
-          traffic. Self-hosting is not the lesser path and never will be — it is the same binary,
-          and the configuration below is the whole of it.
-        </p>
-        {/* A personal address on purpose, for now. The role address is
-            configured but does not receive yet, and a request that bounces is
-            worse than a plain-looking link. Swap it once it does. This is a
-            JSX-style comment rather than an HTML one deliberately: the others
-            in this file explain markup and are worth shipping, and an
-            operational note about a temporary state is not. */}
-        <a
-          class="btn btn-secondary"
-          href="mailto:blake.bauman@gmail.com?subject=fold%20cloud%20access&body=Team%3A%0AWhat%20you%27d%20connect%3A%0AHow%20many%20people%3A%0A"
-          >Request access</a
-        >
-      </div>
-    </section>
-
-    <section
       class="closing"
       data-section="closing"
       data-intent="drive action"
@@ -762,33 +727,6 @@ const jsonld = {
      Translated by 10px, a frozen hero is merely 10px low: fully painted, fully
      readable, indistinguishable in text extraction. Nothing here is gated
      behind a class either, so reduced motion just gets the finished state. */
-  /* Contained rather than full-bleed, and quieter than the closing band, so
-     the hosted option reads as an alternative to self-hosting rather than as
-     the thing the page was building to. */
-  .cloud {
-    padding-block: var(--section-padding-sm);
-    background: var(--color-rack);
-  }
-  .cloud .wrap {
-    max-width: 62ch;
-  }
-  .cloud h2 {
-    margin-block: var(--spacing-xs) var(--spacing-sm);
-  }
-  /* Paragraphs here are spaced explicitly because the global rule sets
-     `margin: 0 0 24px` and this section's own layout would otherwise leave the
-     pitch and the caveat reading as one block of text. They do different jobs
-     and the eye should be able to tell. */
-  .cloud .wrap > p {
-    margin-block: 0 var(--spacing-sm);
-  }
-  .cloud-note {
-    color: var(--color-static);
-  }
-  .cloud .btn {
-    margin-block-start: var(--spacing-lg);
-  }
-
   @media (prefers-reduced-motion: no-preference) {
     .hero .kicker,
     .hero h1,
