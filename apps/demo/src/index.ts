@@ -31,8 +31,11 @@ const FOLD_CONFIG = {
 
 export class FoldDemo extends Container {
   defaultPort = 8080;
-  // The uptime monitor pings every 5 minutes, so in practice this never
-  // sleeps; the timeout is the backstop if monitoring stops.
+  // This is now the only thing bounding what the container costs. It used to
+  // be a backstop — the uptime monitor pinged every 5 minutes, so in practice
+  // the container never slept — but that monitor is undeployed, so an idle
+  // hour after one visitor is an hour of provisioned memory and disk on the
+  // bill. Shorten it to trade a ~1.7s cold start for that tail.
   sleepAfter = '1h';
   enableInternet = true; // fold dials the public upstreams
   envVars = { FOLD_CONFIG: JSON.stringify(FOLD_CONFIG) };

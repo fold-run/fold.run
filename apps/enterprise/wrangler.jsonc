@@ -28,7 +28,20 @@
     {
       "class_name": "FoldEnterprise",
       "image": "./Dockerfile",
-      "instance_type": "basic",
+      // Memory and disk are billed on what is *provisioned*, for every awake
+      // second; only CPU is billed on what is used. An oversized instance
+      // therefore costs full price to sit idle, which is most of what a
+      // gateway does. `lite` is 256 MiB / 2 GB / (1/16) vCPU, and that is
+      // measurably enough: under exactly those limits, fold v1.13.0 on this gateway's larger
+      // config boots in 1.75s and idles at 11.0 MiB, under 5% of the cap. There is
+      // no dial between this and `basic` and nothing below it — a custom
+      // instance type needs a minimum of 1 vCPU and 3 GiB per vCPU, so the
+      // smallest one that can be configured is larger than `basic`. Because
+      // CPU bills on utilization, `lite` and `basic` cost the same to compute
+      // with; the 1/16 vCPU is a ceiling on bursts, not a saving. That ceiling
+      // is what to watch if fan-out gets slow with many upstreams, and going
+      // back to `basic` is this one line.
+      "instance_type": "lite",
       "max_instances": 1
     }
   ],
