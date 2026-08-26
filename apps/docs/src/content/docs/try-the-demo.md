@@ -10,7 +10,7 @@ description: Walk through demo.fold.run — three public MCP servers behind one 
 | Namespace | Upstream | Notes |
 |---|---|---|
 | `cfdocs__*` | Cloudflare's MCP docs server | A real third-party upstream |
-| `git__*` | GitMCP | A public 2025-era server on the session handshake — behind the gateway, just another namespace |
+| `git__*` | GitMCP | A public upstream two revisions behind — behind the gateway, just another namespace |
 | `jobs__*` | fold-demo-tasks | A task-minting server (Go, on the official SDK); where the [federated-tasks story](https://fold.run/blog/federating-mcp-tasks/) runs live |
 
 Every example below is plain `curl`. Responses arrive as a one-event SSE body — read the `data:` line.
@@ -83,15 +83,15 @@ curl -s -X POST $DEMO -H "mcp-session-id: $SID" \
 
 No tool name, no routing hint — fold resolves the owner from its affinity index, or by a read-only probe across upstreams for a task it never saw minted (try it: task ids survive sessions, so `tasks/get` from a brand-new session still finds the owner). Mutating methods are never fanned out; `tasks/cancel` and `tasks/result` locate first, then act on the owner alone. The mechanism is the subject of [the launch post](https://fold.run/blog/federating-mcp-tasks/).
 
-## 4. The 2025-era upstream you address the same way
+## 4. The older upstream you address the same way
 
 ```bash
 curl -s -X POST $DEMO -H "mcp-session-id: $SID" \
   -H 'content-type: application/json' -H 'accept: application/json, text/event-stream' \
-  -d '{"jsonrpc":"2.0","id":6,"method":"tools/call","params":{"name":"git__fetch_generic_documentation","arguments":{"owner":"modelcontextprotocol","repo":"servers"}}}'
+  -d '{"jsonrpc":"2.0","id":6,"method":"tools/call","params":{"name":"git__fetch_generic_documentation","arguments":{"owner":"modelcontextprotocol","repo":"go-sdk"}}}'
 ```
 
-GitMCP speaks the 2025-era session handshake. fold — built on the official Go SDK on both sides of the proxy — holds its own client session to it, so from where you're standing it's just another namespace in the same tool list, behind the same governance.
+GitMCP still speaks MCP `2025-03-26` — two revisions behind the `2025-11-25` this gateway negotiates, whatever you ask for at `initialize`. fold — built on the official Go SDK on both sides of the proxy — holds its own client session to it at the version it speaks, so from where you're standing it's just another namespace in the same tool list, behind the same governance.
 
 ## 5. Watch it in the console
 

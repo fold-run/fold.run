@@ -8,7 +8,7 @@
 import { Container, getContainer } from '@cloudflare/containers';
 
 // The federation the demo presents. Upstreams are public MCP servers:
-// Cloudflare's docs server, GitMCP (2025-era session handshake), and the
+// Cloudflare's docs server, GitMCP (pins MCP 2025-03-26), and the
 // task-minting demo server (apps/demo-tasks — Go, official SDK).
 const FOLD_CONFIG = {
   upstreams: [
