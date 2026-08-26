@@ -182,6 +182,67 @@ const jsonld = {
     </section>
 
     <section
+      class="demo"
+      id="demo"
+      data-section="demo"
+      data-intent="prove it live"
+      data-layout="contained"
+      data-items="3"
+    >
+      <div class="wrap">
+        <div class="section-head">
+          <h2>See it live.</h2>
+          <p class="intro">
+            demo.fold.run federates three public MCP servers behind one endpoint: the unmodified
+            release binary, governed by its own config. Rate-limited, unauthenticated, no warranty.
+            Copy-paste walkthrough: <a href="https://docs.fold.run/try-the-demo/">try the demo</a>.
+          </p>
+        </div>
+        <!-- Two live surfaces, and the order matters: the console is the one a
+             reader can open in this tab, right now, without wiring up a client.
+             It was documented and running on the demo for weeks while the
+             marketing site never once mentioned it. -->
+        <div class="route-rail">
+          <a class="chip chip-link" href="https://demo.fold.run/console/">demo.fold.run/console</a>
+          <span class="chip">demo.fold.run/mcp</span>
+          <span class="muted" style="font-size: var(--body-sm)">three upstreams · one endpoint</span
+          >
+        </div>
+        <p class="console-note">
+          The console ships inside the binary and needs no client. Open it and you are reading the
+          running federation: live latency and breaker state per upstream, the policy in effect, the
+          rate limit. Its test console calls the same endpoint everything else does. The topology
+          at the top of this page is drawn by hand; <a
+            href="https://demo.fold.run/console/#/upstreams?view=map">the console draws its own</a
+          > from the federation it is serving.
+        </p>
+        <div class="termini">
+          <article class="terminus">
+            <h3>cfdocs__*</h3>
+            <p>
+              Cloudflare's public docs MCP server — a real third-party upstream, governed and
+              namespaced like any internal one.
+            </p>
+          </article>
+          <article class="terminus">
+            <h3>git__*</h3>
+            <p>
+              GitMCP — a public 2025-era server on the session handshake. Behind the gateway it is
+              just another namespace.
+            </p>
+          </article>
+          <article class="terminus">
+            <h3>jobs__*</h3>
+            <p>
+              A task-minting demo server. Start a job, then poll it with nothing but the task id —
+              fold routes every poll to the owner.
+            </p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section
       class="runit"
       id="run"
       data-section="run-it"
@@ -983,6 +1044,100 @@ const jsonld = {
       gap: var(--spacing-md);
     }
   }
+  .termini {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: var(--spacing-md);
+  }
+  .terminus {
+    background: var(--color-rack);
+    border: 1px solid var(--color-trace);
+    border-radius: var(--radius);
+    background: var(--color-rack);
+    border: 1px solid var(--color-trace);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-lg);
+    position: relative;
+  }
+  .terminus::before {
+    /* fold-line connector notch: each terminus hangs off the shared route */
+    content: '';
+    position: absolute;
+    top: -13px;
+    left: var(--spacing-lg);
+    width: 1px;
+    height: 12px;
+    border-left: 1px solid var(--color-trace);
+  }
+  .route-rail {
+    margin-bottom: var(--spacing-md);
+    display: flex;
+    align-items: flex-end;
+    gap: var(--spacing-sm);
+    flex-wrap: wrap;
+  }
+  /* the count sits at the far end, the chips group at the near one */
+  .route-rail .muted {
+    margin-left: auto;
+  }
+  /* The console chip is the only clickable thing in the rail, so it carries
+     Signal text and a live dot against the mcp chip's Carrier. */
+  .route-rail .chip-link {
+    color: var(--color-fg);
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition:
+      border-color 0.18s cubic-bezier(0.25, 1, 0.5, 1),
+      background-color 0.18s cubic-bezier(0.25, 1, 0.5, 1);
+  }
+  .route-rail .chip-link::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--color-accent);
+    flex: none;
+  }
+  .route-rail .chip-link:hover {
+    background: var(--color-rack-hi);
+    border-color: var(--color-trace-hi);
+    text-decoration: none;
+  }
+  .console-note {
+    color: var(--color-static);
+    font-size: var(--body-sm);
+    line-height: var(--line-height-meta);
+    max-width: 78ch;
+    margin-bottom: var(--spacing-lg);
+  }
+  .route-rail .chip {
+    font-family: var(--mono-font-family);
+    font-size: var(--body-sm);
+    letter-spacing: 0;
+    color: var(--color-carrier);
+    background: var(--color-rack);
+    border: 1px solid var(--color-trace);
+    border-radius: var(--radius-sm);
+    padding: 3px 10px;
+  }
+  /* The namespace prefixes are literal wire strings, so they keep the mono —
+     the one place a heading earns it. */
+  .terminus h3 {
+    font-family: var(--mono-font-family);
+    font-size: 1.0625rem;
+    font-weight: var(--weight-heading);
+    letter-spacing: 0;
+    line-height: var(--line-height-card);
+    margin-bottom: var(--spacing-sm);
+    color: var(--color-fg);
+  }
+  .terminus p {
+    color: var(--color-static);
+    font-size: var(--body);
+    line-height: 1.6;
+  }
+
   /* ===== run-it: numbered route ===== */
   .route-steps {
     display: grid;
@@ -1151,6 +1306,9 @@ const jsonld = {
        the sheet to sit behind, and the mask's ellipse covers the full width —
        the rules end up running through the headline. */
     .hero-grid {
+      display: none;
+    }
+    .terminus::before {
       display: none;
     }
     .diagram-panel {

@@ -77,6 +77,7 @@ Read that table with care, in two places. The direct column serves *one* upstrea
 - **Retention is the honest throughput framing.** The direct column is an in-process SDK server doing near-zero work per call; fold adds a full second hop through the same SDK. Against a real upstream doing real work, the relative overhead shrinks toward the latency gate's ~0.2 ms.
 - **Sessions are the unit of concurrency.** Each load-test connection is a full SDK client session, with fold holding a per-client upstream session behind it — the deployment-realistic shape, not an artificial socket storm. One untuned instance, default config.
 - **The gate and the typical number are different things.** 5 ms is a regression tripwire that has to survive noisy shared runners; ~0.2 ms is what the same instrument reports on quiet hardware. Quote the second, rely on the first.
+- **Don't benchmark the [demo](/try-the-demo/).** demo.fold.run is rate-limited, containerized on fractional-vCPU hardware, and fronted by Cloudflare — it demonstrates federation, not fold's ceiling. The harness is one command; run that instead.
 
 In production, the same questions are answered continuously by the [`fold_request_duration_seconds` and `fold_upstream_request_duration_seconds` histograms](/operations/#metrics) — the difference between them is the gateway's share of every real request.
 
