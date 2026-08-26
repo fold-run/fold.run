@@ -9,7 +9,12 @@ import { Container, getContainer } from '@cloudflare/containers';
 
 export class TasksBoard extends Container {
   defaultPort = 8080;
-  sleepAfter = '2h';
+  // Matched to the gateways rather than left at the 2h it had. The board is
+  // ephemeral by design and demo jobs run for seconds, so there is no state
+  // here worth paying to keep warm — and the gateway forwards every tasks
+  // call, which keeps this awake for exactly as long as anyone is using it.
+  // A poll that does land on a cold start gets the 503-and-retry below.
+  sleepAfter = '15m';
   enableInternet = false; // it dials nothing; it only answers
 }
 

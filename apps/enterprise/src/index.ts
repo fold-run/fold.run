@@ -199,10 +199,10 @@ const FOLD_CONFIG = {
 
 export class FoldEnterprise extends Container {
   defaultPort = 8080;
-  // The same billing lever as the demo's, and the same caveat: the uptime
-  // monitor that used to keep this warm is undeployed, so this timeout alone
-  // decides how long an idle container stays on the bill.
-  sleepAfter = '1h';
+  // The same billing lever as the demo's, on the same 15m, and with more
+  // reason to be short: this gateway is behind a sign-in, so it sits idle
+  // more of the time than the demo does.
+  sleepAfter = '15m';
   enableInternet = true; // fold dials the public upstreams and the issuer's JWKS
   envVars = { FOLD_CONFIG: JSON.stringify(FOLD_CONFIG) };
 }

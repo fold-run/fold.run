@@ -31,12 +31,14 @@ const FOLD_CONFIG = {
 
 export class FoldDemo extends Container {
   defaultPort = 8080;
-  // This is now the only thing bounding what the container costs. It used to
-  // be a backstop — the uptime monitor pinged every 5 minutes, so in practice
-  // the container never slept — but that monitor is undeployed, so an idle
-  // hour after one visitor is an hour of provisioned memory and disk on the
-  // bill. Shorten it to trade a ~1.7s cold start for that tail.
-  sleepAfter = '1h';
+  // The only thing bounding what this container costs. It used to be a
+  // backstop — the uptime monitor pinged every 5 minutes, so in practice the
+  // container never slept — but that monitor is undeployed, so every idle
+  // minute after a visitor leaves is provisioned memory and disk on the bill.
+  // 15m buys the tail back for a ~1.7s cold start on the next visitor, which
+  // is a fair trade for a demo people arrive at one at a time rather than in
+  // a steady stream.
+  sleepAfter = '15m';
   enableInternet = true; // fold dials the public upstreams
   envVars = { FOLD_CONFIG: JSON.stringify(FOLD_CONFIG) };
 }
