@@ -10,7 +10,7 @@ description: Walk through demo.fold.run — three public MCP servers behind one 
 | Namespace | Upstream | Notes |
 |---|---|---|
 | `cfdocs__*` | Cloudflare's MCP docs server | A real third-party upstream |
-| `git__*` | GitMCP | A public upstream a revision behind — behind the gateway, just another namespace |
+| `git__*` | GitMCP | A public upstream two revisions behind — behind the gateway, just another namespace |
 | `jobs__*` | fold-demo-tasks | A task-minting server (Go, on the official SDK); where the [federated-tasks story](https://fold.run/blog/federating-mcp-tasks/) runs live |
 
 Every example below is plain `curl`. Responses arrive as a one-event SSE body — read the `data:` line.
@@ -91,7 +91,7 @@ curl -s -X POST $DEMO -H "mcp-session-id: $SID" \
   -d '{"jsonrpc":"2.0","id":6,"method":"tools/call","params":{"name":"git__fetch_generic_documentation","arguments":{"owner":"modelcontextprotocol","repo":"go-sdk"}}}'
 ```
 
-GitMCP still speaks MCP `2025-03-26` — two revisions behind the `2026-07-28` you asked the gateway for at `initialize`. fold — built on the official Go SDK on both sides of the proxy — holds its own client session to it at the version it speaks, so from where you're standing it's just another namespace in the same tool list, behind the same governance.
+GitMCP still speaks MCP `2025-03-26` — two revisions behind the `2025-11-25` this gateway negotiates, whatever you ask for at `initialize`. fold — built on the official Go SDK on both sides of the proxy — holds its own client session to it at the version it speaks, so from where you're standing it's just another namespace in the same tool list, behind the same governance.
 
 ## 5. Watch it in the console
 
