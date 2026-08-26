@@ -239,6 +239,29 @@ const jsonld = {
             </p>
           </article>
         </div>
+
+        <!-- The same federation with the governance turned on. It is a separate
+             gateway because auth.mode is gateway-wide: demo stays anonymous and
+             copy-pasteable, and this one can require a token without taking that
+             away. Two deployments is the honest way to show both. -->
+        <div class="governed">
+          <h3>The same three upstreams, governed.</h3>
+          <p>
+            <a href="https://enterprise.fold.run/console/">enterprise.fold.run</a> runs the same
+            binary over the same federation, with auth required and two tenants on it. acme spends
+            up to 5,000 upstream calls a day at 120 req/min; globex gets 1,000 at 60, and never
+            reaches GitMCP at all — the subset filters the fan-out before policy runs, so that
+            upstream is not asked, not billed, and not a partial failure when it is down. Policy is
+            deny-by-default and splits each tenant by whether the caller is a person or an agent.
+          </p>
+          <div class="route-rail">
+            <a class="chip chip-link" href="https://enterprise.fold.run/console/"
+              >enterprise.fold.run/console</a
+            >
+            <span class="chip">enterprise.fold.run/mcp</span>
+            <span class="muted" style="font-size: var(--body-sm)">sign-in required</span>
+          </div>
+        </div>
       </div>
     </section>
 
@@ -1103,6 +1126,28 @@ const jsonld = {
     background: var(--color-rack-hi);
     border-color: var(--color-trace-hi);
     text-decoration: none;
+  }
+  /* The governed gateway hangs off the end of the demo section rather than
+     getting a section of its own: it is the same federation, and the argument
+     only lands next to the ungoverned one. */
+  .governed {
+    margin-top: var(--spacing-lg);
+    padding-top: var(--spacing-lg);
+    border-top: 1px solid var(--color-trace);
+  }
+  .governed h3 {
+    font-size: 1.0625rem;
+    font-weight: var(--weight-heading);
+    line-height: var(--line-height-card);
+    margin-bottom: var(--spacing-sm);
+    color: var(--color-fg);
+  }
+  .governed p {
+    color: var(--color-static);
+    font-size: var(--body);
+    line-height: 1.6;
+    max-width: 78ch;
+    margin-bottom: var(--spacing-md);
   }
   .console-note {
     color: var(--color-static);
