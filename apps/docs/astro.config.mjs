@@ -58,6 +58,7 @@ export default defineConfig({
       sidebar: [
         { label: 'Getting started', slug: 'getting-started' },
         { label: 'Run it locally', slug: 'run-it-locally' },
+        { label: 'Try the live demo', slug: 'try-the-demo' },
         { label: 'The console', slug: 'console' },
         { label: 'Use cases', slug: 'use-cases' },
         { label: 'Configuration', slug: 'configuration' },
