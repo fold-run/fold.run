@@ -210,11 +210,12 @@ const jsonld = {
         </div>
         <p class="console-note">
           The console ships inside the binary and needs no client. Open it and you are reading the
-          running federation: live latency and breaker state per upstream, the policy in effect, the
-          rate limit. Its test console calls the same endpoint everything else does. The topology
-          at the top of this page is drawn by hand; <a
+          running federation: a row per upstream carrying its breaker, whether it is connected and
+          its live latency. Its test console calls the same endpoint everything else does. The
+          topology at the top of this page is drawn by hand; <a
             href="https://demo.fold.run/console/#/upstreams?view=map">the console draws its own</a
-          > from the federation it is serving.
+          > from the federation it is serving, each route labelled with the latency it is answering
+          in.
         </p>
         <div class="termini">
           <article class="terminus">
