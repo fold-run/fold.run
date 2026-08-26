@@ -97,6 +97,36 @@ GitMCP speaks the 2025-era session handshake. fold — built on the official Go 
 
 Open **[demo.fold.run/console](https://demo.fold.run/console/)** — the read-only [fold console](/console/), enabled in the demo's config. The dashboard shows the three upstreams, their breaker state, and the deployment facts live, and **[the map view](https://demo.fold.run/console/#/upstreams?view=map)** draws the federation itself: one gateway node fanning out to cfdocs, git, and jobs, each route carrying that upstream's current breaker state. It's generated from `/api/federation`, so it's this demo's real topology, not a picture of one. The test console is a plain MCP client against the same `/mcp` endpoint you've been curling, governed and audited like any other caller.
 
+## The same federation, governed
+
+Everything above is unauthenticated on purpose. [`https://enterprise.fold.run`](https://enterprise.fold.run/console/) is the same binary over the same three upstreams with `auth.mode: required` — a separate deployment because `auth.mode` is gateway-wide, so making one governed would otherwise take the copy-pasteable one away.
+
+An anonymous `initialize` there answers `401` with an RFC 9728 challenge, which is the correct answer rather than a failure:
+
+```bash
+curl -si -X POST https://enterprise.fold.run/mcp \
+  -H 'content-type: application/json' -H 'accept: application/json, text/event-stream' \
+  -d '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2026-07-28","capabilities":{},"clientInfo":{"name":"me","version":"0"}}}' \
+  | grep -i www-authenticate
+# www-authenticate: Bearer resource_metadata="https://enterprise.fold.run/.well-known/oauth-protected-resource"
+```
+
+Follow that metadata and you get the issuer a client should sign in to — the discovery path an MCP client walks on its own:
+
+```bash
+curl -s https://enterprise.fold.run/.well-known/oauth-protected-resource
+# {"resource":"https://enterprise.fold.run","authorization_servers":["https://oauth.work"],...}
+```
+
+Two tenants sit on it, differing on every axis a tenant governs:
+
+| Tenant | Budget | Rate limit | Upstreams |
+|---|---|---|---|
+| `acme` | 5,000 upstream calls/day | 120 req/min | all three |
+| `globex` | 1,000 upstream calls/day | 60 req/min | `cf-docs`, `demo-tasks` — never reaches GitMCP |
+
+`globex`'s subset filters the fan-out *before* policy runs, so GitMCP is not asked, not billed, and not a partial failure when it is down. Policy is deny-by-default and splits each tenant by `actor_type`, so a signed-in person and that person's agent get different surfaces through the same gateway. The [console](https://enterprise.fold.run/console/) reads it all back live, behind sign-in.
+
 ## Run this yourself
 
 The demo is assembled from one config — the same shape as any fold deployment ([configuration reference](/configuration/)):
