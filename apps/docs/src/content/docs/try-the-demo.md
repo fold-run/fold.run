@@ -95,7 +95,7 @@ GitMCP speaks the 2025-era session handshake. fold — built on the official Go 
 
 ## 5. Watch it in the console
 
-Open **[demo.fold.run/console](https://demo.fold.run/console/)** — the read-only [fold console](/console/), enabled in the demo's config. The dashboard shows the three upstreams, their breaker state, and the deployment facts live, and **[the map view](https://demo.fold.run/console/#/upstreams?view=map)** draws the federation itself: one gateway node fanning out to cfdocs, git, and jobs, each route carrying that upstream's current breaker state. It's generated from `/api/federation`, so it's this demo's real topology, not a picture of one. The test console is a plain MCP client against the same `/mcp` endpoint you've been curling, governed and audited like any other caller.
+Open **[demo.fold.run/console](https://demo.fold.run/console/)** — the read-only [fold console](/console/), enabled in the demo's config. The upstreams table shows a row per upstream — namespace, source, auth, connected, breaker, latency — and **[the map view](https://demo.fold.run/console/#/upstreams?view=map)** draws the federation itself: one gateway node fanning out to cfdocs, git, and jobs, each route labelled with the latency that upstream is answering in, over a footer reading `3 of 3 connected · every route crosses auth, policy and audit`. It's generated from `/api/federation`, so it's this demo's real topology, not a picture of one. The test console is a plain MCP client against the same `/mcp` endpoint you've been curling, governed and audited like any other caller.
 
 ## The same federation, governed
 
