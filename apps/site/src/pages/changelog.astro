@@ -1,0 +1,142 @@
+---
+// What shipped in the gateway, newest first. Entries are curated from fold's
+// own CHANGELOG.md — the headline and the bolded lead of each bullet are the
+// release's own words, and every entry links out to the full notes rather than
+// restating them. Nothing here is written for the website.
+import { getCollection } from 'astro:content';
+import Closing from '../components/Closing.astro';
+import Base from '../layouts/Base.astro';
+import { LINKS } from '../lib/nav';
+import { SEO, SITE } from '../lib/seo';
+
+const entries = (await getCollection('changelog')).sort(
+  (a, b) => b.data.date.valueOf() - a.data.date.valueOf(),
+);
+
+const jsonld = {
+  '@context': 'https://schema.org',
+  '@type': 'CollectionPage',
+  name: SEO.changelog.title,
+  url: `${SITE}${SEO.changelog.pathname}`,
+};
+---
+
+<Base
+  title={SEO.changelog.title}
+  description={SEO.changelog.description}
+  canonical={`${SITE}${SEO.changelog.pathname}`}
+  jsonld={jsonld}
+  template="listing"
+>
+  <main id="main">
+    <section
+      class="index-hero"
+      data-section="index-hero"
+      data-intent="orient"
+      data-layout="contained"
+    >
+      <div class="wrap">
+        <h1>Changelog</h1>
+        <p class="lede">
+          What shipped in fold, newest first. Every release carries its full notes on GitHub.
+        </p>
+      </div>
+    </section>
+
+    <section
+      class="release-list"
+      data-section="release-list"
+      data-intent="discovery"
+      data-layout="stack"
+      data-items={String(entries.length)}
+    >
+      <div class="wrap">
+        {
+          entries.map((entry) => {
+            const iso = entry.data.date.toISOString().slice(0, 10);
+            return (
+              <article class="release">
+                <div class="release-meta">
+                  <time datetime={iso}>{iso}</time>
+                  {entry.data.version && (
+                    <a
+                      class="chip"
+                      href={`${LINKS.github}/releases/tag/${entry.data.version}`}
+                    >
+                      {entry.data.version}
+                    </a>
+                  )}
+                </div>
+                <div class="release-body">
+                  <h2>{entry.data.title}</h2>
+                  <div class="release-items" set:html={entry.rendered?.html} />
+                </div>
+              </article>
+            );
+          })
+        }
+      </div>
+    </section>
+
+    <Closing />
+  </main>
+</Base>
+
+<style is:global>
+  /* A dated ledger, not cards: the date column is the spine and a hairline
+     separates releases, which is the same row grammar the proof band and the
+     capability index use. */
+  .release-list .wrap {
+    display: grid;
+    gap: 0;
+  }
+  .release {
+    display: grid;
+    grid-template-columns: minmax(8rem, 10rem) minmax(0, 1fr);
+    gap: var(--spacing-lg);
+    padding-block: var(--spacing-lg);
+    border-top: 1px solid var(--color-trace);
+  }
+  .release:first-child {
+    border-top: 0;
+  }
+  .release-meta {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--spacing-sm);
+  }
+  .release-meta time {
+    font-family: var(--mono-font-family);
+    font-size: var(--body-sm);
+    font-variant-numeric: tabular-nums slashed-zero;
+    color: var(--color-static);
+  }
+  .release-body h2 {
+    font:
+      var(--weight-heading) var(--heading-md) / var(--line-height-card)
+      var(--heading-font-family);
+    letter-spacing: var(--tracking-card);
+    margin-bottom: var(--spacing-sm);
+    text-wrap: balance;
+  }
+  .release-items ul {
+    display: grid;
+    gap: 10px;
+    padding-left: 1.1rem;
+  }
+  .release-items li {
+    color: var(--color-static);
+    line-height: 1.6;
+  }
+  @media (max-width: 900px) {
+    .release {
+      grid-template-columns: 1fr;
+      gap: var(--spacing-sm);
+    }
+    .release-meta {
+      flex-direction: row;
+      align-items: center;
+    }
+  }
+</style>

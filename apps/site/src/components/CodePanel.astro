@@ -1,0 +1,40 @@
+---
+// The signature code surface: Rack ground, machined 2px corner, a context tag,
+// and a copy affordance — the three things DESIGN.json names as this
+// component's constraint. The blog shipped the first two only: the copy button
+// and its handler lived in index.astro and never reached those pages. The
+// handler now sits in Base.astro, so every panel on the site gets it.
+//
+// Code arrives as a string prop rather than as children, and it is the only
+// shape that survives both callers. Astro collapses whitespace in slotted
+// children, and MDX markdown-parses the children of a multi-line JSX block, so
+// a <pre> spanning a blank line is torn in half. A prop is inert to both.
+// The value is HTML: the highlight spans (.k keyword, .c comment) are authored
+// by hand, because DESIGN.md keeps syntax on the neutral ramp rather than
+// letting a highlighter spend a second accent.
+
+interface Props {
+  /** Context tag, top-left: a filename, a language, or what the block is. */
+  tag: string;
+  /** Describes the block for a reader tabbing through the scroll region. */
+  label: string;
+  /** Pre-highlighted HTML. Newlines and indentation are preserved verbatim. */
+  code: string;
+  /** Set false for a block that is a drawing rather than something runnable. */
+  copy?: boolean;
+}
+
+const { tag, label, code, copy = true } = Astro.props;
+---
+
+<div class="code-panel">
+  <div class="tag">
+    <span>{tag}</span>{
+      copy && (
+        <button type="button" data-copy aria-label={`Copy ${tag}`}>
+          copy
+        </button>
+      )
+    }
+  </div><pre tabindex="0" role="region" aria-label={label}><code set:html={code} /></pre>
+</div>

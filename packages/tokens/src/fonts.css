@@ -1,4 +1,20 @@
-/* self-hosted, OFL */
+/* fold self-hosted faces: IBM Plex Sans + Geist Mono (both OFL).
+
+   One home for the @font-face block, which was previously written out twice:
+   inline in apps/site/src/layouts/Base.astro and again at the top of
+   apps/docs/src/styles/fold.css, with a third dead copy at
+   apps/site/public/fonts/fonts.css that nothing linked.
+
+   The .woff2 binaries stay in each app's public/fonts/. fold.run and
+   docs.fold.run are separate origins and separate Workers deployments, so each
+   has to serve its own copy; only these declarations are shared.
+
+   The wordmark is deliberately NOT here. It ships as outlined paths
+   (DESIGN.md §5), so the one element that must be identical everywhere never
+   waits on a font load and no font binary is redistributed.
+
+   Spec: DESIGN.md §3 at the repo root. */
+
 @font-face {
   font-family: "Geist Mono";
   font-style: normal;

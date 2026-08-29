@@ -5,132 +5,31 @@
  * current-page rail, the focus ring, the brand mark. Machined 0–2px radii. No
  * gradients; elevation by background-step, not shadow. */
 
-/* ===== fonts — self-hosted IBM Plex Sans (ITF free license) + Geist Mono (OFL) ===== */
-@font-face {
-  font-family: "Geist Mono";
-  font-style: normal;
-  font-weight: 400;
-  font-display: swap;
-  src: url(/fonts/GeistMono-400-latin-ext.woff2) format("woff2");
-  unicode-range:
-    U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
-}
-@font-face {
-  font-family: "Geist Mono";
-  font-style: normal;
-  font-weight: 400;
-  font-display: swap;
-  src: url(/fonts/GeistMono-400-latin.woff2) format("woff2");
-  unicode-range:
-    U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
-}
-@font-face {
-  font-family: "Geist Mono";
-  font-style: normal;
-  font-weight: 600;
-  font-display: swap;
-  src: url(/fonts/GeistMono-600-latin-ext.woff2) format("woff2");
-  unicode-range:
-    U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
-}
-@font-face {
-  font-family: "Geist Mono";
-  font-style: normal;
-  font-weight: 600;
-  font-display: swap;
-  src: url(/fonts/GeistMono-600-latin.woff2) format("woff2");
-  unicode-range:
-    U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
-}
-@font-face {
-  font-family: "IBM Plex Sans";
-  font-style: normal;
-  font-weight: 400;
-  font-display: swap;
-  src: url(/fonts/IBMPlexSans-400-latin-ext.woff2) format("woff2");
-  unicode-range:
-    U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
-}
-@font-face {
-  font-family: "IBM Plex Sans";
-  font-style: normal;
-  font-weight: 400;
-  font-display: swap;
-  src: url(/fonts/IBMPlexSans-400-latin.woff2) format("woff2");
-  unicode-range:
-    U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
-}
-@font-face {
-  font-family: "IBM Plex Sans";
-  font-style: normal;
-  font-weight: 500;
-  font-display: swap;
-  src: url(/fonts/IBMPlexSans-500-latin-ext.woff2) format("woff2");
-  unicode-range:
-    U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
-}
-@font-face {
-  font-family: "IBM Plex Sans";
-  font-style: normal;
-  font-weight: 500;
-  font-display: swap;
-  src: url(/fonts/IBMPlexSans-500-latin.woff2) format("woff2");
-  unicode-range:
-    U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
-}
-@font-face {
-  font-family: "IBM Plex Sans";
-  font-style: normal;
-  font-weight: 600;
-  font-display: swap;
-  src: url(/fonts/IBMPlexSans-600-latin-ext.woff2) format("woff2");
-  unicode-range:
-    U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
-}
-@font-face {
-  font-family: "IBM Plex Sans";
-  font-style: normal;
-  font-weight: 600;
-  font-display: swap;
-  src: url(/fonts/IBMPlexSans-600-latin.woff2) format("woff2");
-  unicode-range:
-    U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
-}
-@font-face {
-  font-family: "IBM Plex Sans";
-  font-style: normal;
-  font-weight: 700;
-  font-display: swap;
-  src: url(/fonts/IBMPlexSans-700-latin-ext.woff2) format("woff2");
-  unicode-range:
-    U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
-}
-@font-face {
-  font-family: "IBM Plex Sans";
-  font-style: normal;
-  font-weight: 700;
-  font-display: swap;
-  src: url(/fonts/IBMPlexSans-700-latin.woff2) format("woff2");
-  unicode-range:
-    U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
-}
+@import "@fold-run/tokens/fonts.css";
+@import "@fold-run/tokens/vars.css";
 /* ===== Starlight custom fonts (documented custom-font pattern) ===== */
 :root {
   --sl-font: "IBM Plex Sans", ui-sans-serif, sans-serif;
   --sl-font-mono: "Geist Mono", ui-monospace, monospace;
 }
 
-/* ===== DARK (canonical) — Starlight styles dark via bare :root ===== */
+/* ===== DARK (canonical) — Starlight styles dark via bare :root =====
+ * Values come from @fold-run/tokens; this block only maps them onto
+ * Starlight's variable system, so a colour changes in one place for both
+ * origins. The two exceptions are called out below. */
 :root {
   /* neutral ramp: Signal → Backplane */
-  --sl-color-white: #ffffff; /* Signal (18.73:1 on Backplane) */
-  --sl-color-gray-1: #e0e0e0; /* Carrier */
-  --sl-color-gray-2: #bcbcbc; /* Static — body text (9.86:1) */
+  --sl-color-white: var(--color-fg); /* Signal (18.73:1 on Backplane) */
+  --sl-color-gray-1: var(--color-carrier); /* Carrier */
+  --sl-color-gray-2: var(--color-static); /* Static — body text (9.86:1) */
+  /* gray-3/gray-4 are Starlight ramp intermediates with no counterpart in the
+   * site's token contract: fold-line is #6e6e6e and trace-hi #3d3d3d, neither
+   * of which is these. Mapping them would move pixels, so they stay local. */
   --sl-color-gray-3: #8a8a8a;
   --sl-color-gray-4: #4d4d4d;
-  --sl-color-gray-5: #2b2b2b; /* Trace — hairlines */
-  --sl-color-gray-6: #1a1a1a; /* Rack — panels, nav, sidebar */
-  --sl-color-black: #121212; /* Backplane — page ground */
+  --sl-color-gray-5: var(--color-trace); /* Trace — hairlines */
+  --sl-color-gray-6: var(--color-rack); /* Rack — panels, nav, sidebar */
+  --sl-color-black: var(--color-bg); /* Backplane — page ground */
 
   /* ===== accents =====
    * Live is licensed to proof only, exactly as on the site: the current-page
@@ -139,19 +38,19 @@
    * affordance the colour used to carry. A docs page is mostly links; when
    * every one of them was Live the accent stopped meaning anything, and the
    * body copy had to compete with a field of chartreuse. */
-  --sl-color-accent-low: #2b2b2b; /* neutral surface tint */
-  --sl-color-accent: #ffffff;
-  --sl-color-accent-high: #e0e0e0;
-  --sl-color-text-accent: #ffffff; /* links, current nav — 18.7:1 */
-  --sl-color-bg-accent: #ffffff; /* buttons… */
-  --sl-color-text-invert: #121212; /* …carry ink text (18.7:1) */
+  --sl-color-accent-low: var(--color-trace); /* neutral surface tint */
+  --sl-color-accent: var(--color-action);
+  --sl-color-accent-high: var(--color-carrier);
+  --sl-color-text-accent: var(--color-action); /* links, current nav — 18.7:1 */
+  --sl-color-bg-accent: var(--color-action); /* buttons… */
+  --sl-color-text-invert: var(--color-action-ink); /* …carry ink text (18.7:1) */
 
-  --fold-live: #d6ff00; /* proof, status, focus — never an action */
+  --fold-live: var(--color-accent); /* proof, status, focus — never an action */
 
   /* hairlines are Trace, everywhere */
-  --sl-color-hairline-light: #2b2b2b;
-  --sl-color-hairline: #2b2b2b;
-  --sl-color-hairline-shade: #121212;
+  --sl-color-hairline-light: var(--color-trace);
+  --sl-color-hairline: var(--color-trace);
+  --sl-color-hairline-shade: var(--color-bg);
 
   /* flat by conviction: no shadows on dark */
   --sl-shadow-sm: none;
@@ -159,13 +58,13 @@
   --sl-shadow-lg: none;
 
   /* machined corners for the search UI */
-  --sl-search-corners: 2px;
+  --sl-search-corners: var(--radius);
 
   /* fold-local tokens (theme-flipped below) */
   --fold-rail: var(--fold-live); /* current-page rail — a licensed Live use */
-  --fold-rail-fill: #1a1a1a; /* current-page fill: Rack */
-  --fold-inline-code-bg: #1a1a1a; /* Rack */
-  --fold-inline-code-border: #2b2b2b; /* Trace */
+  --fold-rail-fill: var(--color-rack); /* current-page fill: Rack */
+  --fold-inline-code-bg: var(--color-rack); /* Rack */
+  --fold-inline-code-border: var(--color-trace); /* Trace */
 }
 
 /* ===== LIGHT — Paper ground, ink ramp, AA Live Ink =====
@@ -219,7 +118,7 @@
   --ec-brdRad: 1px;
   --ec-brdCol: var(--sl-color-hairline);
   --ec-frm-frameBoxShdCssVal: none;
-  --ec-codeBg: #1a1a1a; /* Rack — code surfaces */
+  --ec-codeBg: var(--color-rack); /* Rack — code surfaces */
 }
 :root:root[data-theme="light"] {
   --ec-codeBg: #f6f6f6;
@@ -268,9 +167,30 @@ button[data-open-modal] {
 }
 
 /* ===== quiet, technical detailing kept from the previous theme ===== */
-/* Tables read as ledgers: hairlines, no zebra shouting. */
+/* Tables read as ledgers: 12px muted headers, a hairline under every row, no
+   vertical rules and no zebra. The comment above these has claimed this for a
+   while; only the font-size was actually set. Same grammar as the site's
+   proof band and capability index — rows separated by rules, nothing boxed. */
 .sl-markdown-content table {
+  border-collapse: collapse;
   font-size: var(--sl-text-sm);
+}
+.sl-markdown-content th {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--sl-color-gray-2);
+  border: 0;
+  border-bottom: 1px solid var(--sl-color-hairline);
+  padding: 0.5rem 0.75rem;
+  text-align: left;
+}
+.sl-markdown-content td {
+  border: 0;
+  border-bottom: 1px solid var(--sl-color-hairline);
+  padding: 0.5rem 0.75rem;
+}
+.sl-markdown-content tr:nth-child(2n) {
+  background-color: transparent;
 }
 
 /* fold cards (custom Card.astro): full styling, both themes */
@@ -288,7 +208,7 @@ button[data-open-modal] {
   --fold-card-bg: #f6f6f6;
 }
 :root:not([data-theme="light"]) .sl-markdown-content .card {
-  --fold-card-bg: #1a1a1a;
+  --fold-card-bg: var(--color-rack);
 }
 .sl-markdown-content .card .title {
   display: flex;
@@ -367,4 +287,111 @@ a.sl-link-button.secondary {
  * would make them Signal white and louder than the titles they sit beside. */
 .sl-markdown-content .card .title .icon svg {
   color: var(--sl-color-gray-3);
+}
+
+/* ===== content typography =====
+ * DESIGN.md §3 asks for `text-wrap: balance` on h1-h4 and `pretty` on prose,
+ * and for a 70ch measure. The site does all three; the docs did none of them,
+ * so a heading could strand one word on its own line and a paragraph ran the
+ * full width of a wide viewport. */
+.sl-markdown-content :is(h1, h2, h3, h4),
+h1[data-page-title] {
+  text-wrap: balance;
+}
+.sl-markdown-content {
+  text-wrap: pretty;
+}
+
+/* Direct children only. A measure on the container would drag tables, code
+   blocks and card grids in with the prose; those want the full column. */
+.sl-markdown-content > p,
+.sl-markdown-content > ul,
+.sl-markdown-content > ol,
+.sl-markdown-content > blockquote {
+  max-width: 70ch;
+}
+
+/* ===== group labels =====
+ * The sidebar's group headings and the table of contents heading take the
+ * site's label rank: 11px tracked caps in Static. Static rather than gray-3
+ * (#8a8a8a): at this size that is 4.4:1 on Rack, and a heading is text.
+ * Without this the group label sat at the same weight and size as the page
+ * links under it, so the sidebar read as one flat list of nineteen items. */
+.sidebar-content summary .group-label .large,
+.right-sidebar-panel h2 {
+  font-size: 0.6875rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  /* gray-2, not --color-static: the shared token carries the dark value only,
+     because Phase 1 left the hand-tuned light ramp local to this file. Static
+     on Paper is 1.7:1. gray-2 flips with the theme and holds AA in both. */
+  color: var(--sl-color-gray-2);
+}
+.sidebar-content summary {
+  padding-block: 0.35rem;
+}
+
+/* ===== search =====
+ * The same machined field the site's controls use, rather than Starlight's
+ * default. Below Starlight's 50rem breakpoint the control collapses to an
+ * icon: a true square with the glass centred, not a squashed capsule.
+ *
+ * The doubled attribute is the same trick the Expressive Code block above
+ * uses. Starlight styles this control with
+ * `button:where(.astro-pqodzqrd)[data-open-modal]`; `:where()` contributes no
+ * specificity, so that rule *ties* a plain `button[data-open-modal]` and the
+ * winner is decided by injection order — which is not something this file
+ * should depend on. Doubling the attribute outranks it outright without
+ * widening what the selector matches. */
+button[data-open-modal][data-open-modal] {
+  border: 1px solid var(--sl-color-hairline);
+  border-radius: 2px;
+  background-color: var(--sl-color-gray-6);
+  color: var(--sl-color-gray-2);
+  font-size: var(--sl-text-sm);
+  transition:
+    border-color 0.15s cubic-bezier(0.25, 1, 0.5, 1),
+    color 0.15s cubic-bezier(0.25, 1, 0.5, 1);
+}
+button[data-open-modal][data-open-modal]:hover {
+  border-color: var(--sl-color-gray-4);
+  color: var(--sl-color-white);
+}
+button[data-open-modal][data-open-modal] kbd {
+  background-color: transparent;
+  border: 1px solid var(--sl-color-hairline);
+  border-radius: 2px;
+  font-family: var(--sl-font-mono);
+}
+@media (max-width: 49.9375rem) {
+  button[data-open-modal][data-open-modal] {
+    width: 2.5rem;
+    height: 2.5rem;
+    padding: 0;
+    align-items: center;
+    justify-content: center;
+  }
+}
+@media (min-width: 50rem) {
+  button[data-open-modal][data-open-modal] {
+    height: 2rem;
+    padding-block: 0;
+    align-items: center;
+  }
+}
+
+/* Search dialog: a hairline panel on Backplane, no shadow (DESIGN.md §4). */
+dialog[aria-label="Search"] {
+  background-color: var(--sl-color-black);
+  border: 1px solid var(--sl-color-hairline);
+  box-shadow: none;
+}
+dialog[aria-label="Search"]::backdrop {
+  background-color: color-mix(in srgb, #000 60%, transparent);
+}
+@media (min-width: 50rem) {
+  dialog[aria-label="Search"] {
+    border-radius: 2px;
+  }
 }

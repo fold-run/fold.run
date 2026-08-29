@@ -1,0 +1,312 @@
+/* fold.run primitives: the class vocabulary shared by every page —
+   buttons, code panels, and the closing CTA band. Anything here is used
+   by more than one page, which is what keeps it out of a page's own
+   style block. Spec: DESIGN.md §5.
+   Imported by src/layouts/Base.astro. */
+
+/* ===== buttons =====
+   One box for both variants — same height, same padding, same 2px
+   machined corner as every other surface. The arrow that used to trail
+   every button is gone: when a glyph sits after each of forty links it
+   has stopped pointing at anything. It survives on .arrow-link only,
+   where it marks the one inline "keep reading" affordance. */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  height: 44px;
+  padding: 0 22px;
+  border: 1px solid transparent;
+  border-radius: var(--radius);
+  font: var(--weight-heading) var(--body) / 1 var(--body-font-family);
+  letter-spacing: -0.004em;
+  white-space: nowrap;
+  transition:
+    background-color 0.18s cubic-bezier(0.25, 1, 0.5, 1),
+    border-color 0.18s cubic-bezier(0.25, 1, 0.5, 1),
+    color 0.18s cubic-bezier(0.25, 1, 0.5, 1);
+}
+.arrow-link {
+  font-weight: var(--weight-label);
+  color: var(--color-fg);
+}
+.arrow-link::after {
+  content: "\2192";
+  color: var(--color-static);
+  margin-left: 8px;
+  display: inline-block;
+  transition: transform 0.2s cubic-bezier(0.25, 1, 0.5, 1);
+}
+.arrow-link:hover::after {
+  transform: translateX(3px);
+}
+/* flush tile grids: hairline gutters */
+.tile-grid {
+  display: grid;
+  gap: var(--spacing-md);
+}
+.tile-grid > * {
+  background: var(--color-rack);
+  border: 1px solid var(--color-trace);
+  border-radius: var(--radius);
+  padding: var(--spacing-lg);
+  margin: 0;
+}
+a.tile {
+  position: relative;
+  display: block;
+  color: var(--color-fg);
+  min-height: 160px;
+}
+a.tile:hover {
+  background: var(--color-rack);
+  text-decoration: none;
+}
+a.tile::after {
+  content: "\2192";
+  position: absolute;
+  right: var(--spacing-lg);
+  bottom: var(--spacing-md);
+  color: var(--color-static);
+  font-size: 1.125rem;
+  transition:
+    transform 0.2s cubic-bezier(0.25, 1, 0.5, 1),
+    color 0.2s cubic-bezier(0.25, 1, 0.5, 1);
+}
+a.tile:hover::after {
+  transform: translateX(4px);
+  color: var(--color-fg);
+}
+/* Card surfaces. A flat Rack panel on a 1px Trace hairline, lifting one
+   background step on hover. The masked gradient-border that used to run
+   here (and lit an accent glow along the top edge) is gone: an instrument
+   panel does not shimmer, and the effect was the loudest thing on pages
+   whose actual argument is the numbers inside the box. */
+.terminus,
+.problem,
+.cluster-rail,
+.post-row,
+.target,
+a.tile {
+  /* .path is deliberately absent: it is a cell inside the milled .paths panel,
+     where the 1px gap over a Trace ground is the rule. Giving it a border too
+     stacks three lines of Trace between adjacent cells. */
+  background: var(--color-rack);
+  border: 1px solid var(--color-trace);
+  transition:
+    background-color 0.2s cubic-bezier(0.25, 1, 0.5, 1),
+    border-color 0.2s cubic-bezier(0.25, 1, 0.5, 1);
+}
+a.tile:hover,
+.post-row:hover,
+.target:hover {
+  background: var(--color-rack-hi);
+  border-color: var(--color-trace-hi);
+}
+/* The primary action is the brightest neutral on the page, not the
+   brand colour. Live is reserved for proof; a button is not proof. */
+.btn-primary {
+  background: var(--color-action);
+  color: var(--color-action-ink);
+}
+.btn-primary:hover {
+  background: var(--color-action-hover);
+  text-decoration: none;
+}
+.btn-secondary {
+  background: transparent;
+  border-color: var(--color-trace-hi);
+  color: var(--color-fg);
+}
+.btn-secondary:hover {
+  background: var(--color-rack);
+  border-color: var(--color-static);
+  text-decoration: none;
+}
+
+/* skip link */
+.skip-link {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  background: var(--color-action);
+  color: var(--color-action-ink);
+  padding: 10px 16px;
+  border-radius: 0 0 var(--radius) 0;
+  z-index: var(--z-skip);
+}
+.skip-link:focus {
+  left: 0;
+}
+
+/* ===== code panels (signature chrome, shared across pages) ===== */
+.code-panel {
+  background: var(--color-rack);
+  border: 1px solid var(--color-trace);
+  border-radius: var(--radius-lg);
+  position: relative;
+  margin-top: var(--spacing-sm);
+}
+.code-panel .tag {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 10px 12px 0;
+}
+.code-panel .tag span {
+  font-family: var(--mono-font-family);
+  font-size: 0.75rem;
+  letter-spacing: var(--tracking-meta);
+  color: var(--color-carrier);
+  border: 1px solid var(--color-trace);
+  border-radius: var(--radius-sm);
+  padding: 2px 8px;
+}
+.code-panel button {
+  font: 600 0.75rem / 1 var(--mono-font-family);
+  letter-spacing: var(--tracking-meta);
+  color: var(--color-carrier);
+  background: transparent;
+  border: 1px solid var(--color-trace);
+  border-radius: var(--radius-sm);
+  padding: 3px 10px;
+  cursor: pointer;
+  position: relative;
+}
+.code-panel button::before {
+  content: "";
+  position: absolute;
+  inset: -12px;
+}
+.code-panel button:hover {
+  border-color: var(--color-carrier);
+}
+.code-panel pre {
+  overflow-x: auto;
+  padding: var(--spacing-sm) var(--spacing-lg) var(--spacing-md);
+  font: 400 0.8125rem / 1.7 var(--mono-font-family);
+  letter-spacing: 0;
+  font-variant-ligatures: none;
+  font-variant-numeric: slashed-zero;
+  color: var(--color-fg);
+}
+.code-panel code .c {
+  color: var(--color-static); /* comments */
+}
+.code-panel code .k {
+  color: var(--color-carrier); /* keys / prompts */
+}
+
+/* ===== closing band =====
+   The same object on every page that has one: home, blog index, and each
+   post. It lived in three places and two of them had drifted to a
+   stacked, smaller variant, so the site made a different closing argument
+   depending on which page you finished on. One definition here, in the
+   chrome every page already loads.
+
+   The statement holds the left and the action sits at the end of the
+   line: on the wide container a single left-aligned stack leaves half the
+   band empty, and this makes the width part of the composition. */
+.closing {
+  background: var(--color-rack);
+  border-top: 1px solid var(--color-trace);
+  padding-block: var(--section-padding-lg);
+}
+.closing .wrap {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: var(--spacing-lg) var(--spacing-2xl);
+  align-items: center;
+}
+.closing h2 {
+  color: var(--color-fg);
+  font-size: clamp(2rem, 2.2vw + 1.2rem, 2.75rem);
+  max-width: 18ch;
+}
+.closing p {
+  color: var(--color-carrier);
+  font-size: var(--body-lg);
+  line-height: 1.6;
+  max-width: 52ch;
+}
+.closing .btn {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  justify-self: end;
+}
+@media (max-width: 840px) {
+  .closing .wrap {
+    grid-template-columns: 1fr;
+    justify-items: start;
+  }
+  .closing .btn {
+    grid-column: 1;
+    grid-row: auto;
+    justify-self: start;
+  }
+}
+@media (max-width: 640px) {
+  .closing .btn {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+/* ===== chips =====
+   A small mono tag: a namespace, a version, a route step. DESIGN.md §5 names
+   it, but the recipe existed only twice inside .route-rail — once in
+   article.css and once in the home page — so a chip anywhere else rendered
+   unstyled. The rails keep their own padding on top of this. */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  font-family: var(--mono-font-family);
+  font-size: var(--body-sm);
+  letter-spacing: 0;
+  color: var(--color-carrier);
+  background: var(--color-rack);
+  border: 1px solid var(--color-trace);
+  border-radius: var(--radius-sm);
+  padding: 3px 10px;
+  text-decoration: none;
+}
+a.chip:hover {
+  border-color: var(--color-carrier);
+  text-decoration: none;
+}
+
+/* ===== input-method adaptation =====
+   Keyed off the pointer rather than a breakpoint: a touchscreen laptop is
+   still a touchscreen at 1440px, and a mouse on a small window is still a
+   mouse. The site's max-width queries answer "how much room is there", which
+   is a different question from "what is pointing at this". */
+
+/* Hover is the only feedback a tile has, and touch never fires it. */
+@media (hover: none) {
+  a.tile:active {
+    background: var(--color-rack);
+  }
+}
+
+/* 44px is the floor DESIGN.md §5 sets for buttons and .btn already meets it;
+   the header's compact 34px variant is the one that falls under, and on a
+   phone it is the primary call to action. min-height rather than height so
+   the compact rule still wins on a mouse. */
+@media (pointer: coarse) {
+  .btn,
+  .nav-trigger {
+    min-height: 44px;
+  }
+}
+
+/* ===== shared responsive =====
+   Section padding is a clamp() now, so there is nothing to step down. */
+@media (prefers-reduced-motion: reduce) {
+  .btn,
+  a.tile,
+  .arrow-link::after {
+    transition: none;
+  }
+}

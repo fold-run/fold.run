@@ -1,0 +1,10 @@
+{
+  "name": "@fold-run/tokens",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./vars.css": "./src/vars.css",
+    "./fonts.css": "./src/fonts.css"
+  }
+}

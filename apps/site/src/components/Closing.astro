@@ -1,0 +1,42 @@
+---
+// The closing CTA band that ends every page. It was written out four times,
+// byte for byte, across the home page, the blog index and both posts; the copy
+// is the same on all of them because it is the site's one ask.
+//
+// Styles are the global `.closing` recipe in styles/primitives.css rather than
+// scoped here, because the band is full-bleed and its rules interlock with the
+// footer hairline directly below it.
+import { LINKS } from '../lib/nav';
+
+interface Props {
+  /** Override the heading where a page has earned a more specific ask. */
+  heading?: string;
+  cta?: string;
+  href?: string;
+}
+
+const {
+  heading = 'Start where it hurts.',
+  cta = 'Get started',
+  href = `${LINKS.docs}/getting-started/`,
+} = Astro.props;
+---
+
+<section
+  class="closing"
+  data-section="closing"
+  data-intent="drive action"
+  data-layout="full-bleed"
+  data-module="cta-band"
+>
+  <div class="wrap">
+    <h2>{heading}</h2>
+    <p>
+      <slot>
+        A single passthrough upstream in front of your most-used server is one config file away.
+        Governance grows from there.
+      </slot>
+    </p>
+    <a class="btn btn-primary" href={href}>{cta}</a>
+  </div>
+</section>

@@ -1,4 +1,6 @@
 ---
+import Closing from '../components/Closing.astro';
+import CodePanel from '../components/CodePanel.astro';
 // fold.run home — stardust redesign (stardust/migrated/index.html), transplanted
 // onto the shared Base layout. Markup and copy are the approved migrated design.
 import Base from '../layouts/Base.astro';
@@ -288,18 +290,10 @@ const jsonld = {
             <div class="marker" aria-hidden="true">1</div>
             <div>
               <h3>Describe your upstreams</h3>
-              <div class="code-panel">
-                <div class="tag">
-                  <span>fold.config.json</span><button
-                    type="button"
-                    data-copy
-                    aria-label="Copy fold.config.json">copy</button
-                  >
-                </div>
-                <pre
-                  tabindex="0"
-                  role="region"
-                  aria-label="fold.config.json contents"><code>&#123;
+              <CodePanel
+  tag="fold.config.json"
+  label="fold.config.json contents"
+  code={`&#123;
   <span class="k">"upstreams"</span>: [
     &#123;
       <span class="k">"id"</span>: "github-tools",
@@ -308,8 +302,8 @@ const jsonld = {
       <span class="k">"owner"</span>: &#123; <span class="k">"org"</span>: "acme-platform", <span class="k">"team"</span>: "devex" &#125;
     &#125;
   ]
-&#125;</code></pre>
-              </div>
+&#125;`}
+/>
             </div>
           </li>
 
@@ -317,20 +311,14 @@ const jsonld = {
             <div class="marker" aria-hidden="true">2</div>
             <div>
               <h3>Run it</h3>
-              <div class="code-panel">
-                <div class="tag">
-                  <span>shell</span><button type="button" data-copy aria-label="Copy run commands"
-                    >copy</button
-                  >
-                </div>
-                <pre
-                  tabindex="0"
-                  role="region"
-                  aria-label="Run commands"><code><span class="c"># one upstream, one governed endpoint — 60 seconds</span>
+              <CodePanel
+  tag="shell"
+  label="Run commands"
+  code={`<span class="c"># one upstream, one governed endpoint — 60 seconds</span>
 <span class="k">$</span> go run github.com/fold-run/fold/cmd/fold@latest --config fold.config.json
 <span class="c"># or the container:</span>
-<span class="k">$</span> docker run -p 8080:8080 -e FOLD_CONFIG="$(cat fold.config.json)" ghcr.io/fold-run/fold</code></pre>
-              </div>
+<span class="k">$</span> docker run -p 8080:8080 -e FOLD_CONFIG="$(cat fold.config.json)" ghcr.io/fold-run/fold`}
+/>
             </div>
           </li>
 
@@ -559,57 +547,10 @@ const jsonld = {
          before the closing band deliberately: run it yourself is still the
          call to action, and this is the alternative for teams who would
          rather not. -->
-    <section
-      class="closing"
-      data-section="closing"
-      data-intent="drive action"
-      data-layout="full-bleed"
-      data-module="cta-band"
-    >
-      <div class="wrap">
-        <h2>Start where it hurts.</h2>
-        <p>
-          A single passthrough upstream in front of your most-used server is one config file away.
-          Governance grows from there.
-        </p>
-        <a class="btn btn-primary" href="https://docs.fold.run/getting-started/">Get started</a>
-      </div>
-    </section>
+    <Closing />
   </main>
 </Base>
 
-<script>
-  /* copy buttons: progressive enhancement, no external deps */
-  const live = document.createElement('span');
-  live.setAttribute('role', 'status');
-  live.style.cssText = 'position:absolute;left:-9999px';
-  document.body.appendChild(live);
-  for (const btn of document.querySelectorAll<HTMLButtonElement>('[data-copy]')) {
-    btn.addEventListener('click', async () => {
-      const pre = btn.closest('.code-panel')?.querySelector('pre');
-      if (!pre) return;
-      try {
-        await navigator.clipboard.writeText(pre.innerText);
-        btn.textContent = 'copied';
-        live.textContent = 'Copied to clipboard';
-      } catch {
-        const range = document.createRange();
-        range.selectNodeContents(pre);
-        const sel = getSelection();
-        if (sel) {
-          sel.removeAllRanges();
-          sel.addRange(range);
-        }
-        btn.textContent = 'press ⌘C';
-        live.textContent = 'Clipboard unavailable; text selected, press Control or Command C';
-      }
-      setTimeout(() => {
-        btn.textContent = 'copy';
-      }, 1800);
-    });
-  }
-
-</script>
 
 <style is:global>
   /* ===== hero ===== */
@@ -1073,13 +1014,14 @@ const jsonld = {
     grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
     gap: var(--spacing-md);
   }
+  /* Left as discrete cards on purpose: the ::before notch below hangs each
+     terminus off the shared route rail, which is the fold-line vocabulary
+     doing real work. A milled panel would merge the cells and strand the
+     connectors. */
   .terminus {
     background: var(--color-rack);
     border: 1px solid var(--color-trace);
     border-radius: var(--radius);
-    background: var(--color-rack);
-    border: 1px solid var(--color-trace);
-    border-radius: var(--radius-lg);
     padding: var(--spacing-lg);
     position: relative;
   }
@@ -1157,16 +1099,6 @@ const jsonld = {
     max-width: 78ch;
     margin-bottom: var(--spacing-lg);
   }
-  .route-rail .chip {
-    font-family: var(--mono-font-family);
-    font-size: var(--body-sm);
-    letter-spacing: 0;
-    color: var(--color-carrier);
-    background: var(--color-rack);
-    border: 1px solid var(--color-trace);
-    border-radius: var(--radius-sm);
-    padding: 3px 10px;
-  }
   /* The namespace prefixes are literal wire strings, so they keep the mono —
      the one place a heading earns it. */
   .terminus h3 {
@@ -1234,16 +1166,24 @@ const jsonld = {
   .step .muted {
     font-size: var(--body);
   }
+  /* Milled panel, not a card grid: a 1px gap over a Trace ground draws the
+     internal rules as the parent showing through, so three deploy routes read
+     as one instrument surface with one outer edge instead of three floating
+     cards carrying six borders between them. DESIGN.md §6 asks for exactly
+     this ("no grid of identical cards where a ruled table would carry the same
+     content") without giving up the grid. */
   .paths {
     margin-top: var(--spacing-xl);
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-    gap: var(--spacing-md);
+    gap: 1px;
+    background: var(--color-trace);
+    border: 1px solid var(--color-trace);
+    border-radius: var(--radius);
+    overflow: hidden;
   }
   .path {
     background: var(--color-rack);
-    border: 1px solid var(--color-trace);
-    border-radius: var(--radius);
     padding: var(--spacing-lg);
   }
   .path h3 {

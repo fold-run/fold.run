@@ -1,0 +1,140 @@
+---
+title: "Federating MCP tasks: affinity routing over opaque ids"
+description: "The MCP tasks extension standardized long-running work \u2014 and task ids outlive any session. Putting one gateway in front of N task-running servers forces an ownership problem, and the solution generalizes."
+date: 2026-08-04
+category: engineering
+ogImage: /og/federating-mcp-tasks.png
+---
+
+{/*
+// Every number and permalink below resolves to something a hostile reader
+// can click. Publish = site deploy. Markup from the approved stardust
+// redesign (stardust/migrated/blog/federating-mcp-tasks/index.html).
+*/}
+
+import CodePanel from '../../components/CodePanel.astro';
+import { WORDMARK_PATH, wordmarkTransform } from '../../lib/wordmark';
+
+{/* Source permalinks are pinned to the commit the post describes, so a later
+    refactor cannot silently repoint them at unrelated lines. */}
+export const SHA = '5173174afc90efb57f1ccae78cf59d6d3ab3a30a';
+
+The MCP [tasks extension](https://modelcontextprotocol.io/seps/1686) standardized long-running work: a tool call mints a task, and the client polls it with nothing but an opaque id — across requests, sessions, even processes. That's great news for clients — and a real problem for anything in the middle. This post is about what task ids do to a gateway fronting N task-running servers, and the mechanism that solves it. Everything below ships in [fold](https://github.com/fold-run/fold), the open-source enterprise MCP gateway, and every claim links to the code.
+
+## The problem, concretely
+
+fold presents many MCP servers as one governed virtual server: one endpoint, one merged tool list, namespaced names (`gh__create_pr`, `jobs__start_job`).
+
+<CodePanel
+  tag="topology"
+  label="Topology sketch: one client, fold, three upstreams, and a task poll with an unowned id" copy={false}
+  code={`client ──▶ fold ──▶ github-tools   (platform team)
+                ├──▶ ml-search      (the acquisition)
+                └──▶ jobs           (task-minting batch server)
+
+tools/call jobs__start_job  ──▶ jobs mints "job-42"
+tasks/get  &#123; "job-42" &#125;     ──▶ ...which upstream owns this?`}
+/>
+
+A client calls `jobs__start_job`; the task is born on the jobs server and its id travels back through fold. Every later `tasks/get`, `tasks/cancel`, `tasks/result`, and `tasks/update` for that id must reach that server — and the request carries nothing but the opaque id. No namespaced tool name, no routing hint, and no session to lean on: clients persist task ids and come back for them tomorrow, on a fresh connection, possibly through a different gateway instance.
+
+## The answers that don't work \{#the-answers-that-don-t-work\}
+**Rewriting the id** — smuggling the owner into the id the client sees — breaks every client that persists one the moment your encoding changes, and turns an opaque protocol object into a contract you now own forever. fold treats task ids exactly like resource URIs: never rewritten.
+
+**Broadcasting** every task call to all N upstreams costs N× amplification on every poll, and it's a correctness bug, not just a cost: `tasks/cancel` fanned out is a destructive write sent to N−1 servers that never minted the task, and two upstreams can independently mint colliding ids.
+
+**Punting to the client** ("remember which server you created it on") recreates the N×M topology sprawl the gateway exists to remove — and it breaks outright when policy deliberately hides topology from the client, which in an enterprise deployment it does.
+
+## The mechanism: an affinity index with a probe fallback
+
+Ownership is remembered instead of encoded:
+
+- **Recorded at mint.** A `tools/call` result that advertises a task it created pins `taskId → upstream` as it passes through, so the polls that follow skip discovery entirely.
+- **Probe fallback.** A task fold never saw minted — another gateway instance, an evicted record, an id shared out-of-band — is located by fanning a read-only `tasks/get` out once: the owner answers, everyone else is a healthy "not mine". Mutating methods are never fanned out; fold locates first, then acts on the owner alone.
+- **Ownership is principal-bound.** The mint records who created the task. Another caller's `tasks/get` for that id answers exactly like an unknown id — no existence leak, no probe spent on it — and `tasks/list` merges every upstream but shows each principal only its own tasks.
+- **Honest misses.** An id no upstream recognizes answers `-32002`, and the owning upstream's own errors pass through verbatim — the gateway stays invisible.
+
+<figure class="diagram-figure">
+            {/* authored fold-line diagram: the poll path, labels drawn from the article's own terms */}
+            <svg
+              viewBox="0 0 560 250"
+              role="img"
+              aria-label="A tasks/get poll flows from the client through fold to the owner upstream along the route pinned at mint; dashed fold-lines to the two other upstreams carry the read-only probe fallback only."
+            >
+              {/* active route: client -> fold -> owner (the affinity pin) */}
+              <path class="fold-active draw" d="M 118 128 H 246 M 314 128 C 360 128, 380 128, 442 128"
+              ></path>
+              <path class="fold-arrow" d="M 432 122 L 444 128 L 432 134 Z"></path>
+              {/* dashed fold-lines: the read-only probe to the non-owners */}
+              <path class="fold-dash" d="M 314 112 C 370 104, 380 64, 442 56"></path>
+              <path class="fold-dash" d="M 314 144 C 370 152, 380 192, 442 200"></path>
+              {/* client node */}
+              <rect class="fold-node" x="30" y="110" width="88" height="36" rx="2"></rect>
+              <text class="fold-node-label" x="74" y="132" text-anchor="middle">client</text>
+              {/* the gateway node carries the wordmark; the folded corner it
+                   used to wear was the retired square-tile mark's dog-ear */}
+              <rect
+                x="246"
+                y="96"
+                width="68"
+                height="64"
+                rx="2"
+                fill="#1a1a1a"
+                stroke="#D6FF00"
+                stroke-width="1.5"></rect>
+              <path
+                class="fold-node-mark"
+                d={WORDMARK_PATH}
+                transform={wordmarkTransform(280, 128, 44)}></path>
+              {/* upstream nodes */}
+              <rect class="fold-node" x="434" y="38" width="112" height="36" rx="2"></rect>
+              <rect class="fold-node" x="434" y="110" width="112" height="36" rx="2"></rect>
+              <rect class="fold-node" x="434" y="182" width="112" height="36" rx="2"></rect>
+              <text class="fold-node-label" x="490" y="60" text-anchor="middle">upstream</text>
+              <text class="fold-node-label" x="490" y="132" text-anchor="middle">owner</text>
+              <text class="fold-node-label" x="490" y="204" text-anchor="middle">upstream</text>
+              {/* annotations: measurement marks, pattern-paper style */}
+              <text class="fold-anno" x="150" y="116" text-anchor="middle">tasks/get "job-42"</text>
+              <text class="fold-anno" x="382" y="136" text-anchor="middle">pinned at mint</text>
+              <text class="fold-anno" x="378" y="40" text-anchor="middle">read-only probe</text>
+              <text class="fold-anno" x="378" y="236" text-anchor="middle">"not mine"</text>
+            </svg>
+          </figure>
+
+<CodePanel
+  tag="go"
+  label="Go source excerpt: the poll path, affinity then probe"
+  code={`<span class="c">// gateway/tasks.go — the poll path: affinity, then probe</span>
+if v, ok := g.taskOwner.Load(taskID); ok &#123;
+  <span class="c">// a task minted for a different principal is answered exactly like</span>
+  <span class="c">// an unknown id — the denial must not reveal existence</span>
+  return u.callTask(ctx, method, raw)
+&#125;
+<span class="c">// Probe: read-only tasks/get across upstreams — the owner answers,</span>
+<span class="c">// everyone else is a healthy "no". Never fan out a mutating method.</span>
+owner := g.locateTaskOwner(ctx, rt, taskID)`}
+/>
+
+<a href={`https://github.com/fold-run/fold/blob/${SHA}/gateway/tasks.go#L148-L202`} >gateway/tasks.go#L148 — the real thing, including the probe</a >
+
+Governance rides along for free: a task-creating call is a tool call, so deny-by-default policy applies at mint, and every poll that follows is an audit record like any other request.
+
+## What about fan-in?
+
+The extension's companion story is `subscriptions/listen` — one notification stream south, N streams north, merged. fold doesn't implement it yet, and says so [in the README](https://github.com/fold-run/fold#not-implemented) rather than in a footnote: the official Go SDK currently supports the 2026-07-28 protocol on its streamable HTTP server only in stateless mode, and fold's session-keyed bridging (sampling, elicitation, per-client streams) requires stateful sessions.
+
+What ships today is the fan-in the protocol already exercises: list-changed and resource-updated notifications from every upstream fan out to the clients that care, proxied results are origin-tagged (`_meta["run.fold/upstream"]`), and a <a href={`https://github.com/fold-run/fold/blob/${SHA}/gateway/listen_test.go`} >drift canary in the test suite</a > fails the moment the SDK lifts the restriction — the gap closes when it can, and CI notices before we do.
+
+## The transferable lesson
+
+None of this is MCP-specific. Federating any protocol whose resources outlive their transport reduces to the same shape: an ownership index for stateful resources, recorded at mint, with a read-only probe path for the records you'll inevitably miss. Fronting N job APIs with one endpoint, aggregating webhooks, sharding a queue behind a facade — same checklist:
+
+- Namespace what you own at the boundary; never rewrite identifiers clients persist.
+- Record ownership at mint time; keep a probe path for the records you'll inevitably miss.
+- Probe with reads, act with writes — never fan out a mutating method.
+- Bind ownership to the caller, and make a denial indistinguishable from a miss.
+- Fail closed on index misses, and audit them.
+
+## Try it
+
+`go run github.com/fold-run/fold/cmd/fold@latest` — or `docker run ghcr.io/fold-run/fold` — puts the gateway in front of your servers in a minute ([walkthrough](https://docs.fold.run/run-it-locally/)). The integration suite runs the whole story against real MCP servers from the official Go SDK — <a href={`https://github.com/fold-run/fold/blob/${SHA}/gateway/tasks_test.go`} >gateway/tasks_test.go</a > is the receipts. [docs.fold.run](https://docs.fold.run/) · [github.com/fold-run/fold](https://github.com/fold-run/fold) (Apache-2.0). The conformance results are [in CI, on every merge](https://docs.fold.run/conformance/) — check them.

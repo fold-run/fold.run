@@ -1,0 +1,416 @@
+/* fold.run chrome: the one header and one footer both origins wear
+   (DESIGN.json systemComponentRoles). Includes the mega menu and the
+   mobile sheet. Spec: DESIGN.md §5 "Chrome".
+   Imported by src/layouts/Base.astro. */
+
+/* ===== header ===== */
+header.site {
+  /* One height for every control in the bar. Before this the disclosure
+     triggers measured 49px (padding-derived) beside a 34px CTA, so the row
+     held two ranks that were only invisible because the triggers had no
+     resting background. Anything with a hover wash or a focus ring exposed
+     the mismatch. Height here, padding for the inline rhythm only. */
+  --header-h: 60px;
+  --header-control-h: 36px;
+  position: sticky;
+  top: 0;
+  z-index: var(--z-sticky);
+  background: color-mix(in srgb, var(--color-bg) 88%, transparent);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--color-trace);
+}
+@supports not (backdrop-filter: blur(12px)) {
+  header.site {
+    background: var(--color-bg);
+  }
+}
+/* Direct child only: the mega panel reuses .wrap for its container
+   alignment, and the header bar's flex/min-height must not reach it. */
+header.site > .wrap {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-lg);
+  min-height: var(--header-h);
+}
+.brandmark {
+  display: inline-flex;
+  align-items: center;
+  color: var(--color-fg);
+  flex: none;
+}
+.brandmark:hover {
+  text-decoration: none;
+  color: var(--color-carrier);
+}
+header.site nav {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  margin-left: auto;
+  font-size: 0.9375rem;
+}
+/* Nav is a supporting rank: Static until you point at it. Against one
+   solid action on the right, that is the entire hierarchy. */
+/* :not(.mega a) matters: the panel's links are also anchors inside this nav,
+   and this selector outranks `.mega a`. Without the guard the bar's control
+   height and inline-flex collapse each panel entry's title and description
+   onto one line. */
+header.site nav a:not(.btn):not(.mega a) {
+  display: inline-flex;
+  align-items: center;
+  height: var(--header-control-h);
+  padding-inline: 12px;
+  font-weight: var(--weight-label);
+  letter-spacing: 0;
+  color: var(--color-static);
+  transition: color 0.15s cubic-bezier(0.25, 1, 0.5, 1);
+}
+header.site nav a:not(.btn):not(.mega a):hover {
+  color: var(--color-fg);
+  text-decoration: none;
+}
+header.site .btn {
+  margin-left: var(--spacing-sm);
+}
+/* backdrop-filter makes the header the containing block for fixed
+   descendants; lift it while the mobile panel is open so the panel
+   can size against the viewport */
+header.site:has(nav.open) {
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  background: var(--color-bg);
+}
+.nav-burger {
+  display: none;
+  flex-direction: column;
+  gap: 5px;
+  background: none;
+  border: 0;
+  padding: 12px;
+  margin-left: auto;
+  cursor: pointer;
+}
+.nav-burger span {
+  width: 20px;
+  height: 2px;
+  background: var(--color-fg);
+  transition: transform 0.2s cubic-bezier(0.25, 1, 0.5, 1);
+}
+.nav-burger[aria-expanded="true"] span:first-child {
+  transform: translateY(3.5px) rotate(45deg);
+}
+.nav-burger[aria-expanded="true"] span:last-child {
+  transform: translateY(-3.5px) rotate(-45deg);
+}
+/* ===== mega menu =====
+   A full-width strip pinned under the sticky header, so the header's own
+   hairline reads as sliding down rather than a 340px card floating over
+   the page. Open/close is the grid-rows 0fr→1fr disclosure, not a
+   JS-measured height: nothing to re-measure on resize, and it degrades to
+   an ordinary block when the script never runs.
+
+   DESIGN.json's motion stance ("an instrument panel does not shimmer")
+   is why triggers do not cross-fade into one another. Moving between
+   them closes one and opens the next, at the same 0.24s. */
+.nav-drop {
+  /* static, not relative: .mega positions against header.site so it can
+     span the full viewport width rather than the trigger. */
+  position: static;
+}
+.nav-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  height: var(--header-control-h);
+  padding-inline: 12px;
+  background: none;
+  border: 0;
+  color: var(--color-static);
+  font: inherit;
+  font-size: 0.9375rem;
+  font-weight: var(--weight-label);
+  letter-spacing: 0;
+  cursor: pointer;
+  transition: color 0.15s cubic-bezier(0.25, 1, 0.5, 1);
+}
+.nav-trigger:hover,
+.nav-drop[data-open] .nav-trigger {
+  color: var(--color-fg);
+}
+.chev {
+  flex: none;
+  opacity: 0.6;
+  transition: transform 0.2s cubic-bezier(0.25, 1, 0.5, 1);
+}
+.nav-trigger:hover .chev,
+.nav-drop[data-open] .chev {
+  opacity: 1;
+}
+.nav-drop[data-open] .chev {
+  transform: rotate(180deg);
+}
+.mega {
+  position: absolute;
+  left: 0;
+  top: 100%;
+  width: 100%;
+  /* -1px so the panel's bottom edge replaces the header's, instead of
+     stacking a second hairline directly under it. */
+  margin-top: -1px;
+  z-index: var(--z-nav-panel);
+  background: var(--color-bg);
+  border-bottom: 1px solid transparent;
+  display: grid;
+  grid-template-rows: 0fr;
+  pointer-events: none;
+  transition:
+    grid-template-rows 0.24s cubic-bezier(0.25, 1, 0.5, 1),
+    border-color 0.24s cubic-bezier(0.25, 1, 0.5, 1);
+}
+.nav-drop[data-open] .mega {
+  grid-template-rows: 1fr;
+  border-bottom-color: var(--color-trace);
+  pointer-events: auto;
+}
+.mega-clip {
+  overflow: hidden;
+  min-height: 0;
+}
+.mega-cols {
+  display: flex;
+  gap: 0 clamp(2.5rem, 6vw, 7rem);
+  padding-block: var(--spacing-lg) var(--spacing-xl);
+}
+.mega-col {
+  min-width: 14rem;
+}
+/* The shared micro-heading voice: 11px tracked caps in Static, the same
+   label rank the footer columns and section labels use. Static, not
+   fold-line: #6E6E6E is 3.4:1 and this is a heading, not decoration. */
+.mega-label {
+  display: block;
+  font-size: 0.6875rem;
+  font-weight: var(--weight-label);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-static);
+  margin-bottom: var(--spacing-md);
+}
+.mega-col ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 2px;
+}
+.mega a {
+  display: grid;
+  gap: 2px;
+  padding: 10px 12px;
+  margin-inline: -12px;
+  border-radius: var(--radius);
+  color: var(--color-fg);
+}
+.mega a:hover {
+  background: var(--color-rack);
+  text-decoration: none;
+}
+.mega a b {
+  font-weight: var(--weight-heading);
+  font-size: 0.9375rem;
+  letter-spacing: -0.006em;
+}
+.mega a span {
+  color: var(--color-static);
+  font-size: var(--body-sm);
+  line-height: var(--line-height-meta);
+}
+@media (max-width: 900px) {
+  .nav-burger {
+    display: flex;
+  }
+  header.site nav {
+    display: none;
+  }
+  header.site nav.open {
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: hidden;
+    position: fixed;
+    inset: var(--header-h) 0 0 0;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+    background: var(--color-bg);
+    padding: var(--spacing-md) var(--spacing-md) var(--spacing-xl);
+    overflow-y: auto;
+    z-index: var(--z-nav-panel);
+  }
+  /* The sheet is a scrolling column, so its rows must not be flex-shrinkable:
+     with a panel expanded the content overflows, and the default shrink
+     squashed the primary action down to a 16px sliver rather than scrolling. */
+  header.site nav.open > * {
+    flex: none;
+  }
+  header.site nav.open a:not(.btn):not(.mega a),
+  header.site nav.open .nav-trigger {
+    /* Rows, not bar controls: the compact height gives way to padding, which
+       also takes these past the 44px touch floor. */
+    height: auto;
+    min-height: 48px;
+    padding: 14px 8px;
+    font-size: 1.05rem;
+    border-bottom: 1px solid var(--color-trace);
+    width: 100%;
+    text-align: left;
+  }
+  header.site nav.open .nav-trigger {
+    justify-content: space-between;
+  }
+  header.site nav.open .btn {
+    height: 44px;
+    margin-top: var(--spacing-md);
+    justify-content: center;
+  }
+  /* In the sheet the panel flows inline under its own trigger, so it
+     stops being a pinned strip. The grid-rows disclosure is unchanged,
+     which is the whole reason it was chosen over a measured height. */
+  .mega {
+    position: static;
+    width: auto;
+    margin-top: 0;
+    background: transparent;
+    border-bottom: 0;
+  }
+  .nav-drop[data-open] .mega {
+    border-bottom-color: transparent;
+  }
+  .mega-cols {
+    display: grid;
+    gap: 0;
+    padding: var(--spacing-sm) 0 var(--spacing-md) var(--spacing-md);
+    max-width: none;
+    padding-inline-start: var(--spacing-md);
+  }
+  .mega-col {
+    min-width: 0;
+  }
+  .mega-label {
+    margin-block: var(--spacing-md) var(--spacing-sm);
+  }
+  .mega a {
+    margin-inline: 0;
+    padding: 10px 0;
+  }
+}
+/* Matches the resting rule's specificity: `:not(.mega a)` there contributes a
+   class and an element, which silently outranked a plainer current-page
+   selector and left the current page indistinguishable from its neighbours. */
+header.site nav a:not(.btn):not(.mega a)[aria-current="page"] {
+  color: var(--color-fg);
+}
+header.site .btn {
+  height: var(--header-control-h);
+  padding: 0 14px;
+  font-size: var(--body-sm);
+}
+
+/* The disclosure is the only motion the chrome owns, so it carries its own
+   fallback: the panel still opens and closes, it just arrives rather than
+   unfolds. PRODUCT.md requires a reduced-motion path for anything animated;
+   the shared reduce block in primitives.css only covers buttons and links. */
+@media (prefers-reduced-motion: reduce) {
+  .mega,
+  .chev,
+  .nav-trigger,
+  .nav-burger span,
+  header.site nav a:not(.btn):not(.mega a) {
+    transition: none;
+  }
+}
+
+/* ===== footer ===== */
+footer.site {
+  border-top: 1px solid var(--color-trace);
+  padding-block: var(--section-padding);
+}
+footer.site .wrap.foot-grid {
+  display: grid;
+  grid-template-columns: minmax(220px, 1.4fr) repeat(3, minmax(140px, 1fr));
+  align-items: start;
+  gap: var(--spacing-xl);
+  padding-bottom: var(--spacing-xl);
+}
+.foot-brand p {
+  color: var(--color-static);
+  font-size: var(--body-sm);
+  line-height: var(--line-height-meta);
+  max-width: 32ch;
+  margin-top: var(--spacing-sm);
+}
+/* Four columns need 220 + 3×140 + 3×48 of gutter; below ~900px that no
+   longer fits the viewport and the last column pushed the page sideways. */
+@media (max-width: 900px) {
+  footer.site .wrap.foot-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: var(--spacing-lg);
+  }
+  .foot-brand {
+    grid-column: 1 / -1;
+  }
+}
+/* Columns are a flush-left stack: the link text starts on exactly the
+   same vertical as its heading. The links carry block padding only —
+   inline padding would inset the text from the heading above it while
+   leaving the boxes aligned, which is the kind of misalignment that
+   looks like a mistake rather than a margin. Hit area comes from the
+   block padding plus the full-width row, not from side padding. */
+.foot-col {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0;
+}
+.foot-col h2 {
+  font: var(--weight-heading) var(--body-sm) / 1.4 var(--body-font-family);
+  color: var(--color-fg);
+  letter-spacing: 0.02em;
+  margin-bottom: 10px;
+}
+.foot-col a {
+  font-size: var(--body-sm);
+  font-weight: var(--weight-label);
+  color: var(--color-static);
+  /* Tighter leading inside the row, more padding around it, so the air
+     lands between links rather than inside each one. A single-line link
+     does not need body leading. */
+  line-height: 1.35;
+  padding: 9px 0;
+  transition: color 0.15s cubic-bezier(0.25, 1, 0.5, 1);
+}
+.foot-col a:hover {
+  color: var(--color-fg);
+}
+.foot-legal {
+  display: flex;
+  gap: var(--spacing-lg);
+  align-items: center;
+  flex-wrap: wrap;
+  border-top: 1px solid var(--color-trace);
+  padding-top: var(--spacing-lg);
+}
+.foot-legal .tagline {
+  margin-left: auto;
+  color: var(--color-static);
+  font-size: var(--body-sm);
+}
+/* Left over from a single-row footer that no longer exists. They were not
+   inert: `footer.site nav a` (0,1,3) out-ranked `.foot-col a` (0,1,1) and
+   forced 8px of inline padding onto every column link, insetting the text
+   from its heading, and `footer.site nav`'s gap and flex-wrap overrode
+   the column's own. Deleted rather than patched around. */
+footer.site .legal {
+  color: var(--color-static);
+  font-size: var(--body-sm);
+}

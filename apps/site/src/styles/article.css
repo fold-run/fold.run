@@ -67,6 +67,10 @@
 /* Standfirst: the body of this page is already Signal, so a lede in Carrier
    would read as a step down rather than as the way in. Size and leading
    carry it instead. */
+/* The standfirst. Selected structurally rather than by class because the post
+   body is Markdown now, and Markdown has no way to put a class on a paragraph.
+   The .lede class is kept as an alias so anything hand-authored still matches. */
+.article-col > p:first-of-type,
 .article-col .lede {
   font-size: 1.3125rem;
   line-height: 1.55;
@@ -199,18 +203,8 @@
   margin: var(--spacing-2xl) auto 0;
 }
 .route-rail .chip {
-  font-family: var(--mono-font-family);
-  font-size: var(--body-sm);
-  color: var(--color-carrier);
-  background: var(--color-rack);
-  border: 1px solid var(--color-trace);
-  border-radius: var(--radius-sm);
+  /* Roomier than the base chip: these are tap targets in a rail, not tags. */
   padding: 8px 14px;
-  text-decoration: none;
-}
-.route-rail a.chip:hover {
-  border-color: var(--color-carrier);
-  text-decoration: none;
 }
 
 /* ===== closing: compact Route drench (subordinated to the article h1) ===== */
