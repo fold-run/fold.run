@@ -3,6 +3,7 @@
 // the canon header/footer from the stardust redesign (stardust/canon/*).
 // Page-specific section styles live in each page, not here.
 import Wordmark from '../components/Wordmark.astro';
+import { headerNav, LINKS } from '../lib/nav';
 
 interface Props {
   title: string;
@@ -52,776 +53,20 @@ const {
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
     <meta name="twitter:card" content="summary_large_image" />
+    <link rel="alternate" type="application/rss+xml" title="fold" href="/rss.xml" />
     {jsonld && <script type="application/ld+json" is:inline set:html={JSON.stringify(jsonld)} />}
     <style is:global>
-      /* self-hosted · IBM Plex Sans + Geist Mono (both OFL) */
-      @font-face { font-family: 'Geist Mono'; font-style: normal; font-weight: 400; font-display: swap; src: url(/fonts/GeistMono-400-latin-ext.woff2) format('woff2'); unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF; }
-@font-face { font-family: 'Geist Mono'; font-style: normal; font-weight: 400; font-display: swap; src: url(/fonts/GeistMono-400-latin.woff2) format('woff2'); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
-@font-face { font-family: 'Geist Mono'; font-style: normal; font-weight: 600; font-display: swap; src: url(/fonts/GeistMono-600-latin-ext.woff2) format('woff2'); unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF; }
-@font-face { font-family: 'Geist Mono'; font-style: normal; font-weight: 600; font-display: swap; src: url(/fonts/GeistMono-600-latin.woff2) format('woff2'); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
-@font-face { font-family: 'IBM Plex Sans'; font-style: normal; font-weight: 400; font-display: swap; src: url(/fonts/IBMPlexSans-400-latin-ext.woff2) format('woff2'); unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF; }
-@font-face { font-family: 'IBM Plex Sans'; font-style: normal; font-weight: 400; font-display: swap; src: url(/fonts/IBMPlexSans-400-latin.woff2) format('woff2'); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
-@font-face { font-family: 'IBM Plex Sans'; font-style: normal; font-weight: 500; font-display: swap; src: url(/fonts/IBMPlexSans-500-latin-ext.woff2) format('woff2'); unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF; }
-@font-face { font-family: 'IBM Plex Sans'; font-style: normal; font-weight: 500; font-display: swap; src: url(/fonts/IBMPlexSans-500-latin.woff2) format('woff2'); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
-@font-face { font-family: 'IBM Plex Sans'; font-style: normal; font-weight: 600; font-display: swap; src: url(/fonts/IBMPlexSans-600-latin-ext.woff2) format('woff2'); unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF; }
-@font-face { font-family: 'IBM Plex Sans'; font-style: normal; font-weight: 600; font-display: swap; src: url(/fonts/IBMPlexSans-600-latin.woff2) format('woff2'); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
-@font-face { font-family: 'IBM Plex Sans'; font-style: normal; font-weight: 700; font-display: swap; src: url(/fonts/IBMPlexSans-700-latin-ext.woff2) format('woff2'); unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF; }
-@font-face { font-family: 'IBM Plex Sans'; font-style: normal; font-weight: 700; font-display: swap; src: url(/fonts/IBMPlexSans-700-latin.woff2) format('woff2'); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
-/* ===== stardust :root token contract (token-contract.md) ===== */
-      :root {
-        --heading-font-family: 'IBM Plex Sans', ui-sans-serif, system-ui, sans-serif;
-        --body-font-family: 'IBM Plex Sans', ui-sans-serif, system-ui, sans-serif;
-        /* Geist Mono is the face that is actually served from /fonts. */
-        --mono-font-family: 'Geist Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
-
-        /* Type ramp: 14 · 16 · 18 · 20 · 24 · 30–38 · 40–56.
-           Sizes that sit next to each other are at least a 1.25 step apart
-           (body 16 → card heading 20 → section head 30+). The 18/20 pair are
-           different roles — lead prose against a heading — held apart by
-           weight and colour rather than by size. */
-        --heading-xxl: clamp(2.5rem, 4.6vw + 0.6rem, 3.5rem); /* display, weight 600 */
-        --heading-xl: clamp(1.875rem, 1.6vw + 1.3rem, 2.375rem);
-        --heading-lg: 1.5rem;
-        --heading-md: 1.25rem;
-        --body-lg: 1.125rem; /* lede and section intros */
-        --body: 1rem;
-        --body-sm: 0.875rem; /* metadata, captions, mono labels — not prose */
-
-        /* Leading. Light type on a dark ground reads lighter, so every step
-           carries a little more than it would on paper. */
-        --line-height-heading: 1.04;
-        --line-height-title: 1.14;
-        --line-height-card: 1.3;
-        --line-height-body: 1.65;
-        --line-height-meta: 1.5;
-
-        /* Tracking: negative as size grows, positive as it shrinks. */
-        --tracking-display: -0.021em;
-        --tracking-title: -0.014em;
-        --tracking-card: -0.008em;
-        --tracking-body: 0.01em;
-        --tracking-meta: 0.02em;
-
-        /* Weights. 400 prose · 500 UI labels · 600 every heading ·
-           700 reserved for the wordmark and the proof numerals. */
-        --weight-body: 400;
-        --weight-label: 500;
-        --weight-heading: 600;
-        --weight-numeral: 700;
-
-        /* ===== colours — brand-native roles per DESIGN.md =====
-           Two families, and the split between them is the whole system.
-
-           NEUTRALS carry the interface: grounds, panels, hairlines, text, and
-           every action. ACTION is Signal white on ink — the primary button is
-           the brightest neutral, not a colour.
-
-           LIVE (#D6FF00) is licensed to proof only: something that is running,
-           measured, current, or focused. Status dots, the active route in a
-           topology drawing, the focus ring, the brand mark's turned facet. It
-           is never a button, never a bullet, never a decorative arrow. A page
-           where Live appears in more than a couple of places has lost the
-           signal — that is the rule this redesign turns on. */
-        --color-bg: #121212; /* Backplane — page ground */
-        --color-fg: #FFFFFF; /* Signal — 18.7:1 */
-        --color-rack: #1A1A1A; /* Rack — panels, code */
-        --color-rack-hi: #212121; /* Rack, lifted — hover step */
-        --color-trace: #2B2B2B; /* Trace — hairlines */
-        --color-trace-hi: #3D3D3D; /* Trace, lifted — hover borders */
-        --color-fold-line: #6E6E6E; /* meaningful fold-line graphics */
-        --color-static: #BCBCBC; /* Static — muted text (9.9:1) */
-        --color-carrier: #E0E0E0; /* neutral links, labels (14.2:1) */
-
-        --color-accent: #D6FF00; /* Live — proof, status, focus. Never actions. */
-        --color-down: #FF4C79; /* status failures only */
-
-        /* Actions are neutral. Signal fill / Backplane ink is 18.7:1. */
-        --color-action: #FFFFFF;
-        --color-action-ink: #121212;
-        --color-action-hover: #D4D4D4;
-
-        --spacing-xs: 4px;
-        --spacing-sm: 8px;
-        --spacing-md: 16px;
-        --spacing-lg: 24px;
-        --spacing-xl: 48px;
-        --spacing-2xl: 64px;
-
-        /* Vertical rhythm is a scale, not one number. A page whose every band
-           is the same height reads as a list; these three tiers are what give
-           the scroll its pacing. Fluid, so no breakpoint step-downs. */
-        --section-padding: clamp(3rem, 5.2vw, 5.5rem);
-        --section-padding-lg: clamp(4rem, 7.5vw, 7.5rem);
-        --section-padding-sm: clamp(2rem, 3vw, 2.75rem);
-
-        --max-width: 72rem;
-        --radius: 2px; /* machined — one radius, every surface, buttons included */
-        --radius-sm: 0px;
-        --radius-lg: 2px;
-
-        /* semantic stacking order */
-        --z-sticky: 50;
-        --z-dropdown: 60;
-        --z-nav-panel: 55;
-        --z-skip: 80;
-      }
-
-      /* ===== base ===== */
-      * {
-        box-sizing: border-box;
-        margin: 0;
-      }
-      html {
-        color-scheme: dark;
-      }
-      body {
-        background: var(--color-bg);
-        color: var(--color-fg);
-        font: var(--weight-body) var(--body) / var(--line-height-body) var(--body-font-family);
-        letter-spacing: var(--tracking-body); /* light-on-dark compensation */
-        font-kerning: normal;
-        font-optical-sizing: auto;
-        -webkit-font-smoothing: antialiased;
-        -moz-osx-font-smoothing: grayscale;
-      }
-      a {
-        color: var(--color-carrier);
-        text-decoration: none;
-      }
-      a:hover {
-        text-decoration: underline;
-        text-underline-offset: 3px;
-      }
-      main p a,
-      main .lede a,
-      .intro a {
-        text-decoration: underline;
-        text-underline-offset: 3px;
-      }
-      :focus-visible {
-        outline: 2px solid var(--color-accent);
-        outline-offset: 2px;
-        border-radius: 2px;
-      }
-      .wrap {
-        max-width: var(--max-width);
-        margin-inline: auto;
-        padding-inline: max(1.25rem, env(safe-area-inset-left))
-          max(1.25rem, env(safe-area-inset-right));
-      }
-      h1,
-      h2,
-      h3,
-      h4 {
-        font-family: var(--heading-font-family);
-        font-weight: var(--weight-heading);
-        text-wrap: balance;
-      }
-      h2 {
-        font-size: var(--heading-xl);
-        line-height: var(--line-height-title);
-        letter-spacing: var(--tracking-title);
-      }
-      h3 {
-        font-size: var(--heading-lg);
-        line-height: var(--line-height-card);
-        letter-spacing: var(--tracking-card);
-      }
-      h4 {
-        font-size: var(--heading-md);
-        line-height: var(--line-height-card);
-        letter-spacing: var(--tracking-card);
-      }
-      p {
-        max-width: 70ch;
-        text-wrap: pretty;
-      }
-      /* Lead paragraphs — the sentence directly under a heading. Larger and
-         brighter than card prose, and held to a shorter measure so the eye
-         reads it as one statement rather than as a block. */
-      .lede,
-      .intro {
-        font-size: var(--body-lg);
-        line-height: 1.6;
-        color: var(--color-carrier);
-        max-width: 64ch;
-      }
-      .muted {
-        color: var(--color-static);
-      }
-      .mono {
-        font-family: var(--mono-font-family);
-        font-size: var(--body-sm);
-        letter-spacing: 0;
-        font-variant-numeric: tabular-nums slashed-zero;
-      }
-      section {
-        padding-block: var(--section-padding);
-      }
-      .will-reveal {
-        opacity: 0;
-        transform: translateY(10px);
-        transition:
-          opacity 0.45s cubic-bezier(0.22, 1, 0.36, 1),
-          transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
-      }
-      .will-reveal.revealed {
-        opacity: 1;
-        transform: none;
-      }
-      /* Section rules are the page's structure, so they are drawn full-bleed
-         rather than inside the container: the hairline runs edge to edge and
-         the content sits within it, which is what makes the bands read as one
-         instrument rather than as stacked slides. */
-      section + section {
-        border-top: 1px solid var(--color-trace);
-      }
-
-      /* ===== buttons =====
-         One box for both variants — same height, same padding, same 2px
-         machined corner as every other surface. The arrow that used to trail
-         every button is gone: when a glyph sits after each of forty links it
-         has stopped pointing at anything. It survives on .arrow-link only,
-         where it marks the one inline "keep reading" affordance. */
-      .btn {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        gap: 10px;
-        height: 44px;
-        padding: 0 22px;
-        border: 1px solid transparent;
-        border-radius: var(--radius);
-        font: var(--weight-heading) var(--body) / 1 var(--body-font-family);
-        letter-spacing: -0.004em;
-        white-space: nowrap;
-        transition:
-          background-color 0.18s cubic-bezier(0.25, 1, 0.5, 1),
-          border-color 0.18s cubic-bezier(0.25, 1, 0.5, 1),
-          color 0.18s cubic-bezier(0.25, 1, 0.5, 1);
-      }
-      .arrow-link {
-        font-weight: var(--weight-label);
-        color: var(--color-fg);
-      }
-      .arrow-link::after {
-        content: '\2192';
-        color: var(--color-static);
-        margin-left: 8px;
-        display: inline-block;
-        transition: transform 0.2s cubic-bezier(0.25, 1, 0.5, 1);
-      }
-      .arrow-link:hover::after {
-        transform: translateX(3px);
-      }
-      /* flush tile grids: hairline gutters */
-      .tile-grid {
-        display: grid;
-        gap: var(--spacing-md);
-      }
-      .tile-grid > * {
-        background: var(--color-rack);
-        border: 1px solid var(--color-trace);
-        border-radius: var(--radius);
-        padding: var(--spacing-lg);
-        margin: 0;
-      }
-      a.tile {
-        position: relative;
-        display: block;
-        color: var(--color-fg);
-        min-height: 160px;
-      }
-      a.tile:hover {
-        background: var(--color-rack);
-        text-decoration: none;
-      }
-      a.tile::after {
-        content: '\2192';
-        position: absolute;
-        right: var(--spacing-lg);
-        bottom: var(--spacing-md);
-        color: var(--color-static);
-        font-size: 1.125rem;
-        transition:
-          transform 0.2s cubic-bezier(0.25, 1, 0.5, 1),
-          color 0.2s cubic-bezier(0.25, 1, 0.5, 1);
-      }
-      a.tile:hover::after {
-        transform: translateX(4px);
-        color: var(--color-fg);
-      }
-      /* Card surfaces. A flat Rack panel on a 1px Trace hairline, lifting one
-         background step on hover. The masked gradient-border that used to run
-         here (and lit an accent glow along the top edge) is gone: an instrument
-         panel does not shimmer, and the effect was the loudest thing on pages
-         whose actual argument is the numbers inside the box. */
-      .terminus,
-      .problem,
-      .cluster-rail,
-      .path,
-      .post-row,
-      .target,
-      a.tile {
-        background: var(--color-rack);
-        border: 1px solid var(--color-trace);
-        transition:
-          background-color 0.2s cubic-bezier(0.25, 1, 0.5, 1),
-          border-color 0.2s cubic-bezier(0.25, 1, 0.5, 1);
-      }
-      a.tile:hover,
-      .post-row:hover,
-      .target:hover {
-        background: var(--color-rack-hi);
-        border-color: var(--color-trace-hi);
-      }
-      /* The primary action is the brightest neutral on the page, not the
-         brand colour. Live is reserved for proof; a button is not proof. */
-      .btn-primary {
-        background: var(--color-action);
-        color: var(--color-action-ink);
-      }
-      .btn-primary:hover {
-        background: var(--color-action-hover);
-        text-decoration: none;
-      }
-      .btn-secondary {
-        background: transparent;
-        border-color: var(--color-trace-hi);
-        color: var(--color-fg);
-      }
-      .btn-secondary:hover {
-        background: var(--color-rack);
-        border-color: var(--color-static);
-        text-decoration: none;
-      }
-
-      /* skip link */
-      .skip-link {
-        position: absolute;
-        left: -9999px;
-        top: 0;
-        background: var(--color-action);
-        color: var(--color-action-ink);
-        padding: 10px 16px;
-        border-radius: 0 0 var(--radius) 0;
-        z-index: var(--z-skip);
-      }
-      .skip-link:focus {
-        left: 0;
-      }
-
-      /* ===== header ===== */
-      header.site {
-        position: sticky;
-        top: 0;
-        z-index: var(--z-sticky);
-        background: color-mix(in srgb, var(--color-bg) 88%, transparent);
-        backdrop-filter: blur(12px);
-        -webkit-backdrop-filter: blur(12px);
-        border-bottom: 1px solid var(--color-trace);
-      }
-      @supports not (backdrop-filter: blur(12px)) {
-        header.site {
-          background: var(--color-bg);
-        }
-      }
-      header.site .wrap {
-        display: flex;
-        align-items: center;
-        gap: var(--spacing-lg);
-        min-height: 60px;
-      }
-      .brandmark {
-        display: inline-flex;
-        align-items: center;
-        color: var(--color-fg);
-        flex: none;
-      }
-      .brandmark:hover {
-        text-decoration: none;
-        color: var(--color-carrier);
-      }
-      header.site nav {
-        display: flex;
-        align-items: center;
-        gap: 2px;
-        margin-left: auto;
-        font-size: 0.9375rem;
-      }
-      /* Nav is a supporting rank: Static until you point at it. Against one
-         solid action on the right, that is the entire hierarchy. */
-      header.site nav a:not(.btn) {
-        padding: 10px 12px;
-        font-weight: var(--weight-label);
-        letter-spacing: 0;
-        color: var(--color-static);
-        transition: color 0.15s cubic-bezier(0.25, 1, 0.5, 1);
-      }
-      header.site nav a:not(.btn):hover {
-        color: var(--color-fg);
-        text-decoration: none;
-      }
-      header.site .btn {
-        margin-left: var(--spacing-sm);
-      }
-      /* backdrop-filter makes the header the containing block for fixed
-         descendants; lift it while the mobile panel is open so the panel
-         can size against the viewport */
-      header.site:has(nav.open) {
-        backdrop-filter: none;
-        -webkit-backdrop-filter: none;
-        background: var(--color-bg);
-      }
-      .nav-burger {
-        display: none;
-        flex-direction: column;
-        gap: 5px;
-        background: none;
-        border: 0;
-        padding: 12px;
-        margin-left: auto;
-        cursor: pointer;
-      }
-      .nav-burger span {
-        width: 20px;
-        height: 2px;
-        background: var(--color-fg);
-        transition: transform 0.2s cubic-bezier(0.25, 1, 0.5, 1);
-      }
-      .nav-burger[aria-expanded='true'] span:first-child {
-        transform: translateY(3.5px) rotate(45deg);
-      }
-      .nav-burger[aria-expanded='true'] span:last-child {
-        transform: translateY(-3.5px) rotate(-45deg);
-      }
-      .nav-drop {
-        position: relative;
-      }
-      .nav-drop > button {
-        background: none;
-        border: 0;
-        color: var(--color-carrier);
-        font: inherit;
-        font-size: 0.9375rem;
-        font-weight: var(--weight-label);
-        letter-spacing: 0;
-        padding: 12px 10px;
-        cursor: pointer;
-        display: inline-flex;
-        align-items: center;
-        gap: 4px;
-      }
-      .nav-drop > button {
-        color: var(--color-static);
-        transition: color 0.15s cubic-bezier(0.25, 1, 0.5, 1);
-      }
-      .nav-drop > button:hover,
-      .nav-drop > button[aria-expanded='true'] {
-        color: var(--color-fg);
-      }
-      .nav-drop .chev {
-        font-size: 0.7em;
-        transition: transform 0.15s;
-      }
-      .nav-drop > button[aria-expanded='true'] .chev {
-        transform: rotate(180deg);
-      }
-      .drop-panel[hidden] {
-        display: none;
-      }
-      .drop-panel {
-        position: absolute;
-        top: calc(100% + 10px);
-        left: -12px;
-        min-width: 340px;
-        background: var(--color-rack);
-        border: 1px solid var(--color-trace);
-        border-radius: var(--radius-lg);
-        padding: 6px;
-        display: grid;
-        z-index: var(--z-dropdown);
-      }
-      .drop-panel a {
-        display: grid;
-        gap: 2px;
-        padding: 10px 12px;
-        border-radius: var(--radius-sm);
-        color: var(--color-fg);
-      }
-      .drop-panel a:hover {
-        background: var(--color-rack-hi);
-        text-decoration: none;
-      }
-      .drop-panel a b {
-        font-weight: var(--weight-heading);
-        font-size: 0.9375rem;
-        letter-spacing: -0.006em;
-      }
-      .drop-panel a span {
-        color: var(--color-static);
-        font-size: var(--body-sm);
-        line-height: var(--line-height-meta);
-      }
-      @media (max-width: 900px) {
-        .nav-burger {
-          display: flex;
-        }
-        header.site nav {
-          display: none;
-        }
-        header.site nav.open {
-          display: flex;
-          flex-wrap: nowrap;
-          overflow-x: hidden;
-          position: fixed;
-          inset: 60px 0 0 0;
-          flex-direction: column;
-          align-items: stretch;
-          gap: 0;
-          background: var(--color-bg);
-          padding: var(--spacing-md) var(--spacing-md) var(--spacing-xl);
-          overflow-y: auto;
-          z-index: var(--z-nav-panel);
-        }
-        header.site nav.open a:not(.btn),
-        header.site nav.open .nav-drop > button {
-          padding: 14px 8px;
-          font-size: 1.05rem;
-          border-bottom: 1px solid var(--color-trace);
-          width: 100%;
-          text-align: left;
-        }
-        header.site nav.open .btn {
-          margin-top: var(--spacing-md);
-          justify-content: center;
-        }
-        .drop-panel {
-          position: static;
-          min-width: 0;
-          border: 0;
-          background: transparent;
-          padding: 0 0 0 var(--spacing-md);
-        }
-      }
-      header.site nav a[aria-current='page'] {
-        color: var(--color-fg);
-      }
-      header.site .btn {
-        height: 34px;
-        padding: 0 14px;
-        font-size: var(--body-sm);
-      }
-
-      /* ===== footer ===== */
-      footer.site {
-        border-top: 1px solid var(--color-trace);
-        padding-block: var(--section-padding);
-      }
-      footer.site .wrap.foot-grid {
-        display: grid;
-        grid-template-columns: minmax(220px, 1.4fr) repeat(3, minmax(140px, 1fr));
-        align-items: start;
-        gap: var(--spacing-xl);
-        padding-bottom: var(--spacing-xl);
-      }
-      .foot-brand p {
-        color: var(--color-static);
-        font-size: var(--body-sm);
-        line-height: var(--line-height-meta);
-        max-width: 32ch;
-        margin-top: var(--spacing-sm);
-      }
-      /* Four columns need 220 + 3×140 + 3×48 of gutter; below ~900px that no
-         longer fits the viewport and the last column pushed the page sideways. */
-      @media (max-width: 900px) {
-        footer.site .wrap.foot-grid {
-          grid-template-columns: 1fr 1fr;
-          gap: var(--spacing-lg);
-        }
-        .foot-brand {
-          grid-column: 1 / -1;
-        }
-      }
-      /* Columns are a flush-left stack: the link text starts on exactly the
-         same vertical as its heading. The links carry block padding only —
-         inline padding would inset the text from the heading above it while
-         leaving the boxes aligned, which is the kind of misalignment that
-         looks like a mistake rather than a margin. Hit area comes from the
-         block padding plus the full-width row, not from side padding. */
-      .foot-col {
-        display: flex;
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 0;
-      }
-      .foot-col h2 {
-        font: var(--weight-heading) var(--body-sm) / 1.4 var(--body-font-family);
-        color: var(--color-fg);
-        letter-spacing: 0.02em;
-        margin-bottom: 10px;
-      }
-      .foot-col a {
-        font-size: var(--body-sm);
-        font-weight: var(--weight-label);
-        color: var(--color-static);
-        /* Tighter leading inside the row, more padding around it, so the air
-           lands between links rather than inside each one. A single-line link
-           does not need body leading. */
-        line-height: 1.35;
-        padding: 9px 0;
-        transition: color 0.15s cubic-bezier(0.25, 1, 0.5, 1);
-      }
-      .foot-col a:hover {
-        color: var(--color-fg);
-      }
-      .foot-legal {
-        display: flex;
-        gap: var(--spacing-lg);
-        align-items: center;
-        flex-wrap: wrap;
-        border-top: 1px solid var(--color-trace);
-        padding-top: var(--spacing-lg);
-      }
-      .foot-legal .tagline {
-        margin-left: auto;
-        color: var(--color-static);
-        font-size: var(--body-sm);
-      }
-      /* Left over from a single-row footer that no longer exists. They were not
-         inert: `footer.site nav a` (0,1,3) out-ranked `.foot-col a` (0,1,1) and
-         forced 8px of inline padding onto every column link, insetting the text
-         from its heading, and `footer.site nav`'s gap and flex-wrap overrode
-         the column's own. Deleted rather than patched around. */
-      footer.site .legal {
-        color: var(--color-static);
-        font-size: var(--body-sm);
-      }
-
-      /* ===== code panels (signature chrome, shared across pages) ===== */
-      .code-panel {
-        background: var(--color-rack);
-        border: 1px solid var(--color-trace);
-        border-radius: var(--radius-lg);
-        position: relative;
-        margin-top: var(--spacing-sm);
-      }
-      .code-panel .tag {
-        display: flex;
-        gap: 8px;
-        align-items: center;
-        justify-content: flex-end;
-        padding: 10px 12px 0;
-      }
-      .code-panel .tag span {
-        font-family: var(--mono-font-family);
-        font-size: 0.75rem;
-        letter-spacing: var(--tracking-meta);
-        color: var(--color-carrier);
-        border: 1px solid var(--color-trace);
-        border-radius: var(--radius-sm);
-        padding: 2px 8px;
-      }
-      .code-panel button {
-        font: 600 0.75rem/1 var(--mono-font-family);
-        letter-spacing: var(--tracking-meta);
-        color: var(--color-carrier);
-        background: transparent;
-        border: 1px solid var(--color-trace);
-        border-radius: var(--radius-sm);
-        padding: 3px 10px;
-        cursor: pointer;
-        position: relative;
-      }
-      .code-panel button::before {
-        content: '';
-        position: absolute;
-        inset: -12px;
-      }
-      .code-panel button:hover {
-        border-color: var(--color-carrier);
-      }
-      .code-panel pre {
-        overflow-x: auto;
-        padding: var(--spacing-sm) var(--spacing-lg) var(--spacing-md);
-        font: 400 0.8125rem / 1.7 var(--mono-font-family);
-        letter-spacing: 0;
-        font-variant-ligatures: none;
-        font-variant-numeric: slashed-zero;
-        color: var(--color-fg);
-      }
-      .code-panel code .c {
-        color: var(--color-static); /* comments */
-      }
-      .code-panel code .k {
-        color: var(--color-carrier); /* keys / prompts */
-      }
-
-
-      /* ===== closing band =====
-         The same object on every page that has one: home, blog index, and each
-         post. It lived in three places and two of them had drifted to a
-         stacked, smaller variant, so the site made a different closing argument
-         depending on which page you finished on. One definition here, in the
-         chrome every page already loads.
-
-         The statement holds the left and the action sits at the end of the
-         line: on the wide container a single left-aligned stack leaves half the
-         band empty, and this makes the width part of the composition. */
-      .closing {
-        background: var(--color-rack);
-        border-top: 1px solid var(--color-trace);
-        padding-block: var(--section-padding-lg);
-      }
-      .closing .wrap {
-        display: grid;
-        grid-template-columns: minmax(0, 1fr) auto;
-        gap: var(--spacing-lg) var(--spacing-2xl);
-        align-items: center;
-      }
-      .closing h2 {
-        color: var(--color-fg);
-        font-size: clamp(2rem, 2.2vw + 1.2rem, 2.75rem);
-        max-width: 18ch;
-      }
-      .closing p {
-        color: var(--color-carrier);
-        font-size: var(--body-lg);
-        line-height: 1.6;
-        max-width: 52ch;
-      }
-      .closing .btn {
-        grid-column: 2;
-        grid-row: 1 / span 2;
-        justify-self: end;
-      }
-      @media (max-width: 840px) {
-        .closing .wrap {
-          grid-template-columns: 1fr;
-          justify-items: start;
-        }
-        .closing .btn {
-          grid-column: 1;
-          grid-row: auto;
-          justify-self: start;
-        }
-      }
-      @media (max-width: 640px) {
-        .closing .btn {
-          width: 100%;
-          justify-content: center;
-        }
-      }
-
-      /* ===== shared responsive =====
-         Section padding is a clamp() now, so there is nothing to step down. */
-      @media (prefers-reduced-motion: reduce) {
-        .btn,
-        a.tile,
-        .arrow-link::after {
-          transition: none;
-        }
-      }
+      /* Faces and token values live in @fold-run/tokens so docs.fold.run and
+         fold.run cannot drift apart (DESIGN.json: "Divergence between origins
+         is a bug"). The three sheets below are this site's own layers:
+         base (document defaults), primitives (the shared class vocabulary),
+         chrome (the header and footer). Page-specific section styles stay in
+         each page. */
+      @import '@fold-run/tokens/fonts.css';
+      @import '@fold-run/tokens/vars.css';
+      @import '../styles/base.css';
+      @import '../styles/primitives.css';
+      @import '../styles/chrome.css';
     </style>
   </head>
   <body data-template={template}>
@@ -836,21 +81,64 @@ const {
           <span></span><span></span>
         </button>
         <nav aria-label="Site" id="site-nav">
-          <div class="nav-drop">
-            <button aria-expanded="false" aria-controls="docs-menu">Docs <span aria-hidden="true" class="chev">&#x25BE;</span></button>
-            <div class="drop-panel" id="docs-menu" hidden>
-              <a href="https://docs.fold.run/getting-started/"><b>Getting started</b><span>Run a governed endpoint in 60 seconds</span></a>
-              <a href="https://docs.fold.run/use-cases/"><b>Use cases</b><span>Federation, governance, tasks, discovery</span></a>
-              <a href="https://docs.fold.run/architecture/"><b>Architecture</b><span>The request pipeline, end to end</span></a>
-              <a href="https://docs.fold.run/configuration/"><b>Configuration</b><span>One config file, validated</span></a>
-              <a href="https://docs.fold.run/security/"><b>Security model</b><span>AuthN, policy, audit, credential brokering</span></a>
-              <a href="https://docs.fold.run/benchmarks/"><b>Benchmarks</b><span>Honest numbers, caveats attached</span></a>
-            </div>
-          </div>
-          <a href="/#demo">Live demo</a>
-          <a href="/blog/" aria-current={current === 'blog' ? 'page' : undefined}>Blog</a>
-          <a href="https://github.com/fold-run/fold">GitHub</a>
-          <a class="btn btn-primary" href="https://docs.fold.run/getting-started/">Get started</a>
+          {
+            headerNav.map((item, i) =>
+              item.sections ? (
+                <div class="nav-drop">
+                  {/* A disclosure, not a menubar: the only promise made is
+                      expand/collapse, which is the only one kept. */}
+                  <button class="nav-trigger" aria-expanded="false" aria-controls={`mega-${i}`}>
+                    {item.label}
+                    {/* Authored caret rather than the U+25BE glyph, which
+                        renders as a speck off the baseline at label size. */}
+                    <svg
+                      class="chev"
+                      viewBox="0 0 10 6"
+                      width="10"
+                      height="6"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="1.5"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      aria-hidden="true"
+                    >
+                      <path d="M1 1.25 5 4.75 9 1.25" />
+                    </svg>
+                  </button>
+                  <div class="mega" id={`mega-${i}`}>
+                    <div class="mega-clip">
+                      <div class="wrap mega-cols">
+                        {item.sections.map((section) => (
+                          <div class="mega-col">
+                            <span class="mega-label">{section.title}</span>
+                            <ul>
+                              {section.items.map((l) => (
+                                <li>
+                                  <a href={l.href}>
+                                    <b>{l.label}</b>
+                                    <span>{l.description}</span>
+                                  </a>
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <a
+                  href={item.href}
+                  aria-current={current === 'blog' && item.href === '/blog/' ? 'page' : undefined}
+                >
+                  {item.label}
+                </a>
+              )
+            )
+          }
+          <a class="btn btn-primary" href={`${LINKS.docs}/getting-started/`}>Get started</a>
         </nav>
       </div>
     </header>
@@ -883,6 +171,8 @@ const {
           <h2>Project</h2>
           <a href="https://github.com/fold-run/fold">GitHub</a>
           <a href="/blog/" aria-current={current === 'blog' ? 'page' : undefined}>Blog</a>
+          <a href="/changelog/">Changelog</a>
+          <a href="/rss.xml">RSS</a>
           <a href="https://github.com/fold-run/fold/blob/main/LICENSE">Apache-2.0 license</a>
         </nav>
       </div>
@@ -892,44 +182,160 @@ const {
       </div>
     </footer>
       <script>
-      // nav: docs dropdown + mobile menu (progressive enhancement)
+      // nav: mega-menu disclosures + mobile sheet (progressive enhancement).
+      // Without this script every panel is simply an expanded block of links,
+      // which is why the closed state is set here rather than in the markup.
       {
-        const drop = document.querySelector('.nav-drop > button');
-        const panel = document.getElementById('docs-menu');
-        if (drop && panel) {
-          const close = () => {
-            drop.setAttribute('aria-expanded', 'false');
-            panel.hidden = true;
-          };
-          drop.addEventListener('click', () => {
-            const open = drop.getAttribute('aria-expanded') === 'true';
-            drop.setAttribute('aria-expanded', String(!open));
-            panel.hidden = open;
+        const nav = document.getElementById('site-nav');
+        const drops = [...document.querySelectorAll('.nav-drop')];
+        const desktop = matchMedia('(min-width: 901px)');
+        let closeTimer = null;
+
+        const setOpen = (drop, open) => {
+          drop.toggleAttribute('data-open', open);
+          drop.querySelector('.nav-trigger').setAttribute('aria-expanded', String(open));
+          // inert keeps the collapsed links out of the tab order and the
+          // accessibility tree at once; the grid-rows collapse only hides them
+          // visually, so without it a closed panel is still five tab stops.
+          drop.querySelector('.mega').inert = !open;
+        };
+        const closeAll = (except) => {
+          for (const d of drops) if (d !== except) setOpen(d, false);
+        };
+
+        for (const drop of drops) {
+          setOpen(drop, false);
+          const trigger = drop.querySelector('.nav-trigger');
+
+          trigger.addEventListener('click', (e) => {
+            const open = drop.hasAttribute('data-open');
+            closeAll(drop);
+            setOpen(drop, !open);
+            // Keyboard activation reports detail 0. Move focus into the panel,
+            // which otherwise sits behind every remaining trigger in DOM order.
+            if (!open && e.detail === 0) drop.querySelector('.mega a')?.focus();
           });
-          document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') close();
+
+          // Pointer opens only where there is a real pointer; a tap fires the
+          // click handler above and must not also be treated as a hover.
+          drop.addEventListener('pointerenter', (e) => {
+            if (e.pointerType !== 'mouse' || !desktop.matches) return;
+            clearTimeout(closeTimer);
+            closeAll(drop);
+            setOpen(drop, true);
           });
-          document.addEventListener('click', (e) => {
-            if (!drop.closest('.nav-drop').contains(e.target)) close();
+          drop.addEventListener('pointerleave', (e) => {
+            if (e.pointerType !== 'mouse' || !desktop.matches) return;
+            closeTimer = setTimeout(() => setOpen(drop, false), 150);
           });
         }
+
+        if (drops.length) {
+          document.addEventListener('keydown', (e) => {
+            if (e.key !== 'Escape') return;
+            const open = drops.find((d) => d.hasAttribute('data-open'));
+            if (!open) return;
+            // Return focus to the trigger rather than dropping the reader
+            // into a region that just collapsed.
+            if (open.contains(document.activeElement)) open.querySelector('.nav-trigger').focus();
+            setOpen(open, false);
+          });
+          document.addEventListener('pointerdown', (e) => {
+            const el = e.target instanceof Element ? e.target : null;
+            if (!el || !el.closest('.nav-drop')) closeAll();
+          });
+          // A hover-opened panel should not stay pinned over the page while it
+          // scrolls underneath. In the mobile sheet the panel scrolls with the
+          // list, so it stays put.
+          addEventListener(
+            'scroll',
+            () => {
+              if (desktop.matches) closeAll();
+            },
+            { passive: true }
+          );
+          nav?.addEventListener('focusout', (e) => {
+            if (!nav.contains(e.relatedTarget)) closeAll();
+          });
+        }
+
         const burger = document.querySelector('.nav-burger');
-        const nav = document.getElementById('site-nav');
         if (burger && nav) {
           burger.addEventListener('click', () => {
             const open = nav.classList.toggle('open');
             burger.setAttribute('aria-expanded', String(open));
             document.documentElement.style.overflow = open ? 'hidden' : '';
+            if (!open) closeAll();
           });
           nav.addEventListener('click', (e) => {
             if (e.target.closest('a')) {
               nav.classList.remove('open');
               burger.setAttribute('aria-expanded', 'false');
               document.documentElement.style.overflow = '';
+              closeAll();
             }
           });
         }
       }
+      /* Copy affordances: the code panels and the share row's "Copy link".
+         Both moved here from a page. The code-panel handler was in index.astro,
+         so the blog's panels rendered a button with nothing listening; the
+         share-row button had no handler anywhere in the repo at all. One live
+         region serves both. Progressive enhancement, no deps. */
+      {
+        const live = document.createElement('span');
+        live.setAttribute('role', 'status');
+        live.style.cssText = 'position:absolute;left:-9999px';
+        document.body.appendChild(live);
+
+        const flash = (btn, label, message) => {
+          const original = btn.textContent;
+          btn.textContent = label;
+          live.textContent = message;
+          setTimeout(() => {
+            btn.textContent = original;
+          }, 1800);
+        };
+
+        for (const btn of document.querySelectorAll('[data-copy]')) {
+          btn.addEventListener('click', async () => {
+            const pre = btn.closest('.code-panel')?.querySelector('pre');
+            if (!pre) return;
+            try {
+              await navigator.clipboard.writeText(pre.innerText);
+              flash(btn, 'copied', 'Copied to clipboard');
+            } catch {
+              // Select the block so the reader can still take it by keyboard.
+              const range = document.createRange();
+              range.selectNodeContents(pre);
+              const sel = getSelection();
+              if (sel) {
+                sel.removeAllRanges();
+                sel.addRange(range);
+              }
+              flash(
+                btn,
+                'press \u2318C',
+                'Clipboard unavailable; text selected, press Control or Command C'
+              );
+            }
+          });
+        }
+
+        for (const btn of document.querySelectorAll('[data-copy-link]')) {
+          btn.addEventListener('click', async () => {
+            const url = btn.getAttribute('data-copy-link');
+            if (!url) return;
+            try {
+              await navigator.clipboard.writeText(url);
+              flash(btn, 'Copied', 'Link copied to clipboard');
+            } catch {
+              flash(btn, 'Press \u2318C', 'Clipboard unavailable; the link is in the address bar');
+            }
+          });
+        }
+      }
+
       // Scroll reveal: the contents of a band rise in; the default state stays
       // fully visible without JS. Section heads are deliberately NOT reveal
       // targets — with a -8% root margin a head could sit at opacity 0 while

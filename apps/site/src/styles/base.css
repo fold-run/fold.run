@@ -1,0 +1,114 @@
+/* fold.run base layer: resets, document defaults, and the typographic
+   ramp applied to elements. Tokens come from @fold-run/tokens; this file
+   is where they first meet the page. Spec: DESIGN.md §3.
+   Imported by src/layouts/Base.astro. */
+
+/* ===== base ===== */
+* {
+  box-sizing: border-box;
+  margin: 0;
+}
+html {
+  color-scheme: dark;
+}
+body {
+  background: var(--color-bg);
+  color: var(--color-fg);
+  font: var(--weight-body) var(--body) / var(--line-height-body) var(--body-font-family);
+  letter-spacing: var(--tracking-body); /* light-on-dark compensation */
+  font-kerning: normal;
+  font-optical-sizing: auto;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+a {
+  color: var(--color-carrier);
+  text-decoration: none;
+}
+a:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+main p a,
+main .lede a,
+.intro a {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+.wrap {
+  max-width: var(--max-width);
+  margin-inline: auto;
+  padding-inline: max(1.25rem, env(safe-area-inset-left)) max(1.25rem, env(safe-area-inset-right));
+}
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--heading-font-family);
+  font-weight: var(--weight-heading);
+  text-wrap: balance;
+}
+h2 {
+  font-size: var(--heading-xl);
+  line-height: var(--line-height-title);
+  letter-spacing: var(--tracking-title);
+}
+h3 {
+  font-size: var(--heading-lg);
+  line-height: var(--line-height-card);
+  letter-spacing: var(--tracking-card);
+}
+h4 {
+  font-size: var(--heading-md);
+  line-height: var(--line-height-card);
+  letter-spacing: var(--tracking-card);
+}
+p {
+  max-width: 70ch;
+  text-wrap: pretty;
+}
+/* Lead paragraphs — the sentence directly under a heading. Larger and
+   brighter than card prose, and held to a shorter measure so the eye
+   reads it as one statement rather than as a block. */
+.lede,
+.intro {
+  font-size: var(--body-lg);
+  line-height: 1.6;
+  color: var(--color-carrier);
+  max-width: 64ch;
+}
+.muted {
+  color: var(--color-static);
+}
+.mono {
+  font-family: var(--mono-font-family);
+  font-size: var(--body-sm);
+  letter-spacing: 0;
+  font-variant-numeric: tabular-nums slashed-zero;
+}
+section {
+  padding-block: var(--section-padding);
+}
+.will-reveal {
+  opacity: 0;
+  transform: translateY(10px);
+  transition:
+    opacity 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.will-reveal.revealed {
+  opacity: 1;
+  transform: none;
+}
+/* Section rules are the page's structure, so they are drawn full-bleed
+   rather than inside the container: the hairline runs edge to edge and
+   the content sits within it, which is what makes the bands read as one
+   instrument rather than as stacked slides. */
+section + section {
+  border-top: 1px solid var(--color-trace);
+}

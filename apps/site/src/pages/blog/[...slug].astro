@@ -1,0 +1,93 @@
+---
+// One renderer for every post. The two posts used to be hand-written pages
+// that had drifted: one carried a share row and a back-rail, the other did
+// not, and both restated the same header markup. Chrome lives here now;
+// content lives in src/content/blog.
+import { type CollectionEntry, getCollection, render } from 'astro:content';
+import Closing from '../../components/Closing.astro';
+import Base from '../../layouts/Base.astro';
+import { SITE } from '../../lib/seo';
+import '../../styles/article.css';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('blog', ({ data }) => !data.draft);
+  return posts.map((post) => ({ params: { slug: post.id }, props: { post } }));
+}
+
+interface Props {
+  post: CollectionEntry<'blog'>;
+}
+
+const { post } = Astro.props;
+const { title, description, date, category, ogImage } = post.data;
+const { Content } = await render(post);
+
+const url = `${SITE}/blog/${post.id}/`;
+const iso = date.toISOString().slice(0, 10);
+const share = encodeURIComponent(url);
+const text = encodeURIComponent(title);
+
+const jsonld = {
+  '@context': 'https://schema.org',
+  '@type': 'BlogPosting',
+  headline: title,
+  description,
+  datePublished: iso,
+  url,
+  publisher: { '@type': 'Organization', name: 'fold' },
+};
+---
+
+<Base
+  title={`${title} · fold`}
+  description={description}
+  canonical={url}
+  ogImage={ogImage ?? '/og.png'}
+  jsonld={jsonld}
+  current="blog"
+  template="article"
+>
+  <main id="main">
+    <section
+      class="article-header"
+      data-section="article-header"
+      data-intent="orient"
+      data-layout="contained"
+    >
+      <div class="wrap">
+        <div class="article-col">
+          <a class="crumb" href="/blog/">← Blog</a>
+          <p class="kicker"><time datetime={iso}>{iso}</time> · {category}</p>
+          <h1>{title}</h1>
+        </div>
+      </div>
+    </section>
+
+    <section
+      class="article-body"
+      data-section="article-body"
+      data-intent="explain mechanic"
+      data-layout="contained"
+      data-slot="article-body"
+    >
+      <div class="wrap">
+        <article class="article-col">
+          <Content />
+
+          <nav class="route-rail post-rail" aria-label="Article">
+            <a class="chip" href="/blog/">← Blog</a>
+          </nav>
+
+          <div class="share-row">
+            <span>Share:</span>
+            <a href={`https://twitter.com/intent/tweet?text=${text}&url=${share}`}>X</a>
+            <a href={`https://news.ycombinator.com/submitlink?u=${share}&t=${text}`}>Hacker News</a>
+            <button type="button" class="copy-link" data-copy-link={url}>Copy link</button>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <Closing />
+  </main>
+</Base>

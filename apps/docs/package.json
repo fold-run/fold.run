@@ -14,6 +14,7 @@
   },
   "dependencies": {
     "@astrojs/starlight": "^0.41.4",
+    "@fold-run/tokens": "workspace:*",
     "astro": "^7.1.3",
     "lucide-astro": "^0.556.0",
     "sharp": "^0.35.3",

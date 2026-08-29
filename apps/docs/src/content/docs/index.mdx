@@ -1,54 +1,114 @@
 ---
 title: fold
 description: The enterprise MCP gateway — one governed endpoint between every MCP client and every MCP server.
-template: splash
-hero:
-  title: The enterprise MCP gateway.
-  tagline: >-
-    One governed endpoint between every MCP client and every MCP server.
-    Federation, auth, policy, tenancy, budgets, and audit, built on the
-    official MCP Go SDK on both sides of the proxy.
-  actions:
-    - text: Get started
-      link: /getting-started/
-    - text: Use cases
-      link: /use-cases/
-      variant: secondary
-    - text: GitHub
-      link: https://github.com/fold-run/fold
-      variant: minimal
 ---
 
-import { CardGrid } from '@astrojs/starlight/components';
+import { CardGrid, LinkCard } from '@astrojs/starlight/components';
 import Card from '../../components/Card.astro';
-import { BadgeCheck, Container, Network, ShieldCheck } from 'lucide-astro';
+import { BookOpen, Rocket } from 'lucide-astro';
+
+fold is a single Go binary that presents any number of upstream MCP (Model Context Protocol)
+servers as one governed virtual server: one endpoint, one policy, one audit trail. It is built
+on the official MCP Go SDK on both sides of the proxy, and the official conformance suite runs
+through it on every merge.
+
+Before running it against anything that matters:
+
+1. **[Describe your upstreams](/configuration/)** in one config file, validated at load.
+2. **[Put a policy in front of them](/security/)** — fold is deny-by-default, and an empty
+   allowlist denies everything.
 
 <CardGrid>
-  <Card title="Federation with namespaces" icon={Network}>
-    Register any number of upstreams — internal teams or vendors, any
-    language, any SDK. fold fans out lists, merges and namespaces results
-    (`gh__create_pr`), routes named calls to their owner, and degrades
-    gracefully when an upstream is down. Upstreams can even
-    [register themselves](/discovery/).
+  <Card title="Getting started" icon={Rocket}>
+    A governed endpoint in 60 seconds, from one config file and one binary.
+
+    [Start here →](/getting-started/)
   </Card>
-  <Card title="Enterprise governance" icon={ShieldCheck}>
-    OAuth 2.0 resource server, Enterprise-Managed Authorization (ID-JAG),
-    RFC 8693 token exchange per upstream, deny-by-default allowlists with
-    per-principal visibility, and an audit event for every request —
-    including the denials. Group principals into
-    [tenants](/tenancy/) for a shared allowance, a shared rate-limit
-    bucket, and a bounded view of the federation.
-  </Card>
-  <Card title="Provably conformant" icon={BadgeCheck}>
-    The official MCP conformance suite runs through fold on every merge —
-    [40/40 checks](/conformance/), including sampling, elicitation, and
-    subscriptions bridged through the gateway — plus a CI gate on added
-    proxy latency (&lt; 5 ms p50; ~0.2 ms typical).
-  </Card>
-  <Card title="Built to operate" icon={Container}>
-    A single ~22 MB distroless container or static Go binary. Hot config
-    reload without dropping the listener, Redis-shared state so a fleet
-    behaves as one, Prometheus metrics, OpenTelemetry tracing, and health
-    surfaces for your probes. [Operations →](/operations/)
+  <Card title="Run it locally" icon={BookOpen}>
+    The same thing on your own machine, against upstreams you already have.
+
+    [Run it →](/run-it-locally/)
   </Card>
 </CardGrid>
+
+## Federate
+
+<CardGrid>
+  <LinkCard
+    title="Architecture"
+    href="/architecture/"
+    description="The request pipeline end to end: classify, route, authorize, proxy, audit."
+  />
+  <LinkCard
+    title="Configuration"
+    href="/configuration/"
+    description="Upstreams, namespaces, policy, tenants and budgets, in one validated file."
+  />
+  <LinkCard
+    title="Discovery & Kubernetes"
+    href="/discovery/"
+    description="Labelled Services join the federation on their own, with no config edit."
+  />
+  <LinkCard
+    title="Local stdio servers"
+    href="/stdio/"
+    description="Federate a process that speaks stdio alongside remote HTTP upstreams."
+  />
+</CardGrid>
+
+## Govern
+
+<CardGrid>
+  <LinkCard
+    title="Security model"
+    href="/security/"
+    description="Trust anchors, the inbound auth chain, deny-by-default policy, credential brokering."
+  />
+  <LinkCard
+    title="Tenancy"
+    href="/tenancy/"
+    description="Group principals into one allowance, one rate-limit bucket, one bounded view."
+  />
+  <LinkCard
+    title="Budgets & metering"
+    href="/consumption/"
+    description="Per-tenant call budgets, charged narrowest-first, refused rather than billed."
+  />
+  <LinkCard
+    title="Conformance"
+    href="/conformance/"
+    description="40/40 official MCP checks, run through the gateway on every merge."
+  />
+</CardGrid>
+
+## Operate
+
+<CardGrid>
+  <LinkCard
+    title="Deployment"
+    href="/deployment/"
+    description="Static binary, ~22 MB distroless container, or a Helm chart with probes and HPA."
+  />
+  <LinkCard
+    title="Operations"
+    href="/operations/"
+    description="Hot reload, Redis-shared state, Prometheus metrics, OpenTelemetry traces, health."
+  />
+  <LinkCard
+    title="The console"
+    href="/console/"
+    description="Watch calls resolve through the gateway, upstream by upstream, in real time."
+  />
+  <LinkCard
+    title="Benchmarks"
+    href="/benchmarks/"
+    description="Added proxy latency with its caveats attached: < 5 ms p50, ~0.2 ms typical."
+  />
+</CardGrid>
+
+## Everything else
+
+[Use cases](/use-cases/) is the shortest route to whether fold fits what you have.
+[Defaults](/defaults/) lists every value fold picks for you and why.
+[Embedding in Go](/embedding/) is for putting the gateway inside your own binary.
+The source is on [GitHub](https://github.com/fold-run/fold) under Apache-2.0.

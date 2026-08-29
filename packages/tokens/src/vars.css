@@ -1,0 +1,121 @@
+/* fold design token values: plain CSS, no framework directives.
+
+   Consumed directly by apps/site (Base.astro) and by apps/docs, where
+   fold.css maps these onto Starlight's --sl-* variable system. Token values
+   therefore have exactly one home.
+
+   This file exists to enforce two rules the system already states and was not
+   keeping. Before it, the same hex values were declared twice under two
+   different naming schemes, one per origin:
+
+     "Divergence between origins is a bug."           DESIGN.json, narrative
+     "No per-origin theming; docs and marketing
+      consume these tokens only."                     DESIGN.md §6
+
+   The docs light theme is deliberately NOT here. It is hand-tuned rather than
+   a mirror of this ramp (its hairline and gray-5 steps differ, where dark
+   collapses both onto Trace), the site is dark-only by construction, and
+   folding it in would either move pixels or invent tokens. It stays local to
+   apps/docs/src/styles/fold.css.
+
+   Spec: DESIGN.md + DESIGN.json at the repo root. Values are unchanged from
+   the stardust token contract they were lifted from.
+   ===== stardust :root token contract (token-contract.md) ===== */
+
+:root {
+  --heading-font-family: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
+  --body-font-family: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
+  /* Geist Mono is the face that is actually served from /fonts. */
+  --mono-font-family: "Geist Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  /* Type ramp: 14 · 16 · 18 · 20 · 24 · 30–38 · 40–56.
+     Sizes that sit next to each other are at least a 1.25 step apart
+     (body 16 → card heading 20 → section head 30+). The 18/20 pair are
+     different roles — lead prose against a heading — held apart by
+     weight and colour rather than by size. */
+  --heading-xxl: clamp(2.5rem, 4.6vw + 0.6rem, 3.5rem); /* display, weight 600 */
+  --heading-xl: clamp(1.875rem, 1.6vw + 1.3rem, 2.375rem);
+  --heading-lg: 1.5rem;
+  --heading-md: 1.25rem;
+  --body-lg: 1.125rem; /* lede and section intros */
+  --body: 1rem;
+  --body-sm: 0.875rem; /* metadata, captions, mono labels — not prose */
+
+  /* Leading. Light type on a dark ground reads lighter, so every step
+     carries a little more than it would on paper. */
+  --line-height-heading: 1.04;
+  --line-height-title: 1.14;
+  --line-height-card: 1.3;
+  --line-height-body: 1.65;
+  --line-height-meta: 1.5;
+
+  /* Tracking: negative as size grows, positive as it shrinks. */
+  --tracking-display: -0.021em;
+  --tracking-title: -0.014em;
+  --tracking-card: -0.008em;
+  --tracking-body: 0.01em;
+  --tracking-meta: 0.02em;
+
+  /* Weights. 400 prose · 500 UI labels · 600 every heading ·
+     700 reserved for the wordmark and the proof numerals. */
+  --weight-body: 400;
+  --weight-label: 500;
+  --weight-heading: 600;
+  --weight-numeral: 700;
+
+  /* ===== colours — brand-native roles per DESIGN.md =====
+     Two families, and the split between them is the whole system.
+
+     NEUTRALS carry the interface: grounds, panels, hairlines, text, and
+     every action. ACTION is Signal white on ink — the primary button is
+     the brightest neutral, not a colour.
+
+     LIVE (#D6FF00) is licensed to proof only: something that is running,
+     measured, current, or focused. Status dots, the active route in a
+     topology drawing, the focus ring, the brand mark's turned facet. It
+     is never a button, never a bullet, never a decorative arrow. A page
+     where Live appears in more than a couple of places has lost the
+     signal — that is the rule this redesign turns on. */
+  --color-bg: #121212; /* Backplane — page ground */
+  --color-fg: #ffffff; /* Signal — 18.7:1 */
+  --color-rack: #1a1a1a; /* Rack — panels, code */
+  --color-rack-hi: #212121; /* Rack, lifted — hover step */
+  --color-trace: #2b2b2b; /* Trace — hairlines */
+  --color-trace-hi: #3d3d3d; /* Trace, lifted — hover borders */
+  --color-fold-line: #6e6e6e; /* meaningful fold-line graphics */
+  --color-static: #bcbcbc; /* Static — muted text (9.9:1) */
+  --color-carrier: #e0e0e0; /* neutral links, labels (14.2:1) */
+
+  --color-accent: #d6ff00; /* Live — proof, status, focus. Never actions. */
+  --color-down: #ff4c79; /* status failures only */
+
+  /* Actions are neutral. Signal fill / Backplane ink is 18.7:1. */
+  --color-action: #ffffff;
+  --color-action-ink: #121212;
+  --color-action-hover: #d4d4d4;
+
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --spacing-xl: 48px;
+  --spacing-2xl: 64px;
+
+  /* Vertical rhythm is a scale, not one number. A page whose every band
+     is the same height reads as a list; these three tiers are what give
+     the scroll its pacing. Fluid, so no breakpoint step-downs. */
+  --section-padding: clamp(3rem, 5.2vw, 5.5rem);
+  --section-padding-lg: clamp(4rem, 7.5vw, 7.5rem);
+  --section-padding-sm: clamp(2rem, 3vw, 2.75rem);
+
+  --max-width: 72rem;
+  --radius: 2px; /* machined — one radius, every surface, buttons included */
+  --radius-sm: 0px;
+  --radius-lg: 2px;
+
+  /* semantic stacking order */
+  --z-sticky: 50;
+  --z-dropdown: 60;
+  --z-nav-panel: 55;
+  --z-skip: 80;
+}

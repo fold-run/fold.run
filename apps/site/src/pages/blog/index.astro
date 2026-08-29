@@ -1,24 +1,28 @@
 ---
-// The blog index — stardust redesign (stardust/migrated/blog/index.html).
-// Add new posts as .post-row items in the list below, newest first — each
-// href must match a sibling .astro page in this directory.
+// The blog index. Posts come from the content collection, so adding one is a
+// file in src/content/blog — the list here used to be hand-maintained markup
+// and was the only place that knew a post existed.
+import { getCollection } from 'astro:content';
+import Closing from '../../components/Closing.astro';
 import Base from '../../layouts/Base.astro';
+import { SEO, SITE } from '../../lib/seo';
 
-const description =
-  'Engineering notes from fold, the enterprise MCP gateway — federation, governance, and what a stateless protocol does to the thing in the middle.';
+const posts = (await getCollection('blog', ({ data }) => !data.draft)).sort(
+  (a, b) => b.data.date.valueOf() - a.data.date.valueOf(),
+);
 
 const jsonld = {
   '@context': 'https://schema.org',
   '@type': 'Blog',
-  name: 'Blog · fold',
-  url: 'https://fold.run/blog/',
+  name: SEO.blog.title,
+  url: `${SITE}${SEO.blog.pathname}`,
 };
 ---
 
 <Base
-  title="Blog · fold"
-  description={description}
-  canonical="https://fold.run/blog/"
+  title={SEO.blog.title}
+  description={SEO.blog.description}
+  canonical={`${SITE}${SEO.blog.pathname}`}
   jsonld={jsonld}
   current="blog"
   template="listing"
@@ -39,58 +43,32 @@ const jsonld = {
       data-section="post-list"
       data-intent="discovery"
       data-layout="stack"
-      data-items="2"
+      data-items={String(posts.length)}
       data-fragment="post-row"
       data-fragment-role="source"
     >
       <div class="wrap">
         <ul class="posts">
-          <li class="post-row">
-            <p class="post-meta">2026-08-10 · engineering</p>
-            <h2>
-              <a href="/blog/tenancy-one-bucket/" class="arrow-link"
-                >One bucket, not ten: tenancy in an MCP gateway</a
-              >
-            </h2>
-            <p class="teaser">
-              A tenant groups principals and governs them as one. The line the design holds above
-              all is that it never authenticates them. Budgets charge narrowest-first, rate limits
-              check widest-first, and ambiguity is refused rather than resolved.
-            </p>
-          </li>
-          <li class="post-row">
-            <p class="post-meta">2026-08-04 · engineering</p>
-            <h2>
-              <a href="/blog/federating-mcp-tasks/" class="arrow-link"
-                >Federating MCP tasks: affinity routing over opaque ids</a
-              >
-            </h2>
-            <p class="teaser">
-              The MCP tasks extension standardized long-running work — and task ids outlive any
-              session. Putting one gateway in front of N task-running servers forces an ownership
-              problem, and the solution generalizes.
-            </p>
-          </li>
+          {
+            posts.map((post) => (
+              <li class="post-row">
+                <p class="post-meta">
+                  {post.data.date.toISOString().slice(0, 10)} · {post.data.category}
+                </p>
+                <h2>
+                  <a href={`/blog/${post.id}/`} class="arrow-link">
+                    {post.data.title}
+                  </a>
+                </h2>
+                <p class="teaser">{post.data.teaser ?? post.data.description}</p>
+              </li>
+            ))
+          }
         </ul>
       </div>
     </section>
 
-    <section
-      class="closing"
-      data-section="closing"
-      data-intent="drive action"
-      data-layout="full-bleed"
-      data-module="cta-band"
-    >
-      <div class="wrap">
-        <h2>Start where it hurts.</h2>
-        <p>
-          A single passthrough upstream in front of your most-used server is one config file away.
-          Governance grows from there.
-        </p>
-        <a class="btn btn-primary" href="https://docs.fold.run/getting-started/">Get started</a>
-      </div>
-    </section>
+    <Closing />
   </main>
 </Base>
 
